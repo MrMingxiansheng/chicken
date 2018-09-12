@@ -1,68 +1,80 @@
 <template>
+ <view class="tool-item" catchtap='onCollectionTap' data-post-id="post.postId">
+   <img wx:if="post.collectionStatus" src="/static/images/my"/>
+   <img wx:else src="/static/images/my1"/>
+    <text>{{post.collectionNum}}</text>
+  </view>
 
-<div class="tab">
-    <div class="hd">
-        <span :class="{cur:lanmu=='mes'}" @click="change('mes')">消息</span>
-        <span :class="{cur:lanmu=='col'}" @click="change('col')">收藏</span>
-        <span :class="{cur:lanmu=='se'}" @click="change('se')">看过</span>
-        <span :class="{cur:lanmu=='sug'}" @click="change('sug')">反馈</span>
-    </div>
-    <div class="bd">
-        <div class="mes" v-if="lanmu=='mes'"><message></message></div>
-        <div class="col" v-if="lanmu=='col'"><collect></collect></div>
-        <div class="se" v-if="lanmu=='se'"><see></see></div>
-        <div class="sug" v-if="lanmu=='sug'"><suggest></suggest></div>
-    </div>
-</div>
 </template>
 
 <script>
- import line from "@/components/line"
-  import message from "@/components/message"
-  import collect from "@/components/collect"
-  import see from "@/components/see"
-  import suggest from "@/components/suggest"
-export default {
-  components: {
-      line,
-      message,
-      collect,
-      see,
-      suggest,
-    },
-  data () {
-    return {
-    lanmu:"mes"
-    }
-  },
-	methods:{
-		change:function(str){
-            this.lanmu = str;
-        }
 
-	}
+export default {
+    data() {
+        return {
+         
+        }
+    },
+ 
+    methods: {
+    //收藏文章
+collect()
+{
+  return this.updatePostData('collect');
+},
+//更新本地的点赞、评论信息、收藏、阅读量
+updatePostData(category){
+  var itemData = this.getPostItemById(),
+   postData = itemData.data,
+  allPostData = this.getAllPostData();
+  switch(category){
+      case 'collect':
+        //处理收藏
+        if(!postData.collectionStatus){
+          //如果当前状态是未收藏
+          postData.collectionNum++;
+          postData.collectionStatus = true;
+        }else{
+          //如果当前状态是已收藏
+          postData.collectionNum--;
+          postData.collectionStatus = false;
+        }
+        break;
+      default:break;
+  }
+  //更新缓存数据库  
+  allPostData[itemData.index] = postData;
+  this.execSetStorageSync(allPostData);
+  return postData;
+},
+nCollectionTap:function(event){
+        //dbpost对象已在onLoad函数中被保存到了this变量中，无需再次实例化
+        var newData = this.dbPost.collect();
+        //从新绑定数据，注意，不要将整个newData全部作为setData的参数，应当有选择的更新部分数据
+        this.setData(
+          {
+            'post.collectionSataus':newData.collectionStatus,
+            'post.collectionNum':newData.collectionNum
+          }
+        ) 
+        //交互反馈
+    wx.showToast({
+      title:newData.collectionStatus?"收藏成功":"收藏取消",
+      duration:1000,
+      icon:"sucess",
+      make:true
+     })
+},
+
+ }
+ 
+
 
 }
 
 </script>
 
 <style scoped>
- 
-        .tab .hd{overflow: auto;}
-        .tab .hd span{
-            float: left;
-            width: 90px;
-            justify-content: space-around;
-            height: 40px;
-            line-height: 40px;
-            background-color:#ccc;
-            text-align: center;
-        }
-        .tab .hd span.cur{
-            background-color: orange;
-        }
-        .tab .bd div{
-            padding:20px;
-        }
+
 
 </style>

@@ -37,9 +37,9 @@
 
 <style scoped>
   #result {
-    margin-left: 20px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-left: 40rpx;
+    margin-top: 20rpx;
+    margin-bottom: 20rpx;
   }
 
 </style>

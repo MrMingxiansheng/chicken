@@ -1,30 +1,39 @@
 <template>
   <div class="all">
     <div class="loupan">
+      <div class="build-left">{{build}}</div>
       <div class="topic-center">发布小话题</div>
-      <div class="build-right">{{build}}</div>
     </div>
     <line />
+    <div :style="{height:scrollHeight+'px'}" class="scroll">
     <input id="title" :value="words" type="text" placeholder="写个小话题（6个字内）" maxlength="6" />
     <p>热门小话题：</p>
     <div class="item">
-      <itema v-for="(site,index) in sites" :key="site" v-if="index<9" :name="site.name" @child="ss"></itema>
+      <itema v-for="(site,index) in sites" :key="site" v-if="index<9" :nameSet="site.name" @child="childSay"></itema>
     </div>
     <textarea cols="5" class="title1" placeholder="写点小话题描述（200字内）" maxlength="200"></textarea>
     <div class="box">
-      <span>添加图片</span>
-      <img src="/static/images/jiahao.png" class="imgs" />
+      <div v-for="(img,index) in images" :key="img" v-if="index<6" class="box-img">
+        <img :src="img" class="big">
+        <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
+      </div>
+      <div id="plus" v-if="images.length<6&&images.length>0">
+        <img  src="/static/images/jiahao.png" @click="upLoadImage" />
+      </div>
+      <div id="plus1" v-if="images.length===0">
+        <img  src="/static/images/jiahao.png" @click="upLoadImage" />
+      </div>
     </div>
-
+    </div>
     <div class="item1">
       <span>小提示：小话题,描述文字图片至少选一项,可以匿名发布</span>
       <line />
       <ul>
         <li>
-          <a href="#">匿名发</a>
+          <button class="AnonymousPublish" plain="true" @click="ClickAnonymous">匿名发</button>
         </li>
         <li>
-          <a href="#">发布</a>
+          <button class="publish" plain="true" @click="ClickPublish">发布</button>
         </li>
       </ul>
     </div>
@@ -39,8 +48,8 @@
       line
     },
     data() {
-
       return {
+        scrollHeight:"",
         build: "未来城",
         words: "",
         sites: [{
@@ -79,14 +88,67 @@
           {
             name: '价格'
           }
-        ]
+        ],
+        images:[],
       }
+    },
+    onReady (){
+      console.log("ScrollViewHeight")
+      this.ScrollViewHeight()
     },
     computed: {},
     methods: {
-      ss: function (title) {
+      childSay: function (title) {
         this.words = title
-      }
+      },
+      Clickpublish: async function(){
+          this.temp = {};
+          temp.topic = this.topic;
+          temp.owner = this.owner;
+          temp.userType = this.userType;
+          temp.user = this.user;
+          temp.content = this.content;
+          let res = await this.$post('',this.temp);
+          JSON.parse(temp);
+        },
+        ScrollViewHeight() {
+     let that = this
+     let windowHeight = wx.getSystemInfoSync().windowHeight;
+     let scrollHeight = windowHeight -100;
+     that.scrollHeight = scrollHeight;
+     //读取机型全屏高度，减去固定高度获得scroll高度
+    },
+        upLoadImage () {
+        let _this = this;
+        wx.chooseImage({
+          count:6,//最多可以选择的图片总数 
+          sizeType: ['original','compressed'],// 可以指定是原图还是压缩图，默认二者都有 
+          sourceType: ['album', 'camera'],// 可以指定来源是相册还是相机，默认二者都有 
+          success: function(res){
+            let paths=res.tempFilePaths
+            wx.showToast({  
+             title: '正在上传...',  
+             icon: 'loading',  
+             mask: true,  
+             duration: 1000  
+            })  
+            for(let i=0;i<paths.length;i++){
+              _this.images.push(paths[i])
+            }
+          },
+          fail: function (res) {  
+            wx.hideToast();  
+            wx.showModal({  
+              title: '错误提示',  
+              content: '上传图片失败',  
+              showCancel: false,   
+            })  
+          }  
+        })
+      },
+      removeImage(index){
+        this.images.splice(index,1)
+      },
     }
   }
 
@@ -97,42 +159,45 @@
     flex-direction: row;
     align-items: center;
     /*纵向居中*/
-    height: 40px;
+    height: 80rpx;
   }
 
   .topic-center {
-    position: absolute;
+    position: fixed;
     width: 100%;
     text-align: center;
     font-size:22px;
   }
 
-  .build-right {
-    position: absolute;
-    width: 100%;
-    text-align: right;
+  .build-left {
+    position: fixed;
+    text-align: left;
     color: #888888;
     font-size: 17px;
-    right: 10px;
+    left: 20rpx;
+  }
+
+  .scroll{
+    overflow: auto;
   }
 
   #title {
     border: 1px solid #d0d0d0;
     margin: auto;
-    margin-top: 20px;
-    height: 50px;
-    width: 350px;
-    padding-left:10px;
+    margin-top:40rpx;
+    height: 100rpx;
+    width:700rpx;
+    padding-left:20rpx;
   }
 
   p {
-    margin-top: 10px;
-    margin-left: 10px;
+    margin-top: 20rpx;
+    margin-left: 20rpx;
   }
 
   .item {
     list-style: none;
-    margin-left: 10px;
+    margin-left: 20rpx;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -141,31 +206,52 @@
   .title1 {
     border: 1px solid #d0d0d0;
     margin: auto;
-    margin-top: 20px;
-    height: 100px;
-    width: 350px;
-    padding-left:10px;
+    margin-top: 40rpx;
+    height: 200rpx;
+    width: 700rpx;
+    padding-left:20rpx;
   }
 
   .box {
-    display: flex;
-    flex-direction: column;
+    width: 660rpx;
     margin: 0 auto;
   }
-
-  .box span {
-    text-align: center;
-    padding-top: 10px;
-    font-size: 15px;
+  .box img {
+    vertical-align: middle;
   }
-
-  .imgs {
-    width: 40px;
-    height: 40px;
-    margin: 0 auto;
-    /*居中*/
+  .box div {
+    display: inline-block;
+    width: 200rpx;
+    height: 200rpx;
+    margin: 10rpx;
   }
-
+  .box .box-img {
+    position: relative;
+  }
+  .box .box-img .min{
+    width: 50rpx;
+    height: 50rpx;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+  .box .box-img .big {
+    width: 200rpx;
+    height: 200rpx;
+  }
+  
+  #plus,#plus1 {
+    padding: 50rpx;
+    box-sizing: border-box;
+  }
+  #plus img,#plus1 img{
+    width: 100rpx;
+    height: 100rpx;
+  }
+  #plus1 {
+    margin-left: 230rpx;
+  }
+  
   .item1 {
     width: 100%;
     position: fixed;
@@ -179,15 +265,39 @@
   }
 
   .item1 li {
-    width: 10px;
+    color: #c5a500;
+    width: 20rpx;
     text-align: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 20rpx;
     flex: auto;
   }
 
   .item1 span {
     font-size: 15px;
+  }
+
+  .publish{
+    width:120rpx;
+    height:70rpx;
+    color:#c5a500;
+    font-size:20px;
+    text-align:center;
+    padding:0px;
+    vertical-align:middle ;
+    line-height:50rpx;
+    border:none;
+  }
+
+  .AnonymousPublish{
+    width:120rpx;
+    height:70rpx;
+    color:#c5a500;
+    font-size:20px;
+    text-align:center;
+    padding:0px;
+    vertical-align:middle ;
+    line-height:50rpx;
+    border:none;
   }
 
 </style>

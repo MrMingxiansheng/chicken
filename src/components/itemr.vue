@@ -1,7 +1,7 @@
 <template>
   <div class="itemr">
     <ul>
-      <div v-for="(site,index) in sites" :key="site" v-if="index<6">
+      <div v-for="(site,index) in sites" :key="site" v-if="index<9">
         <a href="/pages/qwb/main">
           <li>{{ site.name }}</li>
         </a>
@@ -32,7 +32,18 @@
           {
             name: '距离'
           },
-
+          {
+            name: '价格'
+          },
+          {
+            name: '距离杭州杭州'
+          },
+          {
+            name: '价格杭州杭州'
+          },
+          {
+            name: '距离'
+          },
         ],
         computed: {},
         methods: {}
@@ -50,7 +61,7 @@
 
   li {
     float: left;
-    width: 120px;
+    width: 240rpx;
     color: #c5a500;
   }
 

@@ -48,8 +48,8 @@
 
 <style scoped>
   .timg {
-    width: 400px;
-    height: 100px;
+    width: 750rpx;
+    height: 200rpx;
   }
 
   .timg img {
@@ -64,12 +64,12 @@
 
   .topic p {
     font-size: 16px;
-    margin-left: 10px;
-    margin-top: 10px;
+    margin-left: 20rpx;
+    margin-top: 20rpx;
   }
 
   .hot-topic {
-    margin-left: 15px;
+    margin-left: 30rpx;
   }
 
   /* <a href="/pages/counter/main">

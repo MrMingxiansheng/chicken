@@ -51,7 +51,7 @@
 
   li {
     float: left;
-    width: 120px;
+    width: 240rpx;
     color: #c5a500;
   }
 

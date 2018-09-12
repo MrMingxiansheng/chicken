@@ -1,20 +1,20 @@
 <template>
   <div class="itema">
     <ul>
-      <li @click="onclick">{{ name }}</li>
+      <li @click="onclick">{{ nameSet }}</li>
     </ul>
   </div>
 </template>
 
 <script>
   export default {
-    props: ["name"],
+    props: ["nameSet"],
     data() {
       return {};
     },
     methods: {
       onclick: function () {
-        this.$emit("child", this.name)
+        this.$emit("child", this.nameSet)
       }
     }
   };
@@ -29,7 +29,7 @@
 
   li {
     float: left;
-    width: 120px;
+    width: 240rpx;
     color: #c5a500;
   }
 

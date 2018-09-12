@@ -2,7 +2,7 @@
   <div class="message">
     <div class="build">{{build}}</div>
     <div class="box1">
-      <a href="/pages/qwd/main">
+      <a href="/pages/qwd/main" hover-class="none">
         <div class="head"></div>
       </a>
       <div class="box2">
@@ -50,15 +50,15 @@
 <style scoped>
   .build {
     text-align: center;
-    margin-top: 10px;
+    margin-top: 20rpx;
   }
 
   .head {
     border: 1px solid #d0d0d0;
     margin-left: 20rpx;
     margin-top: 20rpx;
-    height: 40px;
-    width: 40px;
+    height: 80rpx;
+    width: 80rpx;
   }
 
   .box1 {
@@ -71,7 +71,7 @@
     display: flex;
     flex-direction: column;
     margin-left: 10rpx;
-    margin-top: 12rpx;
+    margin-top: 16rpx;
     font-size: 16px;
   }
 
@@ -91,7 +91,7 @@
     flex-direction: row;
     align-items: baseline;
     position: absolute;
-    right: 60px;
+    right: 120rpx;
     color:#888888;
   }
 
@@ -106,13 +106,13 @@
   .reply {
     color: #c5a500;
     position: absolute;
-    right: 10px;
+    right: 20rpx;
   }
 
   .words {
     font-size: 16px;
-    margin-top: 10rpx;
-    width: 300px;
+    margin-top: 20rpx;
+    width: 600rpx;
     white-space: normal;
     /*自动换行*/
   }

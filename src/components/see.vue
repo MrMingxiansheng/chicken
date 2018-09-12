@@ -34,13 +34,13 @@
 
   .see-build {
     text-align: center;
-    margin-top: 10px;
+    margin-top: 20rpx;
   }
 
   .item {
-    margin-top: 5px;
-    margin-bottom: 5px;
-    margin-left: 15px;
+    margin-top: 10rpx;
+    margin-bottom: 10rpx;
+    margin-left: 30rpx;
   }
 
 </style>

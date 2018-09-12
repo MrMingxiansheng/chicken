@@ -68,61 +68,62 @@
   }
 
   .LOGO {
-    margin-top: 40px;
+    margin-top: 80rpx;
     text-align: center;
   }
 
   span {
-    margin-top: 40px;
+    margin-top: 80rpx;
     text-align: center;
   }
 
   .buy {
     background-color: #ffe144;
     border: none;
-    width: 180px;
-    height: 50px;
+    width: 360rpx;
+    height: 100rpx;
     text-align: center;
-    padding: auto;
-    margin-top: 10px;
+    line-height:100rpx;
+    margin-top: 20rpx;
   }
 
   .sell {
     background-color: #ffe144;
     border: none;
-    width: 180px;
-    height: 50px;
+    width:360rpx;
+    height: 100rpx;
     text-align: center;
-    padding: auto;
-    margin-top: 40px;
+    line-height:100rpx;
+    margin-top: 80rpx;
   }
 
   .picker {
     font-size:18px;
     background-color: #DDDDDD;
     text-align: center;
-    height: 30px;
-    width: 180px;
+    line-height:60rpx;
+    height: 60rpx;
+    width: 360rpx;
     margin: auto;
-    margin-top: 10px;
+    margin-top: 20rpx;
   }
 
   .tips {
     color: #888888;
     margin: auto;
-    margin-top: 15px;
+    margin-top: 30rpx;
     font-size: 15px;
   }
 
   .test {
     text-align: center;
-    margin-top: 40px;
+    margin-top:80rpx;
   }
 
   .code {
     border: 1px solid #d0d0d0;
-    height: 100px;
-    width: 100px;
+    height: 200rpx;
+    width: 200rpx;
     margin: auto;
   }
 

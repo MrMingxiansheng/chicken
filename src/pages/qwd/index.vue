@@ -45,16 +45,16 @@
   .card {
     text-align: center;
     font-size: 20px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 20rpx;
+    padding-bottom: 20rpx;
   }
 
   .head {
     border: 1px solid #d0d0d0;
     margin-left: 10rpx;
     margin-top: 10rpx;
-    height: 50px;
-    width: 50px;
+    height: 100rpx;
+    width: 100rpx;
   }
 
   .box {
@@ -65,6 +65,7 @@
   .box1 {
     display: inline-flex;
     flex-direction: column;
+    margin-top:5rpx;
   }
 
   .box2 {
@@ -80,7 +81,7 @@
   .p3 {
     color:#888888;
     margin-left: 10rpx;
-    margin-top: 10px;
+    margin-top: 32rpx;
   }
 
 </style>

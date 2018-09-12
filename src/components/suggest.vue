@@ -22,13 +22,13 @@
 <style scoped>
   .suggest {
     text-align: center;
-    margin-top: 40px;
+    margin-top: 80rpx;
   }
 
   .code {
     border: 1px solid #d0d0d0;
-    height: 100px;
-    width: 100px;
+    height: 200rpx;
+    width: 200rpx;
     margin: auto;
   }
 

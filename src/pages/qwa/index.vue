@@ -97,7 +97,7 @@
     flex-direction: row;
     align-items: center;
     /*纵向居中*/
-    height: 40px;
+    height: 80rpx;
   }
 
   .topic-center {
@@ -113,26 +113,26 @@
     text-align: right;
     color: #888888;
     font-size: 17px;
-    right: 10px;
+    right: 20rpx;
   }
 
   #title {
     border: 1px solid #d0d0d0;
     margin: auto;
-    margin-top: 20px;
-    height: 50px;
-    width: 350px;
-    padding-left:10px;
+    margin-top:40rpx;
+    height: 100rpx;
+    width:700rpx;
+    padding-left:20rpx;
   }
 
   p {
-    margin-top: 10px;
-    margin-left: 10px;
+    margin-top: 20rpx;
+    margin-left: 20rpx;
   }
 
   .item {
     list-style: none;
-    margin-left: 10px;
+    margin-left: 20rpx;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -141,10 +141,10 @@
   .title1 {
     border: 1px solid #d0d0d0;
     margin: auto;
-    margin-top: 20px;
-    height: 100px;
-    width: 350px;
-    padding-left:10px;
+    margin-top: 40rpx;
+    height: 200rpx;
+    width: 700rpx;
+    padding-left:20rpx;
   }
 
   .box {
@@ -155,13 +155,13 @@
 
   .box span {
     text-align: center;
-    padding-top: 10px;
+    padding-top: 20rpx;
     font-size: 15px;
   }
 
   .imgs {
-    width: 40px;
-    height: 40px;
+    width: 80rpx;
+    height: 80rpx;
     margin: 0 auto;
     /*居中*/
   }
@@ -179,10 +179,11 @@
   }
 
   .item1 li {
-    width: 10px;
+    color: #c5a500;
+    width: 20rpx;
     text-align: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 20rpx;
+    margin-bottom: 20rpx;
     flex: auto;
   }
 

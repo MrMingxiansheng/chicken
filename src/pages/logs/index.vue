@@ -77,19 +77,20 @@
     border: 1px solid #d0d0d0;
     margin-left: 10rpx;
     margin-top: 10rpx;
-    height: 50px;
-    width: 50px;
+    height: 100rpx;
+    width: 100rpx;
   }
 
   .box {
     display: inline-flex;
     flex-direction: row;
-    margin-top:10px;
+    margin-top:20rpx;
   }
 
   .box1 {
     display: inline-flex;
     flex-direction: column;
+    margin-top:5rpx;
   }
 
   .box2 {
@@ -104,7 +105,7 @@
 
   .p3 {
     margin-left: 10rpx;
-    margin-top: 10px;
+    margin-top: 32rpx;
     color:#888888;
   }
 
@@ -112,7 +113,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    margin-top: 20px;
+    margin-top: 40rpx;
   }
 
 </style>

@@ -6,7 +6,7 @@
     </div>
     <line />
     <div class="box1" v-for="site in sites" :key="site">
-      <a href="/pages/qwd/main">
+      <a href="/pages/qwd/main" hover-class="none">
         <div class="head"></div>
       </a>
       <div class="box2">
@@ -31,22 +31,22 @@
     </div>
     <div class="item">
       <div class="send_arr">
-        <input class="enter" />
+        <input class="enter" maxlength="200"/>
         <div class="send" @click="ClickSend">发送</div>
       </div>
       <line />
       <ul>
         <li>
-          <span>图片</span>
+          <button plain="true" class="picture">图片</button>
         </li>
         <li>
-          <span>视频</span>
+          <button plain="true" class="video">视频</button>
         </li>
         <li>
-          <span class="collect" @click="ClickCollect">收藏</span>
+          <button plain="true" class="collect" @click="ClickCollect">收藏</button>
         </li>
         <li>
-          <span open-type="share" class="share" @click="ClickShare">分享</span>
+          <button open-type="share" class="share" plain="true" @click="ClickShare">分享</button>
         </li>
       </ul>
     </div>
@@ -73,12 +73,13 @@
         time:"昨天",
         words: "看不到十大客户读书森林防火双离合分那就回复您开户奥拉夫",
         num1: 0,
-        num2: 0
+        num2: 0,
+        
       };
     },
     created() {},
     onShareAppMessage: function (res) {
-      if (res.from === 'span') {
+      if (res.from === 'button') {
         // 来自页面内转发按钮
         console.log(res.target)
       }
@@ -96,6 +97,7 @@
       ClickStep() {
         this.num2 += 1;
       },
+      
     }
   };
 
@@ -107,7 +109,7 @@
     flex-direction: row;
     align-items: center;
     /*纵向居中*/
-    height: 40px;
+    height: 80rpx;
   }
 
   .topic-center {
@@ -123,28 +125,28 @@
     text-align: right;
     color: #888888;
     font-size: 17px;
-    right: 10px;
+    right: 20rpx;
   }
 
   .head {
     border: 1px solid #d0d0d0;
     margin-left: 20rpx;
     margin-top: 20rpx;
-    height: 40px;
-    width: 40px;
+    height: 80rpx;
+    width: 80rpx;
   }
 
   .box1 {
     display: flex;
     flex-direction: row;
-    margin-top:10px;
+    margin-top:20rpx;
   }
 
   .box2 {
     display: flex;
     flex-direction: column;
     margin-left: 10rpx;
-    margin-top: 12rpx;
+    margin-top: 16rpx;
     font-size: 16px;
   }
 
@@ -172,19 +174,19 @@
     flex-direction: row;
     align-items: baseline;
     position: absolute;
-    right: 60px;
+    right: 120rpx;
   }
 
   .reply {
     color: #c5a500;
     position: absolute;
-    right: 10px;
+    right: 20rpx;
   }
 
   .words {
     font-size: 16px;
-    margin-top: 10rpx;
-    width: 300px;
+    margin-top: 20rpx;
+    width: 600rpx;
     white-space: normal;
     /*自动换行*/
   }
@@ -218,30 +220,81 @@
   }
 
   .item li {
-    width: 10px;
+    width: 20rpx;
     text-align: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 20rpx;
+ 
     flex: auto;
   }
 
   .enter {
-    width: 300px;
+    width: 600rpx;
+    height:100rpx;
   }
 
   .send_arr {
     display: flex;
     flex-direction: row;
     border: 1px solid #d0d0d0;
-    width: 355px;
-    height: 30px;
-    margin-bottom: 10px;
-    margin-left: 10px;
+    width: 710rpx;
+    height: 100rpx;
+    margin-bottom: 20rpx;
+    margin-left: 20rpx;
   }
 
   .send{
+    color: #c5a500;
     position: relative;
-    top:2px;
+    top:24rpx;
+    left:20rpx;
+  }
+
+  .picture{
+    width:120rpx;
+    height:70rpx;
+    color:#c5a500;
+    font-size:20px;
+    text-align:center;
+    padding:0px;
+    vertical-align:middle ;
+    line-height:50rpx;
+    border:none;
+  }
+
+  .video{
+    width:120rpx;
+    height:70rpx;
+    color:#c5a500;
+    font-size:20px;
+    text-align:center;
+    padding:0px;
+    vertical-align:middle ;
+    line-height:50rpx;
+    border:none;
+  }
+
+  .collect{
+    width:120rpx;
+    height:70rpx;
+    color:#c5a500;
+    font-size:20px;
+    text-align:center;
+    padding:0px;
+    vertical-align:middle ;
+    line-height:50rpx;
+    border:none;
+  }
+
+  .share{
+    width:120rpx;
+    height:70rpx;
+    color:#c5a500;
+    font-size:20px;
+    text-align:center;
+    padding:0px;
+    vertical-align:middle ;
+    line-height:50rpx;
+    border:none;
   }
 
 </style>

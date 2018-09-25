@@ -19,10 +19,10 @@
       <line />
       <ul>
         <li>
-          <span open-type="share" class="share" @click="ClickShare">分享</span>
+          <button open-type="share" class="share" plain="true" @click="ClickShare">分享</button>
         </li>
         <li>
-          <a href="/pages/qwa/main">发表小话题</a>
+          <a class="publish" hover-class="none" href='/pages/qwa/main'>发表小话题</a>
         </li>
       </ul>
     </div>
@@ -61,7 +61,7 @@
     computed: {},
     // created生命周期，组件创建后执行
     methods: {
-      // 清空已完成的事情
+  
     }
   }
 
@@ -73,7 +73,7 @@
     flex-direction: row;
     align-items: center;
     /*纵向居中*/
-    height: 40px;
+    height: 80rpx;
   }
 
   .home-center {
@@ -89,15 +89,15 @@
     text-align: right;
     color: #888888;
     font-size: 15px;
-    right: 10px;
+    right: 20rpx;
   }
 
   .pop {
     color: #888888;
     font-size: 15px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 10px;
+    padding-top: 20rpx;
+    padding-bottom: 20rpx;
+    padding-left: 20rpx;
   }
 
   .box {
@@ -106,8 +106,8 @@
   }
 
   .item {
-    margin-left: 10px;
-    margin-bottom: 10px;
+    margin-left: 20rpx;
+    margin-bottom: 20rpx;
   }
 
   .item1 {
@@ -117,13 +117,13 @@
   }
 
   .item1 ul {
-    margin-top: 20px;
+    margin-top: 40rpx;
     margin-left: 1rpx;
   }
 
   .item1 li {
     font-size: 20px;
-    padding-top: 10px;
+    padding-top: 20rpx;
   }
 
   .item2 {
@@ -139,11 +139,28 @@
   }
 
   .item2 li {
-    width: 10px;
+    width: 20rpx;
     text-align: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 20rpx;
     flex: auto;
+  }
+
+  .share{
+    width:120rpx;
+    height:70rpx;
+    color:#c5a500;
+    font-size:20px;
+    text-align:center;
+    padding:0px;
+    vertical-align:middle ;
+    line-height:50rpx;
+    border:none;
+  }
+
+  .publish{
+    color:#c5a500;
+    font-size:20px;
+    text-align:center;
   }
 
 </style>

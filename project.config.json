@@ -7,9 +7,9 @@
 		"minified": true,
 		"newFeature": true
 	},
-	"miniprogramRoot": "dist/",
+	"miniprogramRoot": "./dist/",
 	"compileType": "miniprogram",
-	"appid": "wx7453531abbdf8485",
+	"appid": "touristappid",
 	"projectname": "love",
 	"condition": {
 		"search": {

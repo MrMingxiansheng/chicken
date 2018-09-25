@@ -29,8 +29,6 @@
 
 </script>
 
-
-
 <style scoped>
   .p {
     margin-left: 20rpx;

@@ -119,11 +119,6 @@
 
 </script>
 <style scoped>
-  .selectedPic {
-    width: 50rpx;
-    height: 50rpx;
-    display: inline-block;
-  }
   .loupan {
     display: flex;
     flex-direction: row;

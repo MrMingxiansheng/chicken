@@ -5,6 +5,7 @@
       <div class="build-right">{{build}}</div>
     </div>
     <line />
+    <scroll-view scroll-y="true" style="height: 900rpx">
     <input id="title" :value="words" type="text" placeholder="写个小话题（6个字内）" maxlength="6" />
     <p>热门小话题：</p>
     <div class="item">
@@ -19,14 +20,12 @@
       </div>
       <div id="plus" v-if="images.length<6&&images.length>0">
         <img  src="/static/images/jiahao.png" @click="upLoadImage" />
-        <i></i>
       </div>
       <div id="plus1" v-if="images.length===0">
         <img  src="/static/images/jiahao.png" @click="upLoadImage" />
-        <i></i>
       </div>
     </div>
-
+    </scroll-view>
     <div class="item1">
       <span>小提示：小话题,描述文字图片至少选一项,可以匿名发布</span>
       <line />
@@ -182,22 +181,24 @@
   }
 
   .box {
-    width: 640rpx;
+    width: 660rpx;
     margin: 0 auto;
+  }
+
+  .box img {
+    vertical-align: middle;
   }
 
   .box div {
     display: inline-block;
     width: 200rpx;
     height: 200rpx;
-    text-align: center;
     margin: 10rpx;
   }
   .box .box-img {
     position: relative;
   }
   .box .box-img .min{
-    display: inline-block;
     width: 50rpx;
     height: 50rpx;
     position: absolute;
@@ -210,27 +211,24 @@
     height: 200rpx;
   }
   
+  #plus,#plus1 {
+    padding: 50rpx;
+    box-sizing: border-box;
+  }
+
   #plus img,#plus1 img{
     width: 100rpx;
     height: 100rpx;
-    vertical-align: middle;
-  }
-
-  i {
-    display: inline-block;
-    width: 0;
-    height: 100%;
-    vertical-align: middle;
   }
 
   #plus1 {
-    margin: 0 auto;
+    margin-left: 230rpx;
   }
 
   .item1 {
     width: 100%;
-    /* position: fixed;
-    bottom: 0; */
+    position: fixed;
+    bottom: 0;
     /*置底*/
   }
 

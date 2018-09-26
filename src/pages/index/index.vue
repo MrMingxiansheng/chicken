@@ -1,14 +1,15 @@
 <template>
   <div id="app">
     <i-notice-bar icon="systemprompt" loop>
-      小鸡评房正在准备评测未来悦，请大家持续关注！小鸡评房正在准备评测未来悦，请大家持续关注！;
+      小鸡评房正在准备评测未来悦，请大家持续关注！小鸡评房正在准备评测未来悦，请大家持续关注！
     </i-notice-bar>
     <div>
       <page></page>
     </div>
-    <div class="timg">
+    <!-- <div class="timg">
       <img src="/static/images/timg.jpg" />
-    </div>
+    </div> -->
+    <topswiper :tops="tops"></topswiper> 
     <div class="topic">
       <p>热门话题</p>
       <div class="hot-topic">
@@ -29,16 +30,23 @@
   import hot from "@/components/hot"
   import page from "@/components/page"
   import itemx from "@/components/itemx"
+  import topswiper from "@/components/topSwiper"
   export default {
     components: {
       line,
       hot,
       page,
-      itemx
+      itemx,
+      topswiper
     }, //声明在当前组件下使用组件
     data() {
       return {
-        sites: [""]
+        sites: [""],
+        tops : [
+          {imgSrc:'/static/images/timg.jpg'},
+          {imgSrc:'/static/images/timg1.jpg'},
+          {imgSrc:'/static/images/timg2.jpg'}
+        ]
       }
     },
     methods: {}
@@ -47,7 +55,11 @@
 </script>
 
 <style scoped>
+<<<<<<< HEAD
   .timg {
+=======
+  /* .timg {
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
     width: 750rpx;
     height: 200rpx;
   }
@@ -55,11 +67,12 @@
   .timg img {
     width: 100%;
     height: 100%;
-  }
+  } */
 
   .topic {
     display: flex;
     flex-direction: column;
+    margin-top: 10rpx;
   }
 
   .topic p {

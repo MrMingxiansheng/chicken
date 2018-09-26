@@ -1,8 +1,6 @@
 {
-    "window":{ 
-    "navigationBarTitleText": "小鸡窝"
-    },
-    "usingComponents": {
+  "navigationBarTitleText": "小鸡窝",
+  "usingComponents": {
        
-    } 
+  } 
 }

@@ -4,8 +4,13 @@
     <div class="search">
       <div class="search_arr">
         <icon class="searchcion" size="20" type="search"></icon>
+<<<<<<< HEAD
         <input type="search" placeholder="输入楼盘名称或小话题搜索" />
         <a href="/pages/qwc/main" hover-class="none"><span class="seek">搜索</span></a>
+=======
+        <input placeholder="输入楼盘名称或小话题搜索" v-model="inputText">
+        <a href="/pages/qwc/main" hover-class="none" @click="clean"><span class="seek">搜索</span></a>
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
       </div>
     </div>
   </div>
@@ -17,10 +22,13 @@
     data() {
       return {
         city: "杭州",
+        inputText:''
       };
     },
     methods: {
-
+      clean () {
+        this.inputText=''
+      }
     }
   };
 

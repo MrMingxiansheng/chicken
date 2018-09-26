@@ -5,13 +5,18 @@
       <div class="topic-center">发布小话题</div>
     </div>
     <line />
+<<<<<<< HEAD
     <div :style="{height:scrollHeight+'px'}" class="scroll">
+=======
+    <scroll-view scroll-y="true" style="height: 900rpx">
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
     <input id="title" :value="words" type="text" placeholder="写个小话题（6个字内）" maxlength="6" />
     <p>热门小话题：</p>
     <div class="item">
       <itema v-for="(site,index) in sites" :key="site" v-if="index<9" :nameSet="site.name" @child="childSay"></itema>
     </div>
     <textarea cols="5" class="title1" placeholder="写点小话题描述（200字内）" maxlength="200"></textarea>
+    <p class="addPic">添加图片</p>
     <div class="box">
       <div v-for="(img,index) in images" :key="img" v-if="index<6" class="box-img">
         <img :src="img" class="big">
@@ -23,8 +28,13 @@
       <div id="plus1" v-if="images.length===0">
         <img  src="/static/images/jiahao.png" @click="upLoadImage" />
       </div>
+<<<<<<< HEAD
     </div>
     </div>
+=======
+    </div>
+    </scroll-view>
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
     <div class="item1">
       <span>小提示：小话题,描述文字图片至少选一项,可以匿名发布</span>
       <line />
@@ -49,7 +59,11 @@
     },
     data() {
       return {
+<<<<<<< HEAD
         scrollHeight:"",
+=======
+        images:[],
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
         build: "未来城",
         words: "",
         sites: [{
@@ -101,6 +115,7 @@
       childSay: function (title) {
         this.words = title
       },
+<<<<<<< HEAD
       Clickpublish: async function(){
           this.temp = {};
           temp.topic = this.topic;
@@ -144,11 +159,27 @@
               showCancel: false,   
             })  
           }  
+=======
+      upLoadImage () {
+        let _this = this
+        wx.chooseImage({
+          count:6,
+          success(res){
+            let paths=res.tempFilePaths
+            for(let i=0;i<paths.length;i++){
+              _this.images.push(paths[i])
+            }
+          }
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
         })
       },
       removeImage(index){
         this.images.splice(index,1)
+<<<<<<< HEAD
       },
+=======
+      }
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
     }
   }
 
@@ -174,11 +205,15 @@
     text-align: left;
     color: #888888;
     font-size: 17px;
+<<<<<<< HEAD
     left: 20rpx;
   }
 
   .scroll{
     overflow: auto;
+=======
+    right: 20rpx;
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
   }
 
   #title {
@@ -210,20 +245,70 @@
     height: 200rpx;
     width: 700rpx;
     padding-left:20rpx;
+<<<<<<< HEAD
+=======
+  }
+
+  .addPic {
+    text-align: center;
+    padding-top: 20rpx;
+    font-size: 15px;
+    overflow: hidden;
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
   }
 
   .box {
     width: 660rpx;
     margin: 0 auto;
   }
+<<<<<<< HEAD
   .box img {
     vertical-align: middle;
   }
+=======
+
+  .box img {
+    vertical-align: middle;
+  }
+
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
   .box div {
     display: inline-block;
     width: 200rpx;
     height: 200rpx;
     margin: 10rpx;
+<<<<<<< HEAD
+=======
+  }
+  .box .box-img {
+    position: relative;
+  }
+  .box .box-img .min{
+    width: 50rpx;
+    height: 50rpx;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .box .box-img .big {
+    width: 200rpx;
+    height: 200rpx;
+  }
+  
+  #plus,#plus1 {
+    padding: 50rpx;
+    box-sizing: border-box;
+  }
+
+  #plus img,#plus1 img{
+    width: 100rpx;
+    height: 100rpx;
+  }
+
+  #plus1 {
+    margin-left: 230rpx;
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
   }
   .box .box-img {
     position: relative;
@@ -269,6 +354,10 @@
     width: 20rpx;
     text-align: center;
     margin-top: 20rpx;
+<<<<<<< HEAD
+=======
+    margin-bottom: 20rpx;
+>>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
     flex: auto;
   }
 

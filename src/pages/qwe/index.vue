@@ -1,28 +1,15 @@
 <template>
   <div>
-    <view class="section">
-  <view class="section__title">vertical scroll</view>
-  <scroll-view scroll-y style="height: 200px;" bindscrolltoupper="upper" bindscrolltolower="lower" bindscroll="scroll" scroll-into-view="toView" scroll-top="scrollTop">
-    <view id="green" class="scroll-view-item bc_green"></view>
-    <view id="red"  class="scroll-view-item bc_red"></view>
-    <view id="yellow" class="scroll-view-item bc_yellow"></view>
-    <view id="blue" class="scroll-view-item bc_blue"></view>
-  </scroll-view>
+      <div class='page' bindtap="suo">
+    <div class="search">
+      <div class="search_arr">
+        <icon class="searchcion" size='20' type='search'></icon>
+        <input class="" disabled placeholder="请输入关键字"/>
+      </div>
+    </div>
+    <div class='sousuo'>搜索</div>
+  </div>
 
-  <view class="btn-area">
-    <button size="mini" bindtap="tap">click me to scroll into view </button>
-    <button size="mini" bindtap="tapMove">click me to scroll</button>
-  </view>
-</view>
-<view class="section section_gap">
-  <view class="section__title">horizontal scroll</view>
-  <scroll-view class="scroll-view_H" scroll-x style="width: 100%">
-    <view id="green" class="scroll-view-item_H bc_green"></view>
-    <view id="red"  class="scroll-view-item_H bc_red"></view>
-    <view id="yellow" class="scroll-view-item_H bc_yellow"></view>
-    <view id="blue" class="scroll-view-item_H bc_blue"></view>
-  </scroll-view>
-</view>
   </div>
 </template>
 
@@ -35,41 +22,76 @@
 
     data() {
       return {
-toView: 'red',
-    scrollTop: 100
+    lists: [],              // 接收搜索的内容
+    wxSearchData: '',       // 输入的值
       }
     },
     methods: {
-    },
-    upper: function(e) {
-    console.log(e)
+         suo: function (e) {
+    wx.navigateTo({
+      url: '../search/search',
+    })
   },
-  lower: function(e) {
-    console.log(e)
+  /**
+   * 监听软键盘确认键
+   */
+  wxSearchConfirm: function (e) {
+
   },
-  scroll: function(e) {
-    console.log(e)
-  },
-  tap: function(e) {
-    for (var i = 0; i < order.length; ++i) {
-      if (order[i] === this.data.toView) {
-        this.setData({
-          toView: order[i + 1]
-        })
-        break
-      }
-    }
-  },
-  tapMove: function(e) {
-    this.setData({
-      scrollTop: this.data.scrollTop + 10
+
+  /**
+   * 返回
+   */
+  back: function (e) {
+    wx.navigateBack({
+      delta: 1,
     })
   }
-    
+    },  
 }
 </script>
 
 <style scoped>
+ .search{
+  width: 80%;
+}
+.search_arr {
+  border: 1px solid #d0d0d0;
+  border-radius: 10rpx;
+  margin-left: 20rpx;
+}
+.search_arr input{
+  margin-left: 60rpx;
+  height: 60rpx;
+  border-radius: 5px;
+}
+.bc_text {
+  line-height: 68rpx;
+  height: 68rpx;
+  margin-top: 34rpx;
+}
  
+.sousuo {
+  margin-left: 15rpx;
+  width: 15%;
+  line-height: 150%;
+  text-align: center;
+  border: 1px solid #d0d0d0;
+  border-radius: 10rpx;
+}
+.page{
+  display: flex;
+  flex-direction: row
+}
+.searchcion {
+  margin: 10rpx 10rpx 10rpx 10rpx;
+  position: absolute;
+  left:25rpx;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+}
+
 
 </style>

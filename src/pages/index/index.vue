@@ -10,14 +10,6 @@
       <img src="/static/images/timg.jpg" />
     </div> -->
     <topswiper :tops="tops"></topswiper> 
-    <div class="topic">
-      <p>热门话题</p>
-      <div class="hot-topic">
-        <itemx></itemx>
-      </div>
-      <p>热门楼盘</p>
-    </div>
-    <line />
     <div class="Hot">
       <hot v-for="site in sites" :key="site"></hot>
     </div>
@@ -29,14 +21,12 @@
   import line from "@/components/line"
   import hot from "@/components/hot"
   import page from "@/components/page"
-  import itemx from "@/components/itemx"
   import topswiper from "@/components/topSwiper"
   export default {
     components: {
       line,
       hot,
       page,
-      itemx,
       topswiper
     }, //声明在当前组件下使用组件
     data() {
@@ -55,11 +45,7 @@
 </script>
 
 <style scoped>
-<<<<<<< HEAD
   .timg {
-=======
-  /* .timg {
->>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
     width: 750rpx;
     height: 200rpx;
   }

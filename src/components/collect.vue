@@ -2,7 +2,7 @@
   <div class="collect">
     <span class="collect-build">{{CollectBuild}}</span>
     <div class="item">
-      <itemr></itemr>
+      <itemx></itemx>
     </div>
     <line />
   </div>
@@ -10,11 +10,11 @@
 
 <script>
   import line from "@/components/line"
-  import itemr from "@/components/itemr"
+  import itemx from "@/components/itemx"
   export default {
     components: {
       line,
-      itemr
+      itemx
     },
 
     data() {

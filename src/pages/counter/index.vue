@@ -9,7 +9,7 @@
     <div class="pop">热门话题</div>
     <div class="box">
       <div class="item1">
-        <itemr></itemr>
+        <itemx></itemx>
       </div>
       <line />
       <div>
@@ -33,12 +33,12 @@
 
 <script>
   import line from "@/components/line"
-  import itemr from "@/components/itemr"
+  import itemx from "@/components/itemx"
   import topic from "@/components/topic"
   export default {
     components: {
       line,
-      itemr,
+      itemx,
       topic
     }, // 数据
     data() {
@@ -127,7 +127,6 @@
     computed: {},
     // created生命周期，组件创建后执行
     methods: {
-<<<<<<< HEAD
       ScrollViewHeight() {
      let that = this
      let windowHeight = wx.getSystemInfoSync().windowHeight;
@@ -135,9 +134,6 @@
      that.scrollHeight = scrollHeight;
      //读取机型全屏高度，减去固定高度获得scroll高度
     },
-=======
-  
->>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
     }
   }
 
@@ -181,31 +177,9 @@
     flex-direction: column;
   }
 
-<<<<<<< HEAD
   .item1 {
     margin-left: 20rpx;
     margin-bottom: 20rpx;
-=======
-  .item {
-    margin-left: 20rpx;
-    margin-bottom: 20rpx;
-  }
-
-  .item1 {
-    margin: 0px;
-    padding: 0px;
-    list-style: none;
-  }
-
-  .item1 ul {
-    margin-top: 40rpx;
-    margin-left: 1rpx;
-  }
-
-  .item1 li {
-    font-size: 20px;
-    padding-top: 20rpx;
->>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
   }
 
   .item2 {

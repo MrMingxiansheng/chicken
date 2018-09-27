@@ -1,10 +1,6 @@
 <template>
   <div class="aite">
-<<<<<<< HEAD
    <div class="box1">
-=======
-    <div class="box1">
->>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
       <a href="/pages/qwd/main" hover-class="none">
         <div class="head"></div>
       </a>

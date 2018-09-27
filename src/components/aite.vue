@@ -43,10 +43,8 @@
         this.num2 += 1;
       },
       ClickReply:function () {
-        this.$emit("child", "")
-        this.setData({
-           focus: true
-        })
+        this.$emit("child", "s")
+        this.focusState()
     },
       
     }

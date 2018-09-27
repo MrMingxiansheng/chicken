@@ -39,16 +39,14 @@
       return {
         num: 0,
         sites: [{}],
-        money:""
+        money:"n"
       };
     },
     methods: {
        ClickSend: function() {
          const url = '/pages/qwb/main?money='+this.money
          wx.navigateTo({ url })  
-         this.setData({
-            focus: false
-         })
+         this.focusState = true
      },
     }
   };

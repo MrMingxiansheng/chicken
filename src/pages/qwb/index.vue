@@ -11,11 +11,11 @@
     </scroll-view>
     <div class="item">
       <div v-for="(img,index) in images" :key="img" v-if="index<6" class="box-img">
-        <img :src="img" class="big">
+        <img :src="img" class="big" @click="preview">
         <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
       </div>
       <div class="send_arr">
-        <input id="enter" :value="words" focus="true" maxlength="200"/>
+        <input id="enter" :value="words" @blur="focusState = false" :focus="focusState" maxlength="200"/>
         <div class="send" @click="ClickSend">发送</div>
       </div>
       <line />
@@ -90,6 +90,7 @@
           },
         ],
         images:[],
+        focusState:false,
       };
     },
     onShareAppMessage: function (res) {
@@ -171,7 +172,14 @@
               content: '上传图片失败',  
               showCancel: false,   
             })  
-          }  
+          }     
+        })
+      },
+      preview: function(){
+       //图片预览
+        wx.previewImage({
+            current: '', // 当前显示图片的http链接
+            urls: this.images // 需要预览的图片http链接列表
         })
       },
       removeImage(index){

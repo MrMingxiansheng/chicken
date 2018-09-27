@@ -14,7 +14,7 @@
     <textarea cols="5" class="title1" placeholder="写点小话题描述（200字内）" maxlength="200"></textarea>
     <div class="box">
       <div v-for="(img,index) in images" :key="img" v-if="index<6" class="box-img">
-        <img :src="img" class="big">
+        <img :src="img" class="big" @click="preview">
         <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
       </div>
       <div id="plus" v-if="images.length<6&&images.length>0">
@@ -152,6 +152,13 @@
               showCancel: false,   
             })  
           }  
+        })
+      },
+      preview: function(){
+       //图片预览
+        wx.previewImage({
+            current: '', // 当前显示图片的http链接
+            urls: this.images // 需要预览的图片http链接列表
         })
       },
       removeImage(index){

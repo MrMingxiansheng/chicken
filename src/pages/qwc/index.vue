@@ -3,7 +3,7 @@
     <div class="page-search">
       <div class="search_arr">
         <icon class="searchcion" size="20" type="search"></icon>
-        <input type="search" placeholder="输入楼盘名称或小话题搜索" focus="focus"/>
+        <input type="search" placeholder="输入楼盘名称或小话题搜索" :value="searchValue" focus="true"/>
       </div>
       <div class="sousuo" @click="suo">搜索</div> 
     </div>
@@ -25,12 +25,45 @@
       },
     data() {
       return {
-        sites: [""],
-        focus:false,
+        sites: [{}],
+        searchValue:"",
       };
     },
 
     methods: {
+     /* suo: function () {
+       var that = this;
+       if (that.searchValue.length > 0) {
+        wx.request({
+        url: '',
+        data: {
+         
+        },
+        header: { 'content-type': 'application/x-www-form-urlencoded' },
+        method: 'POST',
+        dataType: json,
+        responseType: text,
+        success: function (res) {
+          if (res.code) {
+            var data = that.sites;
+            for (let i = 0; i < res.length; i++) {
+                data.push(res[i]);
+            }
+            
+             that.sites= data
+            
+          }
+        },
+        fail: function (res) { 
+          wx.showToast({
+          title: '网络异常！',
+          duration: 2000
+        });
+        },
+        complete: function (res) { },
+      })
+    }
+    }*/
 
     }
   };

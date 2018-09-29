@@ -1,13 +1,17 @@
 <template>
   <div>
+    <button v-if="canIUse" open-type="getUserInfo" @click="GotUser" :bindgetuserinfo="onGotUserInfo">授权登录</button>
+    <div v-else>请升级微信版本</div>
     <div class="box">
-      <div class="head"></div>
+      <div class="head">
+        <img :src="userInfo.avatarUrl" class="avatarUrl" />
+      </div>
       <div class="box1">
         <div class="box2">
-          <span class="p1">{{name}}</span>
-          <span class="p2" decode="emsp">&emsp; {{identity}} &emsp;&emsp; {{build}}</span>
+          <div class="p1">{{userInfo.nickName}}{{identity}}</div>
+          <div class="p2">{{build}}</div>
         </div>
-        <span class="p3" decode="emsp">{{praise}}赞 &emsp; {{step}}踩</span>
+        <div class="p3" decode="emsp">{{praise}}赞 &emsp; {{step}}踩</div>
       </div>
     </div>
     <div>
@@ -55,19 +59,43 @@
 
     data() {
       return {
-        name: "姓名",
+        canIUse: wx.canIUse('button.open-type.getUserInfo'), //判断小程序的API，回调，参数，组件等是否在当前版本可用
+        user: "姓名",
         identity: "(销售)",
         build: "未来悦",
         praise: "25",
         step: "3",
-        lanmu: "mes"
+        lanmu: "mes",
+        userInfo: {
+          avatarUrl: '',
+          nickName: ''
+        },
+
       }
-    }, // 计算属性
-    computed: {}, // created生命周期，组件创建后执行s
+    },
     methods: {
       change: function (str) {
         this.lanmu = str;
-      }
+      },
+      GotUser: function () {
+        this.onGotUserInfo()
+      },
+      onGotUserInfo: function (e) {
+        let that = this
+        wx.getSetting({
+          success: function (res) {
+            if (res.authSetting['scope.userInfo']) {
+              // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+              wx.getUserInfo({
+                success: function (res) {
+                  console.log(res.userInfo)
+                  that.userInfo = res.userInfo
+                }
+              })
+            }
+          }
+        })
+      },
     }
   }
 
@@ -81,16 +109,21 @@
     width: 100rpx;
   }
 
+  .avatarUrl {
+    height: 100rpx;
+    width: 100rpx;
+  }
+
   .box {
     display: inline-flex;
     flex-direction: row;
-    margin-top:20rpx;
+    margin-top: 20rpx;
   }
 
   .box1 {
     display: inline-flex;
     flex-direction: column;
-    margin-top:5rpx;
+    margin-top: 5rpx;
   }
 
   .box2 {
@@ -106,7 +139,7 @@
   .p3 {
     margin-left: 10rpx;
     margin-top: 32rpx;
-    color:#888888;
+    color: #888888;
   }
 
   .hd {

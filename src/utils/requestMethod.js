@@ -1,6 +1,6 @@
 
-let serverPath = ''
-export function post(url,data) {
+let serverPath = '47.96.113.195/'
+export function get(url,data) {
   wx.showLoading({
         title: '加载中',
         })
@@ -8,7 +8,7 @@ export function post(url,data) {
         wx.request({
               url: serverPath + url   , // 拼接完整的url
               data: data,
-              method:'POST',
+              method:'GET',
               header: {
                   'content-type': 'application/json'
               },

@@ -4,7 +4,7 @@
     <div class="search" @click="suo">
       <div class="search_arr">
         <icon class="searchcion" size="20" type="search"></icon>
-        <input type="text" placeholder="输入楼盘名称或小话题搜索" disabled="true"/>
+        <input type="text" placeholder="输入楼盘名称或小话题搜索" disabled="true" />
       </div>
     </div>
   </div>
@@ -18,13 +18,13 @@
       };
     },
     methods: {
-       suo: function () {
-         wx.navigateTo({
-           url: '/pages/qwc/main',
-       })
+      suo: function () {
+        wx.navigateTo({
+          url: '/pages/qwc/main',
+        })
+      }
     }
   }
-}
 
 </script>
 
@@ -40,7 +40,7 @@
     margin-left: 20rpx;
     font-size: 18px;
     position: relative;
-    top:8rpx;
+    top: 8rpx;
   }
 
   .search_arr {

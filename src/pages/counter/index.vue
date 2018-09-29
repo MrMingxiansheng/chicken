@@ -6,16 +6,16 @@
     </div>
     <line />
     <scroll-view scroll-y="true" :style="{height:scrollHeight+'px'}" class="item">
-    <div class="pop">热门话题</div>
-    <div class="box">
-      <div class="item1">
-        <itemx></itemx>
+      <div class="pop">热门话题</div>
+      <div class="box">
+        <div class="item1">
+          <itemx></itemx>
+        </div>
+        <line />
+        <div>
+          <topic v-for="site in dataList" :item="site" :key="site"></topic>
+        </div>
       </div>
-      <line />
-      <div>
-        <topic v-for="site in dataList" :item="site" :key="site"></topic>
-      </div>
-    </div>
     </scroll-view>
     <div class="item2">
       <line />
@@ -43,69 +43,67 @@
     }, // 数据
     data() {
       return {
-        scrollHeight:"",
+        scrollHeight: "",
         num: "2200",
         build: "未来城瓦课程",
         sites: [{}],
-        dataList:
-        [
-          {
-             topic: "高铁",
-             owner: "程咬金",
-             userType:"(销售)",
-             user: "程咬金",
-             content: "程咬金说这个地方很糟糕veryveryveryverylow",
+        dataList: [{
+            topic: "高铁",
+            owner: "程咬金",
+            userType: "(销售)",
+            user: "程咬金",
+            content: "程咬金说这个地方很糟糕veryveryveryverylow",
           },
           {
-             topic: "高铁",
-             owner: "程咬金",
-             userType:"(销售)",
-             user: "程咬金",
-             content: "程咬金说这个地方很糟糕veryveryveryverylow",
+            topic: "高铁",
+            owner: "程咬金",
+            userType: "(销售)",
+            user: "程咬金",
+            content: "程咬金说这个地方很糟糕veryveryveryverylow",
           },
           {
-             topic: "高铁",
-             owner: "程咬金",
-             userType:"(销售)",
-             user: "程咬金",
-             content: "程咬金说这个地方很糟糕veryveryveryverylow",
+            topic: "高铁",
+            owner: "程咬金",
+            userType: "(销售)",
+            user: "程咬金",
+            content: "程咬金说这个地方很糟糕veryveryveryverylow",
           },
           {
-             topic: "高铁",
-             owner: "程咬金",
-             userType:"(销售)",
-             user: "程咬金",
-             content: "程咬金说这个地方很糟糕veryveryveryverylow",
+            topic: "高铁",
+            owner: "程咬金",
+            userType: "(销售)",
+            user: "程咬金",
+            content: "程咬金说这个地方很糟糕veryveryveryverylow",
           },
           {
-             topic: "高铁",
-             owner: "程咬金",
-             userType:"(销售)",
-             user: "程咬金",
-             content: "程咬金说这个地方很糟糕veryveryveryverylow",
+            topic: "高铁",
+            owner: "程咬金",
+            userType: "(销售)",
+            user: "程咬金",
+            content: "程咬金说这个地方很糟糕veryveryveryverylow",
           },
           {
-             topic: "高铁",
-             owner: "程咬金",
-             userType:"(销售)",
-             user: "程咬金",
-             content: "程咬金说这个地方很糟糕veryveryveryverylow",
+            topic: "高铁",
+            owner: "程咬金",
+            userType: "(销售)",
+            user: "程咬金",
+            content: "程咬金说这个地方很糟糕veryveryveryverylow",
           },
           {
-             topic: "高铁",
-             owner: "程咬金",
-             userType:"(销售)",
-             user: "程咬金",
-             content: "程咬金说这个地方很糟糕veryveryveryverylow",
+            topic: "高铁",
+            owner: "程咬金",
+            userType: "(销售)",
+            user: "程咬金",
+            content: "程咬金说这个地方很糟糕veryveryveryverylow",
           },
           {
-             topic: "高铁",
-             owner: "程咬金",
-             userType:"(销售)",
-             user: "程咬金",
-             content: "程咬金说这个地方很糟糕veryveryveryverylow",
+            topic: "高铁",
+            owner: "程咬金",
+            userType: "(销售)",
+            user: "程咬金",
+            content: "程咬金说这个地方很糟糕veryveryveryverylow",
           },
-        ], 
+        ],
       }
     },
     onShareAppMessage: function (res) {
@@ -119,7 +117,7 @@
         imageUrl: ''
       }
     },
-    onReady (){
+    onReady() {
       console.log("ScrollViewHeight")
       this.ScrollViewHeight()
     },
@@ -128,12 +126,12 @@
     // created生命周期，组件创建后执行
     methods: {
       ScrollViewHeight() {
-     let that = this
-     let windowHeight = wx.getSystemInfoSync().windowHeight;
-     let scrollHeight = windowHeight -85;
-     that.scrollHeight = scrollHeight;
-     //读取机型全屏高度，减去固定高度获得scroll高度
-    },
+        let that = this
+        let windowHeight = wx.getSystemInfoSync().windowHeight;
+        let scrollHeight = windowHeight - 85;
+        that.scrollHeight = scrollHeight;
+        //读取机型全屏高度，减去固定高度获得scroll高度
+      },
     }
   }
 
@@ -152,7 +150,7 @@
     position: fixed;
     width: 100%;
     text-align: center;
-    font-size:22px;
+    font-size: 22px;
   }
 
   .browse-right {
@@ -201,22 +199,22 @@
     flex: auto;
   }
 
-  .share{
-    width:120rpx;
-    height:70rpx;
-    color:#c5a500;
-    font-size:20px;
-    text-align:center;
-    padding:0px;
-    vertical-align:middle ;
-    line-height:50rpx;
-    border:none;
+  .share {
+    width: 120rpx;
+    height: 70rpx;
+    color: #c5a500;
+    font-size: 20px;
+    text-align: center;
+    padding: 0px;
+    vertical-align: middle;
+    line-height: 50rpx;
+    border: none;
   }
 
-  .publish{
-    color:#c5a500;
-    font-size:20px;
-    text-align:center;
+  .publish {
+    color: #c5a500;
+    font-size: 20px;
+    text-align: center;
   }
 
 </style>

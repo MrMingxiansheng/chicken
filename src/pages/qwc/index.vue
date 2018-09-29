@@ -3,9 +3,9 @@
     <div class="page-search">
       <div class="search_arr">
         <icon class="searchcion" size="20" type="search"></icon>
-        <input type="search" placeholder="输入楼盘名称或小话题搜索" :value="searchValue" focus="true"/>
+        <input type="search" placeholder="输入楼盘名称或小话题搜索" :value="searchValue" focus="true" />
       </div>
-      <div class="sousuo" @click="suo">搜索</div> 
+      <div class="sousuo" @click="suo">搜索</div>
     </div>
     <div id="result">搜索结果</div>
     <line />
@@ -22,16 +22,16 @@
     components: {
       line,
       hot,
-      },
+    },
     data() {
       return {
         sites: [{}],
-        searchValue:"",
+        searchValue: "",
       };
     },
 
     methods: {
-     /* suo: function () {
+      /* suo: function () {
        var that = this;
        if (that.searchValue.length > 0) {
         wx.request({
@@ -108,17 +108,17 @@
     /*input框内*/
   }
 
-  
-.sousuo {
-  font-size:17px;
-  margin-left: 15rpx;
-  width: 100rpx;
-  height:60rpx;
-  line-height: 150%;
-  text-align: center;
-  border: 1px solid #d0d0d0;
-  border-radius: 10rpx;
-}
+
+  .sousuo {
+    font-size: 17px;
+    margin-left: 15rpx;
+    width: 100rpx;
+    height: 60rpx;
+    line-height: 150%;
+    text-align: center;
+    border: 1px solid #d0d0d0;
+    border-radius: 10rpx;
+  }
 
   #result {
     margin-left: 40rpx;

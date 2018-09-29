@@ -9,7 +9,7 @@
     <!-- <div class="timg">
       <img src="/static/images/timg.jpg" />
     </div> -->
-    <topswiper :tops="tops"></topswiper> 
+    <topswiper :tops="tops"></topswiper>
     <div class="Hot">
       <hot v-for="site in sites" :key="site"></hot>
     </div>
@@ -32,12 +32,40 @@
     data() {
       return {
         sites: [""],
-        tops : [
-          {imgSrc:'/static/images/timg.jpg'},
-          {imgSrc:'/static/images/timg1.jpg'},
-          {imgSrc:'/static/images/timg2.jpg'}
+        tops: [{
+            imgSrc: '/static/images/timg.jpg'
+          },
+          {
+            imgSrc: '/static/images/timg1.jpg'
+          },
+          {
+            imgSrc: '/static/images/timg2.jpg'
+          }
         ]
       }
+    },
+    onLoad() {
+      wx.login({
+        success: function (res) {
+          let code = res.code;
+          if (code) {
+            console.log('获取用户登录凭证：' + code);
+            // --------- 发送凭证 ------------------
+            wx.request({
+              url: 'http://www.xaoji.com/api/getUser',
+              data: {
+                code: code
+              },
+              success() {
+                console.log('发送code成功')
+              }
+            })
+            // ------------------------------------
+          } else {
+            console.log('获取用户登录态失败：' + res.errMsg);
+          }
+        }
+      });
     },
     methods: {}
   }
@@ -45,7 +73,7 @@
 </script>
 
 <style scoped>
-  .timg {
+  /*.timg {
     width: 750rpx;
     height: 200rpx;
   }
@@ -54,27 +82,5 @@
     width: 100%;
     height: 100%;
   } */
-
-  .topic {
-    display: flex;
-    flex-direction: column;
-    margin-top: 10rpx;
-  }
-
-  .topic p {
-    font-size: 16px;
-    margin-left: 20rpx;
-    margin-top: 20rpx;
-  }
-
-  .hot-topic {
-    margin-left: 30rpx;
-  }
-
-  /* <a href="/pages/counter/main">
-          <li>{{ site.name }}</li>
-          </a>     
-   重要 ，将for循环列表元素分别链接       
-*/
 
 </style>

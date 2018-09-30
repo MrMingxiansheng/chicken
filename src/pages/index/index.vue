@@ -11,7 +11,7 @@
     </div> -->
     <topswiper :tops="tops"></topswiper>
     <div class="Hot">
-      <hot v-for="site in sites" :key="site"></hot>
+      <hot :item="site" v-for="site in sites" :key="site"></hot>
     </div>
   </div>
 </template>
@@ -31,7 +31,7 @@
     }, //声明在当前组件下使用组件
     data() {
       return {
-        sites: [""],
+        sites: [],
         tops: [{
             imgSrc: '/static/images/timg.jpg'
           },
@@ -45,6 +45,7 @@
       }
     },
     onLoad() {
+      let that = this
       wx.login({
         success: function (res) {
           let code = res.code;
@@ -56,8 +57,28 @@
               data: {
                 code: code
               },
-              success() {
-                console.log('发送code成功')
+              success(res) {
+                console.log('发送code成功',res.data)
+                let msg = res.data.msg
+          
+                if (msg=='have data'){
+                wx.setStorage({
+                  key: 'key',
+                  data: res.data.data[0],
+                  success: function(res) {
+                  console.log(res)
+                }
+               })
+                }else {
+                  console.log('open_id_test:',JSON.parse(res.data.data).openid)
+                  wx.setStorage({
+                   key: 'open_id',
+                   data: JSON.parse(res.data.data).openid,
+                   success: function(res) {
+                   console.log(res)
+                }
+               })
+                }
               }
             })
             // ------------------------------------
@@ -66,6 +87,13 @@
           }
         }
       });
+      that.$get('api/queryRealEstateList').then(function(res) {
+       console.log('返回数据:',res)
+       that.sites = res.data
+      }, function(res) {
+       // failure
+      });
+      console.log("请求")
     },
     methods: {}
   }

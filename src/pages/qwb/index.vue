@@ -121,9 +121,10 @@
       },*/
     methods: {
       ClickSend: function () {
+        let that = this
         let temp = {}
         temp.interact_content = this.words
-        let param = {
+        let param = { 
           'db': 'WpInteractModel',
           'model': 'edit',
           'item': JSON.stringify(temp),
@@ -132,7 +133,7 @@
         if (this.words.length == 0) { //交互提示  
           return;
         }
-        let res = this.$get('api/update', param)
+        that.$get('api/update', param)
         console.log("发送")
       },
       ClickCollect: function () {

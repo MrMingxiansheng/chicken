@@ -101,26 +101,41 @@
       childSay: function (title) {
         this.words = title
       },
-      ClickPublish: function () { //上传数据
+      ClickPublish: async function () { //上传数据
+      let that = this
+      let isLogin = await this.$isLogin()
+      console.log('888888',isLogin)
+      if (!isLogin) {
+        //handle error
+        return
+      }
         let temp = {}
-        temp.tag_name = this.words
-        let param = {
-          'db': 'WpTagModel',
-          'model': 'edit',
-          'item': JSON.stringify(temp),
-          'items': JSON.stringify(temp)
-        }
-        if (this.words.length == 0) { //交互提示
-          wx.showToast({
-            title: '小话题不能为空！',
-            icon: 'loading',
-            mask: true,
-            duration: 1000
-          })
-          return;
-        }
-        let res = this.$get('api/update', param)
-        console.log("发布")
+        temp.tag_name = that.words
+        wx.getStorage({
+          key: 'real_estate_id',
+          success: function (res) {
+            console.log(res)
+            temp.real_estate_id = res.data
+            temp.user_id = isLogin
+            let param = {
+              'db': 'WpTagModel',
+              'model': 'edit',
+              'item': JSON.stringify(temp),
+              'items': JSON.stringify(temp)
+            }
+            if (that.words.length == 0) { //交互提示
+              wx.showToast({
+                title: '小话题不能为空！',
+                icon: 'loading',
+                mask: true,
+                duration: 1000
+              })
+              return;
+            }
+            that.$get('api/update', param)
+            console.log("发布:", temp)
+          }
+        })
       },
       ScrollViewHeight() {
         let that = this

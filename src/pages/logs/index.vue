@@ -1,14 +1,15 @@
 <template>
   <div>
-    <button v-if="canIUse" open-type="getUserInfo" @click="GotUser" :bindgetuserinfo="onGotUserInfo">授权登录</button>
-    <div v-else>请升级微信版本</div>
+
+    <button v-if="!userInfo.user_name" open-type="getUserInfo" @getuserinfo="handleUserInfo">授权登录</button>
+
     <div class="box">
       <div class="head">
-        <img :src="userInfo.avatarUrl" class="avatarUrl" />
+        <img :src="userInfo.head_url" class="avatarUrl" />
       </div>
       <div class="box1">
         <div class="box2">
-          <div class="p1">{{userInfo.nickName}}{{identity}}</div>
+          <div class="p1">{{userInfo.user_name}}{{identity}}</div>
           <div class="p2">{{build}}</div>
         </div>
         <div class="p3" decode="emsp">{{praise}}赞 &emsp; {{step}}踩</div>
@@ -59,43 +60,99 @@
 
     data() {
       return {
-        canIUse: wx.canIUse('button.open-type.getUserInfo'), //判断小程序的API，回调，参数，组件等是否在当前版本可用
+        //canIUse: wx.canIUse('button.open-type.getUserInfo'), //判断小程序的API，回调，参数，组件等是否在当前版本可用
+
         user: "姓名",
         identity: "(销售)",
         build: "未来悦",
         praise: "25",
         step: "3",
         lanmu: "mes",
-        userInfo: {
-          avatarUrl: '',
-          nickName: ''
-        },
+        userInfo: {},
 
       }
+    },
+    onLoad: function () {
+      let that = this
+      wx.getStorage({
+        //获取数据的key
+        key: 'key',
+        success: function (res) {
+          console.log(res)
+          that.userInfo = res.data
+        },
+        fail() {
+
+        }
+        /*wx.getSetting({
+          success: function (res) {
+            if (res.authSetting['scope.userInfo']) {
+              console.log('已授权!')
+              wx.getUserInfo({
+                success: function (res) {
+                  console.log(res.userInfo)
+                  //用户已经授权过
+                  that.userInfo = res.userInfo
+
+                }
+              })
+            }
+          }
+        })*/
+
+      })
     },
     methods: {
       change: function (str) {
         this.lanmu = str;
       },
-      GotUser: function () {
-        this.onGotUserInfo()
-      },
-      onGotUserInfo: function (e) {
-        let that = this
-        wx.getSetting({
-          success: function (res) {
-            if (res.authSetting['scope.userInfo']) {
-              // 已经授权，可以直接调用 getUserInfo 获取头像昵称
-              wx.getUserInfo({
-                success: function (res) {
-                  console.log(res.userInfo)
-                  that.userInfo = res.userInfo
-                }
-              })
+      handleUserInfo(e) {
+        console.log(e)
+        if (e.mp.detail.rawData) {
+          let that = this
+          wx.getSetting({
+            success: function (res) {
+              if (res.authSetting['scope.userInfo']) {
+                console.log('已授权!')
+                wx.getUserInfo({
+                  success: function (res) {
+                    console.log(res.userInfo)
+                    //用户已经授权过
+                    let temp = {}
+                    temp.user_name = res.userInfo.nickName
+                    temp.head_url = res.userInfo.avatarUrl
+                    wx.getStorage({
+                      key: 'open_id',
+                      success: function (res) {
+                        console.log(res)
+                        temp.open_id = res.data
+                        let param = {
+                          'db': 'WpUserModel',
+                          'model': 'edit',
+                          'item': JSON.stringify(temp),
+                          'items': JSON.stringify(temp)
+                        }
+                        that.$get('api/update', param)
+                        console.log("发送")
+                        that.userInfo = temp
+                        wx.setStorage({
+                          key: 'key',
+                          data: temp,
+                          success: function (res) {
+                            console.log(res)
+                          }
+                        })
+                      }
+                    })
+                  }
+                })
+              } else {
+
+              }
             }
-          }
-        })
-      },
+          })
+        }
+      }
     }
   }
 

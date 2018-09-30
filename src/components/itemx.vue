@@ -1,41 +1,38 @@
 <template>
   <div class="itemx">
     <ul>
-      <div v-for="(site,index) in sites" :key="site" v-if="index<9">
+      <div v-for="(site,index) in item" :key="site" v-if="index<9">
         <a href="/pages/qwb/main">
-          <li>{{ site.name }}</li>
+          <li>{{ site.tag_name }}</li>
         </a>
       </div>
     </ul>
+    {{getitem}}
   </div>
 </template>
 
 <script>
   export default {
+    props:['id'],
     data() {
       return {
-        sites: [{
-            name: '高铁高铁高铁'
-          },
-          {
-            name: '价格'
-          },
-          {
-            name: '小鸡小鸡'
-          },
-          {
-            name: '价格'
-          },
-          {
-            name: '价格杭州'
-          },
-          {
-            name: '价格杭州杭州'
-          },
-          {
-            name: '价格'
-          }
-        ]
+        item:[]
+      }
+    },
+    computed: {
+      getitem () {
+        let that = this
+        let param={
+          real_estate_id: this.id
+        }
+        that.$get('api/queryRealEstateDetail',param).then(function(res) {
+       console.log('返回:',res)
+       console.log('tag',res.data.tagList)
+       that.item = res.data.tagList
+
+      }, function(res) {
+       // failure
+      });
       }
     },
     methods: {}

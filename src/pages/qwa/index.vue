@@ -6,28 +6,27 @@
     </div>
     <line />
     <div :style="{height:scrollHeight+'px'}" class="scroll">
-    <input id="title" :value="words" type="text" placeholder="写个小话题（6个字内）" maxlength="6" />
-    <p>热门小话题：</p>
-    <div class="item">
-      <itema v-for="(site,index) in sites" :key="site" v-if="index<9" :nameSet="site.name" @child="childSay"></itema>
-    </div>
-    <textarea cols="5" class="title1" placeholder="写点小话题描述（200字内）" maxlength="200"></textarea>
-    <p class="addPic">添加图片</p>
-    <div class="box">
-      <div v-for="(img,index) in images" :key="img" v-if="index<6" class="box-img">
-        <img :src="img" class="big">
-        <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
+      <input id="title" v-model="words" type="text" placeholder="写个小话题（6个字内）" maxlength="6" />
+      <p>热门小话题：</p>
+      <div class="item">
+        <itema v-for="(site,index) in sites" :key="site" v-if="index<9" :nameSet="site.name" @child="childSay"></itema>
       </div>
-      <div id="plus" v-if="images.length<6&&images.length>0">
-        <img  src="/static/images/jiahao.png" @click="upLoadImage" />
+      <textarea cols="5" class="title1" placeholder="写点小话题描述（200字内）" maxlength="200"></textarea>
+      <div class="box">
+        <div v-for="(img,index) in images" :key="img" v-if="index<6" class="box-img">
+          <img :src="img" class="big" @click="preview">
+          <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
+        </div>
+        <div id="plus" v-if="images.length<6&&images.length>0">
+          <img src="/static/images/jiahao.png" @click="upLoadImage" />
+        </div>
+        <div id="plus1" v-if="images.length===0">
+          <img src="/static/images/jiahao.png" @click="upLoadImage" />
+        </div>
       </div>
-      <div id="plus1" v-if="images.length===0">
-        <img  src="/static/images/jiahao.png" @click="upLoadImage" />
-      </div>
-    </div>
     </div>
     <div class="item1">
-      <span>小提示：小话题,描述文字图片至少选一项,可以匿名发布</span>
+      <span>小提示：小话题必选,可以匿名发布</span>
       <line />
       <ul>
         <li>
@@ -50,7 +49,7 @@
     },
     data() {
       return {
-        scrollHeight:"",
+        scrollHeight: "",
         build: "未来城",
         words: "",
         sites: [{
@@ -90,11 +89,11 @@
             name: '价格'
           }
         ],
-        images:[],
+        images: [],
       }
     },
-    onReady (){
-      // console.log("ScrollViewHeight")
+    onReady() {
+      console.log("ScrollViewHeight")
       this.ScrollViewHeight()
     },
     computed: {},
@@ -102,53 +101,95 @@
       childSay: function (title) {
         this.words = title
       },
-      Clickpublish: async function(){
-        this.temp = {};
-        temp.topic = this.topic;
-        temp.owner = this.owner;
-        temp.userType = this.userType;
-        temp.user = this.user;
-        temp.content = this.content;
-        let res = await this.$post('',this.temp);
-        JSON.parse(temp);
-      },
-      ScrollViewHeight() {
-        let windowHeight = wx.getSystemInfoSync().windowHeight;
-        let scrollHeight = windowHeight -100;
-        this.scrollHeight = scrollHeight;
-        //读取机型全屏高度，减去固定高度获得scroll高度
-      },
-      upLoadImage () {
-        let _this = this;
-        wx.chooseImage({
-          count:6,//最多可以选择的图片总数 
-          sizeType: ['original','compressed'],// 可以指定是原图还是压缩图，默认二者都有 
-          sourceType: ['album', 'camera'],// 可以指定来源是相册还是相机，默认二者都有 
-          success: function(res){
-            let paths=res.tempFilePaths
-            wx.showToast({  
-             title: '正在上传...',  
-             icon: 'loading',  
-             mask: true,  
-             duration: 1000  
-            })  
-            for(let i=0;i<paths.length;i++){
-              _this.images.push(paths[i])
+      ClickPublish: async function () { //上传数据
+      let that = this
+      let isLogin = await this.$isLogin()
+      console.log('888888',isLogin)
+      if (!isLogin) {
+        //handle error
+        return
+      }
+        let temp = {}
+        temp.tag_name = that.words
+        wx.getStorage({
+          key: 'real_estate_id',
+          success: function (res) {
+            console.log(res)
+            temp.real_estate_id = res.data
+            temp.user_id = isLogin
+            let param = {
+              'db': 'WpTagModel',
+              'model': 'edit',
+              'item': JSON.stringify(temp),
+              'items': JSON.stringify(temp)
             }
-          },
-          fail: function (res) {  
-            wx.hideToast();  
-            wx.showModal({  
-              title: '错误提示',  
-              content: '上传图片失败',  
-              showCancel: false,   
-            })  
-          }  
+            if (that.words.length == 0) { //交互提示
+              wx.showToast({
+                title: '小话题不能为空！',
+                icon: 'loading',
+                mask: true,
+                duration: 1000
+              })
+              return;
+            }
+            that.$get('api/update', param)
+            console.log("发布:", temp)
+          }
         })
       },
-      removeImage(index){
-        this.images.splice(index,1)
-      }
+      ScrollViewHeight() {
+        let that = this
+        let windowHeight = wx.getSystemInfoSync().windowHeight;
+        let scrollHeight = windowHeight - 100;
+        that.scrollHeight = scrollHeight;
+        //读取机型全屏高度，减去固定高度获得scroll高度
+      },
+      upLoadImage() {
+        let _this = this;
+        wx.chooseImage({
+          count: 6, //最多可以选择的图片总数 
+          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有 
+          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有 
+          success: function (res) {
+            let paths = res.tempFilePaths
+            wx.showToast({
+              title: '正在上传...',
+              icon: 'loading',
+              mask: true,
+              duration: 500
+            })
+            for (let i = 0; i < paths.length; i++) {
+              if (_this.images.length < 6) {
+                _this.images.push(paths[i])
+              } else {
+                wx.showModal({
+                  title: '温馨提示',
+                  content: '最多可上传六张照片',
+                  showCancel: false,
+                })
+              }
+            }
+          },
+          fail: function (res) {
+            wx.hideToast();
+            wx.showModal({
+              title: '错误提示',
+              content: '上传图片失败',
+              showCancel: false,
+            })
+          }
+        })
+      },
+      preview: function () {
+        //图片预览
+        wx.previewImage({
+          current: '', // 当前显示图片的http链接
+          urls: this.images // 需要预览的图片http链接列表
+        })
+      },
+      removeImage(index) {
+        this.images.splice(index, 1)
+      },
     }
   }
 
@@ -166,7 +207,7 @@
     position: fixed;
     width: 100%;
     text-align: center;
-    font-size:22px;
+    font-size: 22px;
   }
 
   .build-left {
@@ -177,17 +218,17 @@
     left: 20rpx;
   }
 
-  .scroll{
+  .scroll {
     overflow: auto;
   }
 
   #title {
     border: 1px solid #d0d0d0;
     margin: auto;
-    margin-top:40rpx;
+    margin-top: 40rpx;
     height: 100rpx;
-    width:700rpx;
-    padding-left:20rpx;
+    width: 700rpx;
+    padding-left: 20rpx;
   }
 
   p {
@@ -209,26 +250,30 @@
     margin-top: 40rpx;
     height: 200rpx;
     width: 700rpx;
-    padding-left:20rpx;
+    padding-left: 20rpx;
   }
 
   .box {
     width: 660rpx;
     margin: 0 auto;
   }
+
   .box img {
     vertical-align: middle;
   }
+
   .box div {
     display: inline-block;
     width: 200rpx;
     height: 200rpx;
     margin: 10rpx;
   }
+
   .box .box-img {
     position: relative;
   }
-  .box .box-img .min{
+
+  .box .box-img .min {
     width: 50rpx;
     height: 50rpx;
     position: absolute;
@@ -239,19 +284,23 @@
     width: 200rpx;
     height: 200rpx;
   }
-  
-  #plus,#plus1 {
+
+  #plus,
+  #plus1 {
     padding: 50rpx;
     box-sizing: border-box;
   }
-  #plus img,#plus1 img{
+
+  #plus img,
+  #plus1 img {
     width: 100rpx;
     height: 100rpx;
   }
+
   #plus1 {
     margin-left: 230rpx;
   }
-  
+
   .item1 {
     width: 100%;
     position: fixed;
@@ -276,28 +325,28 @@
     font-size: 15px;
   }
 
-  .publish{
-    width:120rpx;
-    height:70rpx;
-    color:#c5a500;
-    font-size:20px;
-    text-align:center;
-    padding:0px;
-    vertical-align:middle ;
-    line-height:50rpx;
-    border:none;
+  .publish {
+    width: 120rpx;
+    height: 70rpx;
+    color: #c5a500;
+    font-size: 20px;
+    text-align: center;
+    padding: 0px;
+    vertical-align: middle;
+    line-height: 50rpx;
+    border: none;
   }
 
-  .AnonymousPublish{
-    width:120rpx;
-    height:70rpx;
-    color:#c5a500;
-    font-size:20px;
-    text-align:center;
-    padding:0px;
-    vertical-align:middle ;
-    line-height:50rpx;
-    border:none;
+  .AnonymousPublish {
+    width: 120rpx;
+    height: 70rpx;
+    color: #c5a500;
+    font-size: 20px;
+    text-align: center;
+    padding: 0px;
+    vertical-align: middle;
+    line-height: 50rpx;
+    border: none;
   }
 
 </style>

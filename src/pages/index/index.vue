@@ -9,17 +9,9 @@
     <!-- <div class="timg">
       <img src="/static/images/timg.jpg" />
     </div> -->
-    <topswiper :tops="tops"></topswiper> 
-    <div class="topic">
-      <p>热门话题</p>
-      <div class="hot-topic">
-        <itemx></itemx>
-      </div>
-      <p>热门楼盘</p>
-    </div>
-    <line />
+    <topswiper :tops="tops"></topswiper>
     <div class="Hot">
-      <hot v-for="site in sites" :key="site"></hot>
+      <hot :item="site" v-for="site in sites" :key="site"></hot>
     </div>
   </div>
 </template>
@@ -29,25 +21,79 @@
   import line from "@/components/line"
   import hot from "@/components/hot"
   import page from "@/components/page"
-  import itemx from "@/components/itemx"
   import topswiper from "@/components/topSwiper"
   export default {
     components: {
       line,
       hot,
       page,
-      itemx,
       topswiper
     }, //声明在当前组件下使用组件
     data() {
       return {
-        sites: [""],
-        tops : [
-          {imgSrc:'/static/images/timg.jpg'},
-          {imgSrc:'/static/images/timg1.jpg'},
-          {imgSrc:'/static/images/timg2.jpg'}
+        sites: [],
+        tops: [{
+            imgSrc: '/static/images/timg.jpg'
+          },
+          {
+            imgSrc: '/static/images/timg1.jpg'
+          },
+          {
+            imgSrc: '/static/images/timg2.jpg'
+          }
         ]
       }
+    },
+    onLoad() {
+      let that = this
+      wx.login({
+        success: function (res) {
+          let code = res.code;
+          if (code) {
+            console.log('获取用户登录凭证：' + code);
+            // --------- 发送凭证 ------------------
+            wx.request({
+              url: 'http://www.xaoji.com/api/getUser',
+              data: {
+                code: code
+              },
+              success(res) {
+                console.log('发送code成功',res.data)
+                let msg = res.data.msg
+          
+                if (msg=='have data'){
+                wx.setStorage({
+                  key: 'key',
+                  data: res.data.data[0],
+                  success: function(res) {
+                  console.log(res)
+                }
+               })
+                }else {
+                  console.log('open_id_test:',JSON.parse(res.data.data).openid)
+                  wx.setStorage({
+                   key: 'open_id',
+                   data: JSON.parse(res.data.data).openid,
+                   success: function(res) {
+                   console.log(res)
+                }
+               })
+                }
+              }
+            })
+            // ------------------------------------
+          } else {
+            console.log('获取用户登录态失败：' + res.errMsg);
+          }
+        }
+      });
+      that.$get('api/queryRealEstateList').then(function(res) {
+       console.log('返回数据:',res)
+       that.sites = res.data
+      }, function(res) {
+       // failure
+      });
+      console.log("请求")
     },
     methods: {}
   }
@@ -55,7 +101,7 @@
 </script>
 
 <style scoped>
-  .timg {
+  /*.timg {
     width: 750rpx;
     height: 200rpx;
   }
@@ -64,27 +110,5 @@
     width: 100%;
     height: 100%;
   } */
-
-  .topic {
-    display: flex;
-    flex-direction: column;
-    margin-top: 10rpx;
-  }
-
-  .topic p {
-    font-size: 16px;
-    margin-left: 20rpx;
-    margin-top: 20rpx;
-  }
-
-  .hot-topic {
-    margin-left: 30rpx;
-  }
-
-  /* <a href="/pages/counter/main">
-          <li>{{ site.name }}</li>
-          </a>     
-   重要 ，将for循环列表元素分别链接       
-*/
 
 </style>

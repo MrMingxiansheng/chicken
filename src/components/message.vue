@@ -10,18 +10,18 @@
           <p class="name">{{name1}}{{identity}}@{{name2}}{{identity}}</p>
           <div class="words">{{words}}</div>
         </div>
-      <div class="box4">
-            <p class="time">{{time}}</p>
-         <div class="box5">
+        <div class="box4">
+          <p class="time">{{time}}</p>
+          <div class="box5">
             <div class="praise-num">{{num1}}</div>
             <div class="praise">赞</div>
             <div class="step-num" decode="ensp">&ensp;{{num2}}</div>
             <div class="step">踩</div>
-         </div> 
+          </div>
           <p class="reply" @click="ClickReply">回复</p>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -34,9 +34,9 @@
       return {
         build: "楼盘名称",
         name1: "姓名",
-        identity:"(销售)",
+        identity: "(销售)",
         name2: "拉拉",
-        time:"前天",
+        time: "前天",
         words: "看不到大客户读书森林防火双离合分那就回复您开户奥拉夫",
         num1: "5",
         num2: "5"
@@ -92,15 +92,15 @@
     align-items: baseline;
     position: absolute;
     right: 120rpx;
-    color:#888888;
+    color: #888888;
   }
 
-  .name{
-    color:#888888;
+  .name {
+    color: #888888;
   }
 
-  .time{
-    color:#888888;
+  .time {
+    color: #888888;
   }
 
   .reply {

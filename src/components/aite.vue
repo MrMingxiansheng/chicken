@@ -1,6 +1,6 @@
 <template>
   <div class="aite">
-   <div class="box1">
+    <div class="box1">
       <a href="/pages/qwd/main" hover-class="none">
         <div class="head"></div>
       </a>
@@ -10,15 +10,17 @@
           <div class="words">{{item.content}}</div>
         </div>
         <div class="box4">
-            <p class="time">{{item.time}}</p>
-            <div class="box5">
+          <p class="time">{{item.time}}</p>
+          <div class="box5">
             <div class="praise-num">{{num1}}</div>
-            <div class="praise" @click.stop="ClickPraise">赞</div>
+            <div class="praise" v-if="up" @click="ClickPraise">赞</div>
+            <div class="praise" v-else @click="ClickPraise">已赞</div>
             <div class="step-num" decode="ensp">&ensp;{{num2}}</div>
-            <div class="step" @click.stop="ClickStep">踩</div>
-            </div>
-            <p class="reply" @click="ClickReply">回复</p>
+            <div class="step" v-if="down" @click="ClickStep">踩</div>
+            <div class="step" v-else @click="ClickStep">已踩</div>
           </div>
+          <p class="reply" @click="ClickReply">回复</p>
+        </div>
       </div>
     </div>
 
@@ -28,27 +30,51 @@
 <script>
   export default {
     components: {},
-    props:['item'],
+    props: ['item'],
     data() {
-      return {  
-        num1:0,
-        num2:0,   
+      return {
+        num1: 0,
+        up: true,
+        num2: 0,
+        down: true,
       }
     },
     methods: {
       ClickPraise() {
-        this.num1 += 1;
+        let that = this
+        that.up = !that.up
+        if (that.up == false) {
+          that.num1++
+          wx.showToast({
+            title: "已赞",
+            icon: 'success',
+            mask: true,
+            duration: 1000
+          })
+        } else {
+          that.num1--
+        }
       },
       ClickStep() {
-        this.num2 += 1;
+        let that = this
+        that.down = !that.down
+        if (that.down == false) {
+          that.num2++
+          wx.showToast({
+            title: "已踩",
+            icon: 'success',
+            mask: true,
+            duration: 1000
+          })
+        } else {
+          that.num2--
+        }
       },
-      ClickReply:function () {
-        this.$emit("child", "")
-        this.setData({
-           focus: true
-        })
-    },
-      
+      ClickReply: function () {
+        this.$emit("child", "s")
+        this.focusState()
+      },
+
     }
   }
 
@@ -68,7 +94,7 @@
   .box1 {
     display: flex;
     flex-direction: row;
-    margin-top:20rpx;
+    margin-top: 20rpx;
   }
 
   .box2 {
@@ -84,12 +110,12 @@
     flex-direction: column;
   }
 
-  .user{
-    color:#888888;
+  .user {
+    color: #888888;
   }
 
-  .time{
-    color:#888888;
+  .time {
+    color: #888888;
   }
 
   .box4 {
@@ -98,7 +124,7 @@
     align-items: baseline;
   }
 
-  .box5{
+  .box5 {
     display: flex;
     flex-direction: row;
     align-items: baseline;
@@ -124,15 +150,16 @@
     color: #c5a500;
   }
 
-  .praise-num{
-    color:#888888;
+  .praise-num {
+    color: #888888;
   }
 
   .step {
     color: #c5a500;
   }
 
-  .step-num{
-    color:#888888;
+  .step-num {
+    color: #888888;
   }
+
 </style>

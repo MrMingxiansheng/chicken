@@ -9,7 +9,7 @@
 	},
 	"miniprogramRoot": "dist/",
 	"compileType": "miniprogram",
-	"appid": "touristappid",
+	"appid": "wx9a50157194dab24e",
 	"projectname": "love",
 	"condition": {
 		"search": {

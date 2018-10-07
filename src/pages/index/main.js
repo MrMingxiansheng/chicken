@@ -6,3 +6,4 @@ app.$mount()
 pages: [
     '^pages/index/main'
   ]
+  

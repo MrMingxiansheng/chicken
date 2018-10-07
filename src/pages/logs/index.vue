@@ -1,14 +1,18 @@
 <template>
   <div>
-    <button v-if="!userinfo.openId" open-type="getUserInfo" lang="zh_CN" class='btn' @getuserinfo="login">点击登录</button>
+
+    <button v-if="!userInfo.user_name" open-type="getUserInfo" @getuserinfo="handleUserInfo">授权登录</button>
+
     <div class="box">
-      <div class="head"></div>
+      <div class="head">
+        <img :src="userInfo.head_url" class="avatarUrl" />
+      </div>
       <div class="box1">
         <div class="box2">
-          <span class="p1">{{name}}</span>
-          <span class="p2" decode="emsp">&emsp; {{identity}} &emsp;&emsp; {{build}}</span>
+          <div class="p1">{{userInfo.user_name}}{{identity}}</div>
+          <div class="p2">{{build}}</div>
         </div>
-        <span class="p3" decode="emsp">{{praise}}赞 &emsp; {{step}}踩</span>
+        <div class="p3" decode="emsp">{{praise}}赞 &emsp; {{step}}踩</div>
       </div>
     </div>
     <div>
@@ -56,59 +60,100 @@ export default {
     suggest
   },
 
-  data() {
-    
-    return {
-      name: "姓名",
-      identity: "(销售)",
-      build: "未来悦",
-      praise: "25",
-      step: "3",
-      lanmu: "mes",
-      userinfo: {
-        avatarUrl: "http://image.shengxinjing.cn/rate/unlogin.png",
-        nickName: ""
-      }
-    };
-  }, // 计算属性
-  computed: {}, // created生命周期，组件创建后执行s
-  methods: {
-    change: function(str) {
-      this.lanmu = str;
-    },
+    data() {
+      return {
+        //canIUse: wx.canIUse('button.open-type.getUserInfo'), //判断小程序的API，回调，参数，组件等是否在当前版本可用
 
-    loginSuccess(res) {
-      showSuccess("登录成功");
-      wx.setStorageSync("userinfo", res);
-      this.userinfo = res;
+        user: "姓名",
+        identity: "(销售)",
+        build: "未来悦",
+        praise: "25",
+        step: "3",
+        lanmu: "mes",
+        userInfo: {},
+
+      }
     },
-    login () {
-      wx.showToast({
-        title: '登录中',
-        icon: 'loading'
+    onLoad: function () {
+      let that = this
+      wx.getStorage({
+        //获取数据的key
+        key: 'key',
+        success: function (res) {
+          console.log(res)
+          that.userInfo = res.data
+        },
+        fail() {
+
+        }
+        /*wx.getSetting({
+          success: function (res) {
+            if (res.authSetting['scope.userInfo']) {
+              console.log('已授权!')
+              wx.getUserInfo({
+                success: function (res) {
+                  console.log(res.userInfo)
+                  //用户已经授权过
+                  that.userInfo = res.userInfo
+
+                }
+              })
+            }
+          }
+        })*/
+
       })
-      qcloud.setLoginUrl(config.loginUrl)
-      const session = qcloud.Session.get()
-      if (session) {
-        qcloud.loginWithCode({
-          success: res => {
-            console.log('没过期的登录', res)
-            this.loginSuccess(res)
-          },
-          fail: err => {
-            console.error(err)
-          }
-        })
-      } else {
-        qcloud.login({
-          success: res => {
-            console.log('登录成功', res)
-            this.loginSuccess(res)
-          },
-          fail: err => {
-            console.error(err)
-          }
-        })
+    },
+    methods: {
+      change: function (str) {
+        this.lanmu = str;
+      },
+      handleUserInfo(e) {
+        console.log(e)
+        if (e.mp.detail.rawData) {
+          let that = this
+          wx.getSetting({
+            success: function (res) {
+              if (res.authSetting['scope.userInfo']) {
+                console.log('已授权!')
+                wx.getUserInfo({
+                  success: function (res) {
+                    console.log(res.userInfo)
+                    //用户已经授权过
+                    let temp = {}
+                    temp.user_name = res.userInfo.nickName
+                    temp.head_url = res.userInfo.avatarUrl
+                    wx.getStorage({
+                      key: 'open_id',
+                      success: function (res) {
+                        console.log(res)
+                        temp.open_id = res.data
+                        let param = {
+                          'db': 'WpUserModel',
+                          'model': 'edit',
+                          'item': JSON.stringify(temp),
+                          'items': JSON.stringify(temp)
+                        }
+                        that.$get('api/update', param)
+                        console.log("发送")
+                        that.userInfo = temp
+                        wx.setStorage({
+                          key: 'key',
+                          data: temp,
+                          success: function (res) {
+                            console.log(res)
+                          }
+                        })
+                      }
+                    })
+                  }
+                })
+              } else {
+
+              }
+            }
+          })
+        }
       }
     }
     
@@ -116,19 +161,30 @@ export default {
 };
 </script>
 <style scoped>
-.head {
-  border: 1px solid #d0d0d0;
-  margin-left: 10rpx;
-  margin-top: 10rpx;
-  height: 100rpx;
-  width: 100rpx;
-}
+  .head {
+    border: 1px solid #d0d0d0;
+    margin-left: 10rpx;
+    margin-top: 10rpx;
+    height: 100rpx;
+    width: 100rpx;
+  }
 
-.box {
-  display: inline-flex;
-  flex-direction: row;
-  margin-top: 20rpx;
-}
+  .avatarUrl {
+    height: 100rpx;
+    width: 100rpx;
+  }
+
+  .box {
+    display: inline-flex;
+    flex-direction: row;
+    margin-top: 20rpx;
+  }
+
+  .box1 {
+    display: inline-flex;
+    flex-direction: column;
+    margin-top: 5rpx;
+  }
 
 .box1 {
   display: inline-flex;
@@ -145,11 +201,18 @@ export default {
   margin-left: 10rpx;
 }
 
-.p3 {
-  margin-left: 10rpx;
-  margin-top: 32rpx;
-  color: #888888;
-}
+  .p3 {
+    margin-left: 10rpx;
+    margin-top: 32rpx;
+    color: #888888;
+  }
+
+  .hd {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 40rpx;
+  }
 
 .hd {
   display: flex;

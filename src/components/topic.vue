@@ -17,10 +17,10 @@
       </div>
       <div class="box2" v-for="(site,index) in sites" :key="site" v-if="index<=3">
         <a href="/pages/qwb/main" hover-class="none">
-        <div class="item">
-          <div class="border2"></div>
-          <span class="user" decode="ensp">{{item.user}}{{item.userType}}:&ensp;{{item.content}}</span>
-        </div>
+          <div class="item">
+            <div class="border2"></div>
+            <span class="user" decode="ensp">{{item.user}}{{item.userType}}:&ensp;{{item.content}}</span>
+          </div>
         </a>
       </div>
     </div>
@@ -34,22 +34,21 @@
     components: {
       line
     },
-    props:['item'],
+    props: ['item'],
     data() {
       return {
         num: 0,
         sites: [{}],
-        money:""
       };
     },
     methods: {
-       ClickSend: function() {
-         const url = '/pages/qwb/main?money='+this.money
-         wx.navigateTo({ url })  
-         this.setData({
-            focus: false
-         })
-     },
+      ClickSend: function () {
+        const url = '/pages/qwb/main?'
+        wx.navigateTo({
+          url
+        })
+        this.focusState = true
+      },
     }
   };
 
@@ -77,12 +76,12 @@
     margin-top: 4rpx;
   }
 
- .border2 {
+  .border2 {
     border: 1px solid #d0d0d0;
     height: 32rpx;
     width: 32rpx;
     position: relative;
-    bottom:4rpx;
+    bottom: 4rpx;
   }
 
   .number {
@@ -102,11 +101,11 @@
   .item {
     display: flex;
     flex-direction: row;
-    font-size:17px;
+    font-size: 17px;
     align-items: center;
   }
 
-  .box2 { 
+  .box2 {
     margin-top: 20rpx;
     margin-left: 20rpx;
     margin-bottom: 10rpx;

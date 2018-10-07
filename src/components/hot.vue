@@ -3,15 +3,15 @@
     <div class="box">
       <div class="box1">
         <div class="topic">
-          <span decode="ensp">&ensp;{{topic}}小话题&ensp;{{browse}}浏览</span>
+          <span decode="ensp">&ensp;{{item.topic}}小话题&ensp;{{item.views_num}}浏览</span>
         </div>
         <a href="/pages/counter/main" hover-class="none">
-          <div class="build">{{build}}</div>
+          <div class="build">{{item.real_estate_name}}</div>
         </a>
-        <div class="send"><a href="/pages/qwa/main" hover-class="none">发个小话题</a></div>
+        <div class="send" @click="sendTopic"><a href="/pages/qwa/main" hover-class="none">发个小话题</a></div>
       </div>
       <div class="box2">
-        <itemx></itemx>
+        <itemx :id="item.id"></itemx>
       </div>
     </div>
     <line />
@@ -26,14 +26,23 @@
       itemx,
       line
     },
+    props:['item'],
     data() {
       return {
-        build: "未来城",
-        topic: "20",
-        browse: "10000"
       };
     },
-    methods: {}
+    methods: {
+      sendTopic: function(){
+        let that = this
+         wx.setStorage({
+                   key: 'real_estate_id',
+                   data: that.item.id,
+                   success: function(res) {
+                   console.log(res)
+                }
+               })
+      }
+    }
   };
 
 </script>

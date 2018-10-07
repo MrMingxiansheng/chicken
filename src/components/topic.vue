@@ -9,17 +9,10 @@
           </div>
         </a>
         <a href="/pages/qwb/main" hover-class="none">
-<<<<<<< HEAD
           <span class="title">"{{item.topic}}"</span></a>
         <div class="talk">
           <span class="number">{{num}}讨论</span>
           <span class="send" @click="ClickSend" decode="ensp">&ensp;讨论&ensp;</span>
-=======
-          <span class="title">"{{topic}}"</span></a>
-        <div class="talk">
-          <span class="number">{{num}}讨论</span>
-          <span class="send" decode="ensp"><a href="#" hover-class="none">&ensp;讨论&ensp;</a></span>
->>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
         </div>
       </div>
       <div class="box2" v-for="(site,index) in sites" :key="site" v-if="index<=3">

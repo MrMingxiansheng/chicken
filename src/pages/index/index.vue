@@ -55,11 +55,7 @@
 </script>
 
 <style scoped>
-<<<<<<< HEAD
   .timg {
-=======
-  /* .timg {
->>>>>>> d190400a3f878bbba14797c395d85f57fc2ba1ea
     width: 750rpx;
     height: 200rpx;
   }

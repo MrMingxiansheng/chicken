@@ -9,7 +9,8 @@
     "pages/qwd/main",
     "pages/qwe/main",
     "pages/qwf/main",
-    "pages/login/main"
+    "pages/login/main",
+    "pages/topic/main"
   ],
   "window": {
     "backgroundTextStyle": "light",

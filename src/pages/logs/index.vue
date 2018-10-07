@@ -1,5 +1,6 @@
 <template>
   <div>
+    <button v-if="!userinfo.openId" open-type="getUserInfo" lang="zh_CN" class='btn' @getuserinfo="login">点击登录</button>
     <div class="box">
       <div class="head"></div>
       <div class="box1">
@@ -38,82 +39,122 @@
   </div>
 </template>
 <script>
-  //  decode="emsp"设置空格
-  import line from "@/components/line"
-  import message from "@/components/message"
-  import collect from "@/components/collect"
-  import see from "@/components/see"
-  import suggest from "@/components/suggest"
-  export default {
-    components: {
-      line,
-      message,
-      collect,
-      see,
-      suggest,
+//  decode="emsp"设置空格
+import { showSuccess } from "@/util";
+import config from "@/config";
+import line from "@/components/line";
+import message from "@/components/message";
+import collect from "@/components/collect";
+import see from "@/components/see";
+import suggest from "@/components/suggest";
+export default {
+  components: {
+    line,
+    message,
+    collect,
+    see,
+    suggest
+  },
+
+  data() {
+    
+    return {
+      name: "姓名",
+      identity: "(销售)",
+      build: "未来悦",
+      praise: "25",
+      step: "3",
+      lanmu: "mes",
+      userinfo: {
+        avatarUrl: "http://image.shengxinjing.cn/rate/unlogin.png",
+        nickName: ""
+      }
+    };
+  }, // 计算属性
+  computed: {}, // created生命周期，组件创建后执行s
+  methods: {
+    change: function(str) {
+      this.lanmu = str;
     },
 
-    data() {
-      return {
-        name: "姓名",
-        identity: "(销售)",
-        build: "未来悦",
-        praise: "25",
-        step: "3",
-        lanmu: "mes"
-      }
-    }, // 计算属性
-    computed: {}, // created生命周期，组件创建后执行s
-    methods: {
-      change: function (str) {
-        this.lanmu = str;
+    loginSuccess(res) {
+      showSuccess("登录成功");
+      wx.setStorageSync("userinfo", res);
+      this.userinfo = res;
+    },
+    login () {
+      wx.showToast({
+        title: '登录中',
+        icon: 'loading'
+      })
+      qcloud.setLoginUrl(config.loginUrl)
+      const session = qcloud.Session.get()
+      if (session) {
+        qcloud.loginWithCode({
+          success: res => {
+            console.log('没过期的登录', res)
+            this.loginSuccess(res)
+          },
+          fail: err => {
+            console.error(err)
+          }
+        })
+      } else {
+        qcloud.login({
+          success: res => {
+            console.log('登录成功', res)
+            this.loginSuccess(res)
+          },
+          fail: err => {
+            console.error(err)
+          }
+        })
       }
     }
+    
   }
-
+};
 </script>
 <style scoped>
-  .head {
-    border: 1px solid #d0d0d0;
-    margin-left: 10rpx;
-    margin-top: 10rpx;
-    height: 100rpx;
-    width: 100rpx;
-  }
+.head {
+  border: 1px solid #d0d0d0;
+  margin-left: 10rpx;
+  margin-top: 10rpx;
+  height: 100rpx;
+  width: 100rpx;
+}
 
-  .box {
-    display: inline-flex;
-    flex-direction: row;
-    margin-top:20rpx;
-  }
+.box {
+  display: inline-flex;
+  flex-direction: row;
+  margin-top: 20rpx;
+}
 
-  .box1 {
-    display: inline-flex;
-    flex-direction: column;
-    margin-top:5rpx;
-  }
+.box1 {
+  display: inline-flex;
+  flex-direction: column;
+  margin-top: 5rpx;
+}
 
-  .box2 {
-    display: inline-flex;
-    flex-direction: row;
-  }
+.box2 {
+  display: inline-flex;
+  flex-direction: row;
+}
 
-  .p1 {
-    margin-left: 10rpx;
-  }
+.p1 {
+  margin-left: 10rpx;
+}
 
+.p3 {
+  margin-left: 10rpx;
+  margin-top: 32rpx;
+  color: #888888;
+}
 
-  .p3 {
-    margin-left: 10rpx;
-    margin-top: 32rpx;
-    color:#888888;
-  }
-
-  .hd {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    margin-top: 40rpx;
-  }
-
+.hd {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-top: 40rpx;
+}
 </style>

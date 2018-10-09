@@ -2,8 +2,8 @@
   <div class="itemx">
     <ul>
       <div v-for="(site,index) in item" :key="site" v-if="index<9">
-        <a href="/pages/qwb/main">
-          <li>{{ site.tag_name }}</li>
+        <a href="/pages/topic/main" >
+          <li @click="storageTagId(site)">{{ site.tag_name }}</li>
         </a>
       </div>
     </ul>
@@ -35,7 +35,40 @@
       });
       }
     },
-    methods: {}
+    methods: {
+      storageTagId(site){
+        wx.setStorage({
+          key:'tag_id',
+          data:site.id,
+          success:function(){
+          }
+        })
+        wx.setStorage({
+          key:'real_estate_id',
+          data:site.real_estate_id,
+          success:function(){
+          }
+        })
+        wx.setStorage({
+          key:'tag_name',
+          data:site.tag_name,
+          success:function(){
+          }
+        })
+        wx.setStorage({
+          key:'user_id',
+          data:site.user_id,
+          success:function(){
+          }
+        })
+        // wx.setStorage({
+        //   key:'tag_content_id',
+        //   data:site.tag_content_id,
+        //   success:function(){
+        //   }
+        // })
+      }
+    }
   };
 
 </script>

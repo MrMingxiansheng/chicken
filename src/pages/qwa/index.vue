@@ -11,7 +11,7 @@
       <div class="item">
         <itema v-for="(site,index) in sites" :key="site" v-if="index<9" :nameSet="site.name" @child="childSay"></itema>
       </div>
-      <textarea cols="5" class="title1" placeholder="写点小话题描述（200字内）" maxlength="200"></textarea>
+      <textarea cols="5" class="title1" placeholder="写点小话题描述（200字内）" maxlength="200" v-model="des"></textarea>
       <div class="box">
         <div v-for="(img,index) in images" :key="img" v-if="index<6" class="box-img">
           <img :src="img" class="big" @click="preview">
@@ -49,9 +49,10 @@
     },
     data() {
       return {
-        scrollHeight: '',
-        build: '',
-        words: '',
+        scrollHeight: "",
+        build: "未来城",
+        words: "",
+        des:'',
         sites: [{
             name: '高铁杭州杭州'
           },
@@ -152,9 +153,41 @@
                 })
               }
               that.$get('api/update', param)
-            }
-          })
-        },
+              that.$get('api/update', param).then(function(res){
+              if(that.des){
+                let interact = {}
+                interact.interact_content = that.des
+                interact.tag_id = res.data.id
+                interact.user_id = res.data.user_id
+                interact.interact_type = '评论'
+                interact.interact_status = '0'
+                let updateInteract = {
+                'db': 'WpInteractModel',
+                'model': 'edit',
+                'item': JSON.stringify(interact),
+                'items': JSON.stringify(interact)
+                }
+                that.$get('api/update', updateInteract).then(function(res){
+                  let interactId = {
+                    id:res.data.tag_id,
+                    tag_content_id:res.data.id
+                  }
+                  let updateInteractId = {
+                    'db': 'WpTagModel',
+                    'model': 'edit',
+                    'item': JSON.stringify(interactId),
+                    'items': JSON.stringify(interactId)
+                  }
+                  that.$get('api/update', updateInteractId).then(function(){
+                    console.log('更新成功了')
+                  })
+                })
+              }
+              
+            })
+          }
+        })
+      },
         ScrollViewHeight() {
           let that = this
           let windowHeight = wx.getSystemInfoSync().windowHeight;
@@ -298,7 +331,6 @@
     top: 0;
     right: 0;
   }
-
   .box .box-img .big {
     width: 200rpx;
     height: 200rpx;

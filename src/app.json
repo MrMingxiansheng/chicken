@@ -7,8 +7,6 @@
     "pages/qwb/main",
     "pages/qwc/main",
     "pages/qwd/main",
-    "pages/qwe/main",
-    "pages/qwf/main",
     "pages/login/main"
   ],
   "window": {

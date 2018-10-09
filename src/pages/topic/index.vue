@@ -206,7 +206,13 @@
             tag_id: res.data
           }
           that.$get("api/queryTagDetail", uploadTagId).then(function (tagDetail) {
-            that.topicDes.interactInfo = tagDetail.data.interactList[0]
+            console.log(tagDetail.data)
+            let interactList = tagDetail.data.interactList
+            for(let i=0;i<interactList.length;i++){
+              let oneInteract = interactList[i]
+              console.log(oneInteract)
+            }
+            // that.topicDes.interactInfo = tagDetail.data.interactList[0]
           }) 
         }
       })
@@ -240,9 +246,27 @@
       clickSend(){
         let that = this
         if(that.words){
-          let interact = {}
-          interact.interact_content = that.words
-          interact.tag_id = that.tag_id
+          wx.getStorage({
+            key:'key',
+            success:function(res){
+              let interact = {}
+              interact.interact_content = that.words
+              interact.tag_id = that.tag_id
+              interact.user_id = res.data.id
+              interact.interact_type = '评论'
+              interact.interact_status = '0'
+              let updateInteract = {
+                'db': 'WpInteractModel',
+                'model': 'edit',
+                'item': JSON.stringify(interact),
+                'items': JSON.stringify(interact)
+              }
+              that.$get('api/update', updateInteract).then(function(obj){
+                console.log(obj)
+                that.words = ''
+              })
+            }
+          })
         }
       }
     }

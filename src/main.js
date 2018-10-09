@@ -4,13 +4,8 @@ import App from './App'
 Vue.config.productionTip = false
 App.mpType = 'app'
 
-let serverPath = 'http://www.xaoji.com/'
+let serverPath = 'http://www.xaoji.com:3000/'
 let Methods = function get(url, data) {
-  wx.showLoading({
-    title: '加载中',
-    mask: true,
-    duration: 1000
-  })
   return new Promise((resolve, reject) => {
     wx.request({
       url: serverPath + url, // 拼接完整的url

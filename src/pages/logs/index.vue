@@ -61,7 +61,6 @@
     data() {
       return {
         //canIUse: wx.canIUse('button.open-type.getUserInfo'), //判断小程序的API，回调，参数，组件等是否在当前版本可用
-
         user: "姓名",
         identity: "(销售)",
         build: "未来悦",
@@ -69,7 +68,6 @@
         step: "3",
         lanmu: "mes",
         userInfo: {},
-
       }
     },
     onLoad: function () {
@@ -82,24 +80,7 @@
           that.userInfo = res.data
         },
         fail() {
-
         }
-        /*wx.getSetting({
-          success: function (res) {
-            if (res.authSetting['scope.userInfo']) {
-              console.log('已授权!')
-              wx.getUserInfo({
-                success: function (res) {
-                  console.log(res.userInfo)
-                  //用户已经授权过
-                  that.userInfo = res.userInfo
-
-                }
-              })
-            }
-          }
-        })*/
-
       })
     },
     methods: {
@@ -126,7 +107,7 @@
                       success: function (res) {
                         console.log(res)
                         temp.open_id = res.data
-                        let param = {
+                        let param = {    //数据库查询
                           'db': 'WpUserModel',
                           'model': 'edit',
                           'item': JSON.stringify(temp),

@@ -25,7 +25,7 @@
         let param={
           real_estate_id: this.id
         }
-        that.$get('api/queryRealEstateDetail',param).then(function(res) {
+        that.$get('api/queryRealEstateDetail',param).then(function(res) { //查对应id的数据
        console.log('返回:',res)
        console.log('tag',res.data.tagList)
        that.item = res.data.tagList

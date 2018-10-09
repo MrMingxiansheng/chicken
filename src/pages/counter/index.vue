@@ -6,16 +6,9 @@
     </div>
     <line />
     <scroll-view scroll-y="true" :style="{height:scrollHeight+'px'}" class="item">
-      <div class="pop">热门话题</div>
-      <div class="box">
-        <div class="item1">
-          <itemx></itemx>
-        </div>
-        <line />
-        <div>
+        <div class="box">
           <topic v-for="site in dataList" :item="site" :key="site"></topic>
         </div>
-      </div>
     </scroll-view>
     <div class="item2">
       <line />
@@ -44,66 +37,9 @@
     data() {
       return {
         scrollHeight: "",
-        num: "2200",
-        build: "未来城瓦课程",
-        sites: [{}],
-        dataList: [{
-            topic: "高铁",
-            owner: "程咬金",
-            userType: "(销售)",
-            user: "程咬金",
-            content: "程咬金说这个地方很糟糕veryveryveryverylow",
-          },
-          {
-            topic: "高铁",
-            owner: "程咬金",
-            userType: "(销售)",
-            user: "程咬金",
-            content: "程咬金说这个地方很糟糕veryveryveryverylow",
-          },
-          {
-            topic: "高铁",
-            owner: "程咬金",
-            userType: "(销售)",
-            user: "程咬金",
-            content: "程咬金说这个地方很糟糕veryveryveryverylow",
-          },
-          {
-            topic: "高铁",
-            owner: "程咬金",
-            userType: "(销售)",
-            user: "程咬金",
-            content: "程咬金说这个地方很糟糕veryveryveryverylow",
-          },
-          {
-            topic: "高铁",
-            owner: "程咬金",
-            userType: "(销售)",
-            user: "程咬金",
-            content: "程咬金说这个地方很糟糕veryveryveryverylow",
-          },
-          {
-            topic: "高铁",
-            owner: "程咬金",
-            userType: "(销售)",
-            user: "程咬金",
-            content: "程咬金说这个地方很糟糕veryveryveryverylow",
-          },
-          {
-            topic: "高铁",
-            owner: "程咬金",
-            userType: "(销售)",
-            user: "程咬金",
-            content: "程咬金说这个地方很糟糕veryveryveryverylow",
-          },
-          {
-            topic: "高铁",
-            owner: "程咬金",
-            userType: "(销售)",
-            user: "程咬金",
-            content: "程咬金说这个地方很糟糕veryveryveryverylow",
-          },
-        ],
+        num: "",
+        build: "",
+        dataList: [],
       }
     },
     onShareAppMessage: function (res) {
@@ -116,6 +52,44 @@
         path: '/pages/counter/main',
         imageUrl: ''
       }
+    },
+    onLoad() {
+      let that = this
+      wx.getStorage({
+        key: 'real_estate_name', //楼盘名字
+        success: function (res) {
+          that.build = res.data
+          console.log('楼盘',that.build)
+        }
+      })
+      wx.getStorage({
+        key: 'real_estate_id', //楼盘ID
+        success: function (res) {  
+           let param={
+             real_estate_id: res.data
+           };  
+           let temp = {}
+           that.dataList = []
+            that.$get('api/queryRealEstateDetail',param).then(function (res){
+              that.num = res.data.realEstate.views_num
+              temp.tag_name = res.data.tagList[0].tag_name
+              temp.views_num = res.data.tagList[0].views_num //没有
+              temp.interact_content = res.data.tagList[0].interact.interact_content
+              
+                let user_id={
+                  user_id: res.data.tagList[0].user_id
+                }
+                 that.$get('api/queryUserDetail',user_id).then(function (res){
+                   temp.user_name = res.data.user.user_name
+                   temp.user_type = res.data.user.user_type //没有
+                   temp.head_url = res.data.user.head_url
+                 })
+                        
+              })
+              that.dataList.push(temp)  //把数据push到数组里
+              console.log('数据',temp)
+        }
+      })
     },
     onReady() {
       console.log("ScrollViewHeight")
@@ -162,37 +136,24 @@
     right: 20rpx;
   }
 
-  .pop {
-    color: #888888;
-    font-size: 15px;
-    padding-top: 20rpx;
-    padding-bottom: 20rpx;
-    padding-left: 20rpx;
-  }
-
   .box {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .item1 {
     margin-left: 20rpx;
     margin-bottom: 20rpx;
   }
 
-  .item2 {
+  .item1 {
     width: 100%;
     position: fixed;
     bottom: 0;
     /*置底*/
   }
 
-  .item2 ul {
+  .item1 ul {
     display: flex;
     flex-direction: row;
   }
 
-  .item2 li {
+  .item1 li {
     width: 20rpx;
     text-align: center;
     margin-top: 20rpx;

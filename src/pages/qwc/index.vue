@@ -1,16 +1,14 @@
 <template>
   <div>
     <div class="page-search">
-      <div class="search_arr">
+      <div class="search_that.arr">
         <icon class="searchcion" size="20" type="search"></icon>
-        <input type="search" placeholder="输入楼盘名称或小话题搜索" :value="searchValue" focus="true" />
+        <input type="search" placeholder="输入楼盘名称或小话题搜索" v-model="searchValue" focus="true" />
       </div>
       <div class="sousuo" @click="suo">搜索</div>
     </div>
-    <div id="result">搜索结果</div>
-    <line />
     <div class="Hot">
-      <hot v-for="site in sites" :key="site"></hot>
+      <hot :item="site" v-for="site in sites" :key="site"></hot>
     </div>
   </div>
 </template>
@@ -25,48 +23,49 @@
     },
     data() {
       return {
-        sites: [{}],
+        sites: [],
+        arr: [],
         searchValue: "",
       };
     },
 
     methods: {
-      /* suo: function () {
-       var that = this;
-       if (that.searchValue.length > 0) {
-        wx.request({
-        url: '',
-        data: {
-         
-        },
-        header: { 'content-type': 'application/x-www-form-urlencoded' },
-        method: 'POST',
-        dataType: json,
-        responseType: text,
-        success: function (res) {
-          if (res.code) {
-            var data = that.sites;
-            for (let i = 0; i < res.length; i++) {
-                data.push(res[i]);
-            }
-            
-             that.sites= data
-            
-          }
-        },
-        fail: function (res) { 
-          wx.showToast({
-          title: '网络异常！',
-          duration: 2000
-        });
-        },
-        complete: function (res) { },
-      })
-    }
-    }*/
+      suo: function () {
+        let that = this;
+        that.arr = [] //空值
+        that.sites = []
+        let searchValue = that.searchValue
+        console.log('长度', searchValue.length)
+        if (searchValue.length > 0) {
+          let sites = wx.getStorage({
+            key: 'queryRealEstateList',
+            success: function (res) {
+              console.log('搜索：', res)
+              //查找匹配搜索
+              for (let i in res.data) {
+                res.data[i].show = false
+                if (res.data[i].real_estate_name.indexOf(searchValue) >= 0) { //insecOf用法
+                  res.data[i].show = true
+                  that.arr.push(res.data[i])
+                }
+              }
+              if (that.arr.length == 0) {
 
+              } else {
+                that.sites = that.arr
+              }
+            },
+            fail() {
+              wx.showToast({
+                title: '网络异常！',
+                duration: 2000
+              })
+            }
+          })
+        }
+      }
     }
-  };
+  }
 
 </script>
 
@@ -78,7 +77,7 @@
     margin-top: 20rpx;
   }
 
-  .search_arr {
+  .search_that.arr {
     display: flex;
     flex-direction: row;
     border: 1px solid #d0d0d0;
@@ -99,7 +98,7 @@
     /*搜索图标*/
   }
 
-  .search_arr input {
+  .search_that.arr input {
     margin-left: 60rpx;
     height: 60rpx;
     border-radius: 5px;
@@ -118,12 +117,6 @@
     text-align: center;
     border: 1px solid #d0d0d0;
     border-radius: 10rpx;
-  }
-
-  #result {
-    margin-left: 40rpx;
-    margin-top: 20rpx;
-    margin-bottom: 20rpx;
   }
 
 </style>

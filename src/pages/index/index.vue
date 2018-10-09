@@ -58,26 +58,25 @@
                 code: code
               },
               success(res) {
-                console.log('发送code成功',res.data)
+                console.log('发送code成功', res.data)
                 let msg = res.data.msg
-          
-                if (msg=='have data'){
-                wx.setStorage({
-                  key: 'key',
-                  data: res.data.data[0],
-                  success: function(res) {
-                  console.log(res)
-                }
-               })
-                }else {
-                  console.log('open_id_test:',JSON.parse(res.data.data).openid)
+                if (msg == 'have data') {
                   wx.setStorage({
-                   key: 'open_id',
-                   data: JSON.parse(res.data.data).openid,
-                   success: function(res) {
-                   console.log(res)
-                }
-               })
+                    key: 'key',
+                    data: res.data.data[0],
+                    success: function (res) {
+                      console.log(res)
+                    }
+                  })
+                } else {
+                  console.log('open_id_test:', JSON.parse(res.data.data).openid)
+                  wx.setStorage({
+                    key: 'open_id',
+                    data: JSON.parse(res.data.data).openid,
+                    success: function (res) {
+                      console.log(res)
+                    }
+                  })
                 }
               }
             })
@@ -87,13 +86,82 @@
           }
         }
       });
-      that.$get('api/queryRealEstateList').then(function(res) {
-       console.log('返回数据:',res)
-       that.sites = res.data
-      }, function(res) {
-       // failure
-      });
-      console.log("请求")
+      wx.getStorage({
+        key: 'open_id',
+        success: function (res) {
+          if (!res.data) {
+            wx.login({
+              success: function (res) {
+                let code = res.code;
+                if (code) {
+                  console.log('获取用户登录凭证：' + code);
+                  wx.request({
+                    url: 'http://www.xaoji.com/api/getUser',
+                    data: {
+                      code: code
+                    },
+                    success(res) {
+                      console.log('发送code成功', res.data)
+                      let msg = res.data.msg
+                      if (msg == 'have data') {
+                        wx.setStorage({
+                          key: 'key',
+                          data: res.data.data[0],
+                          success: function (res) {
+                            console.log(res)
+                          }
+                        })
+                      } else {
+                        console.log('open_id_test:', JSON.parse(res.data.data).openid)
+                        wx.setStorage({
+                          key: 'open_id',
+                          data: JSON.parse(res.data.data).openid,
+                          success: function (res) {
+                            console.log(res)
+                          }
+                        })
+                      }
+                    }
+                  })
+                  // ------------------------------------
+                } else {
+                  console.log('获取用户登录态失败：' + res.errMsg);
+                }
+              }
+            });
+          }
+        }
+      })
+      that.$get('api/queryRealEstateList').then(function (res) {
+        console.log('返回数据:', res)
+        that.sites = res.data
+        wx.setStorage({
+          key: 'queryRealEstateList',
+          data: res.data,
+          success: function (res) {
+            console.log(res)
+          }
+        })
+      }, function (res) {
+        // failure
+      })
+    },
+    // 下拉刷新回调接口
+    onPullDownRefresh: function () {
+        let that = this
+        that.sites = []
+        that.$get('api/queryRealEstateList').then(function (res) {
+        that.sites = res.data
+        wx.setStorage({
+          key: 'queryRealEstateList',
+          data: res.data,
+          success: function (res) {
+            console.log(res)
+          }
+        })
+      }, function (res) {
+        // failure
+      })
     },
     methods: {}
   }

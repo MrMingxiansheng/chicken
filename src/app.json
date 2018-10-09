@@ -15,7 +15,8 @@
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#ffe144",
     "navigationBarTitleText": "小鸡窝",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "enablePullDownRefresh": true
   },
   "tabBar": {
     "color": "#000000",

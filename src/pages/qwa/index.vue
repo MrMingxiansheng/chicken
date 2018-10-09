@@ -153,7 +153,7 @@
                 })
               }
               that.$get('api/update', param)
-              that.$get('api/update', param).then(function(res){
+              that.$get('api/update', param).then(function(res){ 
               if(that.des){
                 let interact = {}
                 interact.interact_content = that.des

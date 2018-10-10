@@ -2,13 +2,8 @@
   <div class="itemx">
     <ul>
       <div v-for="(site,index) in item" :key="site" v-if="index<9">
-<<<<<<< HEAD
         <a href="/pages/topic/main">
           <li @click="storageTagId(site)">{{ site.tag_name }}</li>
-=======
-        <a href="/pages/qwb/main">
-          <li>{{ site.tag_name }}</li>
->>>>>>> 0ebd99a46026e4efcbdd05e7a07298e2ea584f41
         </a>
       </div>
     </ul>
@@ -30,24 +25,16 @@
         let param = {
           real_estate_id: this.id
         }
-<<<<<<< HEAD
         that.$get('api/queryRealEstateDetail', param).then(function (res) {
           console.log('返回:', res)
           console.log('tag', res.data.tagList)
           that.item = res.data.tagList
-=======
-        that.$get('api/queryRealEstateDetail',param).then(function(res) { //查对应id的数据
-       console.log('返回:',res)
-       console.log('tag',res.data.tagList)
-       that.item = res.data.tagList
->>>>>>> 0ebd99a46026e4efcbdd05e7a07298e2ea584f41
 
         }, function (res) {
           // failure
         });
       }
     },
-<<<<<<< HEAD
     methods: {
       //<把需要用到的数据存到缓存里>
       storageTagId(site) {
@@ -79,9 +66,6 @@
       }
       //</把需要用到的数据存到缓存里>
     }
-=======
-    methods: {}
->>>>>>> 0ebd99a46026e4efcbdd05e7a07298e2ea584f41
   };
 
 </script>

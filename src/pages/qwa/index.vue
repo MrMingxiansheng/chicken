@@ -93,6 +93,15 @@
         images: [],
       }
     },
+    onLoad (){
+      let that = this
+      wx.getStorage({
+                   key: 'real_estate_name', //楼盘名字
+                   success: function(res) {
+                   that.build = res.data
+                }
+               })
+    },
     onReady() {
       console.log("ScrollViewHeight")
       this.ScrollViewHeight()
@@ -103,38 +112,48 @@
         this.words = title
       },
       ClickPublish: async function () { //上传数据
-      let that = this
-      let isLogin = await this.$isLogin()
-      console.log('888888',isLogin)
-      if (!isLogin) {
-        //handle error
-        return
-      }
-      
-        let temp = {}
-        temp.tag_name = that.words
-        wx.getStorage({
-          key: 'real_estate_id',
-          success: function (res) {
-            console.log(res)
-            temp.real_estate_id = res.data
-            temp.user_id = isLogin
-            let param = {
-              'db': 'WpTagModel',
-              'model': 'edit',
-              'item': JSON.stringify(temp),
-              'items': JSON.stringify(temp)
-            }
-            if (that.words.length == 0) { //交互提示
-              wx.showToast({
-                title: '小话题不能为空！',
-                icon: 'loading',
-                mask: true,
-                duration: 1000
-              })
-              return;
-            }
-            that.$get('api/update', param).then(function(res){
+          let that = this
+          let isLogin = await this.$isLogin()
+          console.log('888888', isLogin)
+          if (!isLogin) {
+            //handle error
+            return
+          }
+          let temp = {}
+          temp.tag_name = that.words
+          wx.getStorage({
+            key: 'real_estate_id',
+            success: function (res) {
+              console.log(res)
+              temp.real_estate_id = res.data
+              temp.user_id = isLogin
+              let param = {
+                'db': 'WpTagModel',
+                'model': 'edit',
+                'item': JSON.stringify(temp),
+                'items': JSON.stringify(temp)
+              }
+              if (that.words.length == 0) { //交互提示
+                wx.showToast({
+                  title: '小话题不能为空！',
+                  icon: 'loading',
+                  mask: true,
+                  duration: 1000
+                })
+                return;
+              } else {
+                wx.navigateTo({
+                  url: '/pages/qwb/main'
+                })
+                wx.showToast({
+                  title: '发布成功',
+                  icon: 'true',
+                  mask: true,
+                  duration: 1000
+                })
+              }
+              that.$get('api/update', param)
+              that.$get('api/update', param).then(function(res){ 
               if(that.des){
                 let interact = {}
                 interact.interact_content = that.des
@@ -169,59 +188,59 @@
           }
         })
       },
-      ScrollViewHeight() {
-        let that = this
-        let windowHeight = wx.getSystemInfoSync().windowHeight;
-        let scrollHeight = windowHeight - 100;
-        that.scrollHeight = scrollHeight;
-        //读取机型全屏高度，减去固定高度获得scroll高度
-      },
-      upLoadImage() {
-        let _this = this;
-        wx.chooseImage({
-          count: 6, //最多可以选择的图片总数 
-          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有 
-          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有 
-          success: function (res) {
-            let paths = res.tempFilePaths
-            wx.showToast({
-              title: '正在上传...',
-              icon: 'loading',
-              mask: true,
-              duration: 500
-            })
-            for (let i = 0; i < paths.length; i++) {
-              if (_this.images.length < 6) {
-                _this.images.push(paths[i])
-              } else {
-                wx.showModal({
-                  title: '温馨提示',
-                  content: '最多可上传六张照片',
-                  showCancel: false,
-                })
+        ScrollViewHeight() {
+          let that = this
+          let windowHeight = wx.getSystemInfoSync().windowHeight;
+          let scrollHeight = windowHeight - 100;
+          that.scrollHeight = scrollHeight;
+          //读取机型全屏高度，减去固定高度获得scroll高度
+        },
+        upLoadImage() {
+          let that = this;
+          wx.chooseImage({
+            count: 6, //最多可以选择的图片总数 
+            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有 
+            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有 
+            success: function (res) {
+              let paths = res.tempFilePaths
+              wx.showToast({
+                title: '正在上传...',
+                icon: 'loading',
+                mask: true,
+                duration: 500
+              })
+              for (let i = 0; i < paths.length; i++) {
+                if (that.images.length < 6) {
+                  that.images.push(paths[i])
+                } else {
+                  wx.showModal({
+                    title: '温馨提示',
+                    content: '最多可上传六张照片',
+                    showCancel: false,
+                  })
+                }
               }
+            },
+            fail: function (res) {
+              wx.hideToast();
+              wx.showModal({
+                title: '错误提示',
+                content: '上传图片失败',
+                showCancel: false,
+              })
             }
-          },
-          fail: function (res) {
-            wx.hideToast();
-            wx.showModal({
-              title: '错误提示',
-              content: '上传图片失败',
-              showCancel: false,
-            })
-          }
-        })
-      },
-      preview: function () {
-        //图片预览
-        wx.previewImage({
-          current: '', // 当前显示图片的http链接
-          urls: this.images // 需要预览的图片http链接列表
-        })
-      },
-      removeImage(index) {
-        this.images.splice(index, 1)
-      },
+          })
+        },
+        preview: function () {
+          //图片预览
+          wx.previewImage({
+            current: '', // 当前显示图片的http链接
+            urls: this.images // 需要预览的图片http链接列表
+          })
+        },
+        removeImage(index) {
+          this.images.splice(index, 1)
+        },
     }
   }
 

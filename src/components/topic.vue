@@ -1,25 +1,29 @@
 <template>
-  <div class="topic">
+  <div class="topic" v-if="item.tag_name">
     <div class="box">
       <div class="box1">
         <a href="/pages/qwd/main" hover-class="none">
           <div class="bor">
-            <div class="border1"></div>
-            <span>{{item.owner}}{{item.userType}}</span>
+            <div class="border1">
+              <img :src="item.head_url" class="avatarUrl" />
+            </div>
+            <span>{{item.user_name}}{{item.user_type}}</span>
           </div>
         </a>
         <a href="/pages/qwb/main" hover-class="none">
-          <span class="title">"{{item.topic}}"</span></a>
+          <span class="title">"{{item.tag_name}}"</span></a>
         <div class="talk">
-          <span class="number">{{num}}讨论</span>
+          <span class="number">{{item.views_num}}讨论</span>
           <span class="send" @click="ClickSend" decode="ensp">&ensp;讨论&ensp;</span>
         </div>
       </div>
-      <div class="box2" v-for="(site,index) in sites" :key="site" v-if="index<=3">
+      <div class="box2">
         <a href="/pages/qwb/main" hover-class="none">
-          <div class="item">
-            <div class="border2"></div>
-            <span class="user" decode="ensp">{{item.user}}{{item.userType}}:&ensp;{{item.content}}</span>
+          <div class="users">
+            <div class="border2">
+              <img :src="item.head_url" class="avatarUrl" />
+            </div>
+            <span class="user" decode="ensp">{{item.user_name}}{{item.user_type}}:&ensp;{{item.interact_content}}</span>
           </div>
         </a>
       </div>
@@ -37,9 +41,11 @@
     props: ['item'],
     data() {
       return {
-        num: 0,
-        sites: [{}],
+        
       };
+    },
+    onLoad (){
+
     },
     methods: {
       ClickSend: function () {
@@ -69,19 +75,9 @@
     font-size: 25px;
   }
 
-  .border1 {
-    border: 1px solid #d0d0d0;
+  .avatarUrl {
     height: 32rpx;
     width: 32rpx;
-    margin-top: 4rpx;
-  }
-
-  .border2 {
-    border: 1px solid #d0d0d0;
-    height: 32rpx;
-    width: 32rpx;
-    position: relative;
-    bottom: 4rpx;
   }
 
   .number {
@@ -98,7 +94,7 @@
     font-size: 15px;
   }
 
-  .item {
+  .users {
     display: flex;
     flex-direction: row;
     font-size: 17px;

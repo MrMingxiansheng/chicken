@@ -172,7 +172,7 @@
         //读取机型全屏高度，减去固定高度获得scroll高度
       },
       upLoadImage() {
-        let _this = this;
+        let that = this;
         wx.chooseImage({
           count: 6, //最多可以选择的图片总数 
           sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有 
@@ -186,8 +186,8 @@
               duration: 500
             })
             for (let i = 0; i < paths.length; i++) {
-              if (_this.images.length < 6) {
-                _this.images.push(paths[i])
+              if (that.images.length < 6) {
+                that.images.push(paths[i])
               } else {
                 wx.showModal({
                   title: '温馨提示',

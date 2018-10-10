@@ -7,16 +7,14 @@
     "pages/qwb/main",
     "pages/qwc/main",
     "pages/qwd/main",
-    "pages/qwe/main",
-    "pages/qwf/main",
-    "pages/login/main",
-    "pages/topic/main"
+    "pages/login/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#ffe144",
     "navigationBarTitleText": "小鸡窝",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "enablePullDownRefresh": true
   },
   "tabBar": {
     "color": "#000000",

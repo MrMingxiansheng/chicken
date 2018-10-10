@@ -15,7 +15,6 @@
             <div class="praise-num">{{num1}}</div>
             <div class="praise" v-if="up" @click="ClickPraise">赞</div>
             <div class="praise" v-else @click="ClickPraise">已赞</div>
-            <div class="step-num" decode="ensp">&ensp;{{num2}}</div>
             <div class="step" v-if="down" @click="ClickStep">踩</div>
             <div class="step" v-else @click="ClickStep">已踩</div>
           </div>
@@ -35,7 +34,6 @@
       return {
         num1: 0,
         up: true,
-        num2: 0,
         down: true,
       }
     },
@@ -59,16 +57,13 @@
         let that = this
         that.down = !that.down
         if (that.down == false) {
-          that.num2++
           wx.showToast({
             title: "已踩",
             icon: 'success',
             mask: true,
             duration: 1000
           })
-        } else {
-          that.num2--
-        }
+        } 
       },
       ClickReply: function () {
         this.$emit("child", "s")
@@ -78,9 +73,7 @@
     }
   }
 
-</script> 
-
-
+</script>
 
 <style scoped>
   .head {

@@ -43,27 +43,24 @@
   </div>
 </template>
 <script>
-//  decode="emsp"设置空格
-import { showSuccess } from "@/util";
-import config from "@/config";
-import line from "@/components/line";
-import message from "@/components/message";
-import collect from "@/components/collect";
-import see from "@/components/see";
-import suggest from "@/components/suggest";
-export default {
-  components: {
-    line,
-    message,
-    collect,
-    see,
-    suggest
-  },
+  //  decode="emsp"设置空格
+  import line from "@/components/line"
+  import message from "@/components/message"
+  import collect from "@/components/collect"
+  import see from "@/components/see"
+  import suggest from "@/components/suggest"
+  export default {
+    components: {
+      line,
+      message,
+      collect,
+      see,
+      suggest,
+    },
 
     data() {
       return {
         //canIUse: wx.canIUse('button.open-type.getUserInfo'), //判断小程序的API，回调，参数，组件等是否在当前版本可用
-
         user: "姓名",
         identity: "(销售)",
         build: "未来悦",
@@ -71,7 +68,6 @@ export default {
         step: "3",
         lanmu: "mes",
         userInfo: {},
-
       }
     },
     onLoad: function () {
@@ -84,24 +80,7 @@ export default {
           that.userInfo = res.data
         },
         fail() {
-
         }
-        /*wx.getSetting({
-          success: function (res) {
-            if (res.authSetting['scope.userInfo']) {
-              console.log('已授权!')
-              wx.getUserInfo({
-                success: function (res) {
-                  console.log(res.userInfo)
-                  //用户已经授权过
-                  that.userInfo = res.userInfo
-
-                }
-              })
-            }
-          }
-        })*/
-
       })
     },
     methods: {
@@ -128,7 +107,7 @@ export default {
                       success: function (res) {
                         console.log(res)
                         temp.open_id = res.data
-                        let param = {
+                        let param = {    //数据库查询
                           'db': 'WpUserModel',
                           'model': 'edit',
                           'item': JSON.stringify(temp),
@@ -156,7 +135,6 @@ export default {
         }
       }
     }
-    
   }
 
 </script>
@@ -186,20 +164,15 @@ export default {
     margin-top: 5rpx;
   }
 
-.box1 {
-  display: inline-flex;
-  flex-direction: column;
-  margin-top: 5rpx;
-}
+  .box2 {
+    display: inline-flex;
+    flex-direction: row;
+  }
 
-.box2 {
-  display: inline-flex;
-  flex-direction: row;
-}
+  .p1 {
+    margin-left: 10rpx;
+  }
 
-.p1 {
-  margin-left: 10rpx;
-}
 
   .p3 {
     margin-left: 10rpx;
@@ -214,10 +187,4 @@ export default {
     margin-top: 40rpx;
   }
 
-.hd {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  margin-top: 40rpx;
-}
 </style>

@@ -1,18 +1,18 @@
 <template>
   <div class="reply">
-    <div class="header" v-if="reply.toUserInfo.user_name">
-      <img :src="reply.userInfo.head_url" alt="">
-      <span>{{reply.userInfo.user_name}}</span>
+    <div class="header" v-if="reply.interact_type==='回复'">
+      <img :src="reply.user.head_url" alt="">
+      <span>{{reply.user.user_name}}</span>
       <span class="middle">&nbsp;&nbsp;回复</span>
-      <img :src="reply.toUserInfo.head_url" alt="">
-      <span>{{reply.toUserInfo.user_name}}</span>
+      <img :src="reply.to_interact.user.head_url" alt="">
+      <span>{{reply.to_interact.user.user_name}}</span>
     </div>
-    <div class="header1" v-if="!reply.toUserInfo.user_name">
-      <img :src="reply.userInfo.head_url" alt="">
-      <span>{{reply.userInfo.user_name}}</span>
+    <div class="header1" v-if="reply.interact_type==='评论'">
+      <img :src="reply.user.head_url" alt="">
+      <span>{{reply.user.user_name}}</span>
     </div>
     <div class="content">
-      <p>{{reply.interactInfo.interact_content}}</p>
+      <p>{{reply.interact_content}}</p>
       <ul>
         <li v-for="img in reply.replyImages" :key="img">
           <img :src="img" alt="">
@@ -20,14 +20,14 @@
       </ul>
     </div>
     <div class="footer">
-      <div class="left">{{reply.interactInfo.update_time}}</div>
+      <div class="left">{{reply.update_time}}</div>
       <div class="right">
-        <div class="subReply">回复</div>
+        <div class="subReply" @click="clickReply">回复</div>
         <div class="step">
           <span>踩</span>
         </div>
         <div class="praise">
-          {{reply.interactInfo.interact_status}}
+          {{reply.interact_status}}
           <span @click="clickPraise">赞</span>
         </div>
       </div>
@@ -39,7 +39,22 @@
 export default {
   props:["reply"],
   methods: {
-    
+    clickReply(){
+      this.$emit('toReplyName',this.reply.user.user_name,this.reply.id)
+    },
+    clickPraise(){
+      let that = this
+      wx.getStorage({
+        key:'key',
+        success:function(res){
+          let myUserId = res.data.id
+          let to_interact_id = that.reply.id
+          that.$get("api/queryUserDetail", {user_id: myUserId}).then(function(res){
+            console.log(res.data)
+          })
+        }
+      })
+    }
   }
 }
 </script>

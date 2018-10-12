@@ -6,9 +6,6 @@
     <div>
       <page></page>
     </div>
-    <!-- <div class="timg">
-      <img src="/static/images/timg.jpg" />
-    </div> -->
     <topswiper :tops="tops"></topswiper>
     <div class="Hot">
       <hot :item="site" v-for="site in sites" :key="site"></hot>
@@ -44,7 +41,7 @@
         ]
       }
     },
-    onLoad() {
+    onLoad(){
       let that = this
       wx.login({
         success: function (res) {
@@ -169,14 +166,5 @@
 </script>
 
 <style scoped>
-  /*.timg {
-    width: 750rpx;
-    height: 200rpx;
-  }
-
-  .timg img {
-    width: 100%;
-    height: 100%;
-  } */
-
+ 
 </style>

@@ -114,7 +114,6 @@
       ClickPublish: async function () { //上传数据
           let that = this
           let isLogin = await this.$isLogin()
-          console.log('888888', isLogin)
           if (!isLogin) {
             //handle error
             return
@@ -152,7 +151,6 @@
                   duration: 1000
                 })
               }
-              that.$get('api/update', param)
               that.$get('api/update', param).then(function(res){ 
               if(that.des){
                 let interact = {}

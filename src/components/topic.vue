@@ -1,17 +1,17 @@
 <template>
   <div class="topic" v-if="item.tag_name">
     <div class="box">
+      <a href="/pages/qwb/main" hover-class="none">
+          <div class="title">{{item.tag_name}}</div></a>
       <div class="box1">
         <a href="/pages/qwd/main" hover-class="none">
           <div class="bor">
             <div class="border1">
               <img :src="item.head_url" class="avatarUrl" />
             </div>
-            <span>{{item.user_name}}{{item.user_type}}</span>
+            <span>{{item.user_name}}(题主)发布</span>
           </div>
-        </a>
-        <a href="/pages/qwb/main" hover-class="none">
-          <span class="title">"{{item.tag_name}}"</span></a>
+        </a>  
         <div class="talk">
           <span class="number">{{item.views_num}}讨论</span>
           <span class="send" @click="ClickSend" decode="ensp">&ensp;讨论&ensp;</span>
@@ -21,9 +21,9 @@
         <a href="/pages/qwb/main" hover-class="none">
           <div class="users">
             <div class="border2">
-              <img :src="item.head_url" class="avatarUrl" />
+              <img :src="item.head_url" class="avatarUrl" v-if="item.interact"/>
             </div>
-            <span class="user" decode="ensp">{{item.user_name}}{{item.user_type}}:&ensp;{{item.interact_content}}</span>
+            <span class="user" decode="ensp" v-if="item.interact">{{item.user_name}}:&ensp;{{item.interact.interact_content}}</span>
           </div>
         </a>
       </div>
@@ -72,7 +72,8 @@
   }
 
   .title {
-    font-size: 25px;
+    text-align: center;
+    font-size: 20px;
   }
 
   .avatarUrl {
@@ -111,7 +112,6 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
     margin-left: 20rpx;
   }
 

@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="collect" v-for="(item,itemIndex) in itemList" :key="itemIndex" >
+    <div class="collect" v-for="site in dataList" :key="site" v-if="real_estate_name">
       <div>
-      <div class="collect-build">{{item.real_estate_name}}</div>
+      <div class="collect-build">{{site.real_estate_name}}</div>
       <ul>
-        <li v-for="(site,index) in dataList" :key="index">
+        <li>
           <div class="border" @click="ClickTag_name(site)">{{ site.tag_name }}</div>
         </li>
       </ul>
@@ -23,8 +23,9 @@
 
     data() {
       return {
-        itemList: [],
         dataList: [],
+        real_estate_name:'',
+        tag_name:''
       }
     },
     onLoad: async function () {
@@ -35,7 +36,7 @@
           return
         }
         let collect = {}
-        let second_collect = {}
+        let arr = []
         let collectId = {
           user_id: isLogin
         }
@@ -46,43 +47,30 @@
               that.dataList.push(res.data.recordList[i]) //push后dataList变为收藏记录的数组
             }
           }
-          for (let j = 0; j < that.dataList.length; j++) {
-            let tag_id = {
+              for (let j = 0; j < that.dataList.length; j++) {
+              let tag_id = {
               tag_id: that.dataList[j].tag_id //获取对应的tag_id
             }
-            console.log('tag_id', tag_id)
             that.$get('api/queryTagDetail', tag_id).then(function (res) { //查询对应的tag_name和real_estate_id
               that.dataList[j].tag_name = res.data.tag.tag_name
-              collect.tag_name = res.data.tag.tag_name
-              console.log('name', collect.tag_name)
+              that.tag_name = res.data.tag.tag_name
+              // collect.tag_name = res.data.tag.tag_name
+              // console.log('对象话题名字', collect.tag_name)
               collect.real_estate_id = res.data.tag.real_estate_id
               let first_id = {
                 real_estate_id: res.data.tag.real_estate_id
               }
               that.$get('api/queryRealEstateDetail', first_id).then(function (res) { //查询对应楼盘名
-                collect.real_estate_name = res.data.realEstate.real_estate_name
-                console.log('name3', collect.real_estate_name)
-                that.itemList.push(collect)
-                console.log('1', that.itemList)
+               that.dataList[j].real_estate_name = res.data.realEstate.real_estate_name
+               that.real_estate_name = res.data.realEstate.real_estate_name
+                // collect.real_estate_name = res.data.realEstate.real_estate_name
+                // console.log('对象楼盘名字', collect.real_estate_name)
+                // that.dataList.push(collect)
+                // console.log('一个对象', collect)
+                console.log('总', that.dataList)
               })
-            console.log('2', that.dataList)
-         }, function() {
-                 if (res.data.tag.real_estate_id === that.itemList[j].real_estate_id){
-                   that.itemList[j].tag_name = res.data.tag.tag_name
-                   that.dataList[j].tag_name = res.data.tag.tag_name
-                 }else{
-                   that.dataList[j].tag_name = res.data.tag.tag_name
-               second_collect.tag_name = res.data.tag.tag_name
-               let second_id = {
-                real_estate_id: res.data.tag.real_estate_id
-              }
-              that.$get('api/queryRealEstateDetail', second_id).then(function (res) {
-                second_collect.real_estate_name = res.data.realEstate.real_estate_name
-                that.itemList.push(second_collect)
-              })
-                 }
         })
-          }
+            }
         })
       },
       methods: {
@@ -144,3 +132,4 @@
   }
 
 </style>
+

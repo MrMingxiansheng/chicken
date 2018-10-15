@@ -8,7 +8,7 @@
     </div>
     <topswiper :tops="tops"></topswiper>
     <div class="Hot">
-      <hot :item="site" v-for="site in sites" :key="site"></hot>
+      <hot :item="site" v-for="site in sites" :key="site.id"></hot>
     </div>
   </div>
 </template>

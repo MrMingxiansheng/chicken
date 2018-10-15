@@ -1,6 +1,6 @@
 <template>
-  <div class="see">
-    <span class="see-build">{{seeBuild}}</span>
+  <div class="my">
+    <span class="my-topic">{{mytopic}}</span>
     <div class="item">
       <itemx></itemx>
     </div>
@@ -18,7 +18,7 @@
     },
     data() {
       return {
-        seeBuild: "未来城",
+        mytopic: "未来城",
       }
     },
     methods: {}
@@ -27,12 +27,12 @@
 </script>
 
 <style scoped>
-  .see {
+  .my {
     display: flex;
     flex-direction: column;
   }
 
-  .see-build {
+  .my-topic {
     text-align: center;
     margin-top: 20rpx;
   }

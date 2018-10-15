@@ -116,6 +116,7 @@
 
       //ClickPublish
       ClickPublish: async function () { //上传数据
+<<<<<<< HEAD
         let that = this
         let isLogin = await this.$isLogin()
         console.log('888888', isLogin)
@@ -161,6 +162,24 @@
               interact.interact_status = '0'
               let updateInteract = {
                 'db': 'WpInteractModel',
+=======
+          let that = this
+          let isLogin = await this.$isLogin()
+          if (!isLogin) {
+            //handle error
+            return
+          }
+          let temp = {}
+          temp.tag_name = that.words
+          wx.getStorage({
+            key: 'real_estate_id',
+            success: function (res) {
+              console.log(res)
+              temp.real_estate_id = res.data
+              temp.user_id = isLogin
+              let param = {
+                'db': 'WpTagModel',
+>>>>>>> 957438c3fca124ee9a98c487b76ea95ff21d62c4
                 'model': 'edit',
                 'item': JSON.stringify(interact),
                 'items': JSON.stringify(interact)
@@ -231,12 +250,24 @@
               } else {
                 interact.interact_content = '"' + that.words + '"'
               }
+<<<<<<< HEAD
               interact.tag_id = res.data.id
               interact.user_id = res.data.user_id
               interact.interact_type = '评论'
               interact.interact_status = '0'
               interact.user_type = '匿名'
               let updateInteract = {
+=======
+              that.$get('api/update', param).then(function(res){ 
+              if(that.des){
+                let interact = {}
+                interact.interact_content = that.des
+                interact.tag_id = res.data.id
+                interact.user_id = res.data.user_id
+                interact.interact_type = '评论'
+                interact.interact_status = '0'
+                let updateInteract = {
+>>>>>>> 957438c3fca124ee9a98c487b76ea95ff21d62c4
                 'db': 'WpInteractModel',
                 'model': 'edit',
                 'item': JSON.stringify(interact),

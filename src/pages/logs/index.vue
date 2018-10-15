@@ -20,7 +20,7 @@
         <div class="hd">
           <div :class="{cur:lanmu=='mes'}" @click="change('mes')">消息</div>
           <div :class="{cur:lanmu=='col'}" @click="change('col')">收藏</div>
-          <div :class="{cur:lanmu=='se'}" @click="change('se')">看过</div>
+          <div :class="{cur:lanmu=='my'}" @click="change('my')">我的</div>
           <div :class="{cur:lanmu=='sug'}" @click="change('sug')">反馈</div>
         </div>
         <line />
@@ -31,7 +31,7 @@
           <div class="col" v-if="lanmu=='col'">
             <collect></collect>
           </div>
-          <div class="se" v-if="lanmu=='se'">
+          <div class="my" v-if="lanmu=='my'">
             <see></see>
           </div>
           <div class="sug" v-if="lanmu=='sug'">
@@ -47,14 +47,14 @@
   import line from "@/components/line"
   import message from "@/components/message"
   import collect from "@/components/collect"
-  import see from "@/components/see"
+  import my from "@/components/my"
   import suggest from "@/components/suggest"
   export default {
     components: {
       line,
       message,
       collect,
-      see,
+      my,
       suggest,
     },
 

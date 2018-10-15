@@ -7,17 +7,17 @@
     <line />
     <scroll-view scroll-y="true" :style="{height:scrollHeight+'px'}" class="item">
         <div class="box">
-          <topic v-for="site in dataList" :item="site" :key="site"></topic>
+          <topic v-for="(site,index) in dataList" :item="site" :key="index"></topic>
         </div>
     </scroll-view>
-    <div class="item2">
+    <div class="item1">
       <line />
       <ul>
         <li>
           <button open-type="share" class="share" plain="true" @click="ClickShare">分享</button>
         </li>
         <li>
-          <a class="publish" hover-class="none" href='/pages/qwa/main'>发表小话题</a>
+          <button class="publish" plain="true" @click="ClickPublish">发表小话题</button>
         </li>
       </ul>
     </div>
@@ -64,36 +64,39 @@
       })
       wx.getStorage({
         key: 'real_estate_id', //楼盘ID
-        success: function (res) {  
-           let param={
+        success: function (res) { 
+        let param={
              real_estate_id: res.data
            };  
-           let temp = {}
-           that.dataList = []
             that.$get('api/queryRealEstateDetail',param).then(function (res){
               that.num = res.data.realEstate.views_num
-              temp.tag_name = res.data.tagList[0].tag_name
-              temp.views_num = res.data.tagList[0].views_num //没有
-              temp.interact_content = res.data.tagList[0].interact.interact_content
-              
-                let user_id={
-                  user_id: res.data.tagList[0].user_id
-                }
-                 that.$get('api/queryUserDetail',user_id).then(function (res){
-                   temp.user_name = res.data.user.user_name
-                   temp.user_type = res.data.user.user_type //没有
-                   temp.head_url = res.data.user.head_url
-                 })
-                        
+              that.dataList = res.data.tagList      
+                for (let i=0;i<that.dataList.length;i++){ 
+                let id={
+                  user_id: res.data.tagList[i].user_id
+                }; 
+                console.log('ww',id)
+                 that.$get('api/queryUserDetail',id).then(function (res){                                
+                   that.dataList[i].user_name = res.data.user.user_name
+                   console.log('data',that.dataList[i].user_name)
+                   that.dataList[i].user_type = res.data.user.user_type //没有
+                   that.dataList[i].head_url = res.data.user.head_url      
+                   let temp = JSON.parse(JSON.stringify(that.dataList))
+                   that.dataList = []
+                   that.dataList = temp
+                   console.log('数据',that.dataList) 
+                 })  
+           }
               })
-              that.dataList.push(temp)  //把数据push到数组里
-              console.log('数据',temp)
-        }
+           }      
       })
     },
     onReady() {
       console.log("ScrollViewHeight")
       this.ScrollViewHeight()
+    },
+    onPullDownRefresh: function(){
+
     },
     // 计算属性
     computed: {},
@@ -106,6 +109,11 @@
         that.scrollHeight = scrollHeight;
         //读取机型全屏高度，减去固定高度获得scroll高度
       },
+      ClickPublish: function(){
+         wx.navigateTo({
+                  url: '/pages/qwa/main'
+                })
+      }
     }
   }
 
@@ -134,11 +142,6 @@
     color: #888888;
     font-size: 15px;
     right: 20rpx;
-  }
-
-  .box {
-    margin-left: 20rpx;
-    margin-bottom: 20rpx;
   }
 
   .item1 {
@@ -173,9 +176,15 @@
   }
 
   .publish {
+    width: 240rpx;
+    height: 70rpx;
     color: #c5a500;
     font-size: 20px;
     text-align: center;
+    padding: 0px;
+    vertical-align: middle;
+    line-height: 50rpx;
+    border: none;
   }
 
 </style>

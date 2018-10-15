@@ -41,7 +41,7 @@
         ]
       }
     },
-    onLoad() {
+    onLoad(){
       let that = this
       wx.login({
         success: function (res) {
@@ -166,14 +166,5 @@
 </script>
 
 <style scoped>
-  /*.timg {
-    width: 750rpx;
-    height: 200rpx;
-  }
-
-  .timg img {
-    width: 100%;
-    height: 100%;
-  } */
-
+ 
 </style>

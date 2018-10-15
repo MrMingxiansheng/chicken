@@ -9,7 +9,7 @@
       <input id="title" v-model="words" type="text" placeholder="写个小话题（8个字内）" maxlength="8" />
       <p>热门小话题：</p>
       <div class="item">
-        <itema v-for="(site,index) in sites" :key="site" v-if="index<9" :nameSet="site.name" @child="childSay"></itema>
+        
       </div>
       <textarea cols="5" class="title1" placeholder="写点小话题描述（200字内）" maxlength="200" v-model="des"></textarea>
       <div class="box">
@@ -40,11 +40,9 @@
   </div>
 </template>
 <script>
-  import itema from "@/components/itema"
   import line from "@/components/line"
   export default {
     components: {
-      itema,
       line
     },
     data() {
@@ -54,43 +52,7 @@
         words: "",
         des: '',
         tag:'',
-        sites: [{
-            name: '高铁杭州杭州'
-          },
-          {
-            name: '价格'
-          },
-          {
-            name: '距离杭州杭州'
-          },
-          {
-            name: '价格'
-          },
-          {
-            name: '距离'
-          },
-          {
-            name: '价格杭州杭州'
-          },
-          {
-            name: '高铁'
-          },
-          {
-            name: '价格'
-          },
-          {
-            name: '距离'
-          },
-          {
-            name: '价格'
-          },
-          {
-            name: '距离'
-          },
-          {
-            name: '价格'
-          }
-        ],
+        sites: [],
         images: [],
       }
     },

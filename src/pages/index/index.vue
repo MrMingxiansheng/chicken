@@ -14,7 +14,6 @@
 </template>
 
 <script>
-  //导入组件
   import line from "@/components/line"
   import hot from "@/components/hot"
   import page from "@/components/page"
@@ -25,7 +24,7 @@
       hot,
       page,
       topswiper
-    }, //声明在当前组件下使用组件
+    },
     data() {
       return {
         sites: [],

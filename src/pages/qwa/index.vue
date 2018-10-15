@@ -6,7 +6,7 @@
     </div>
     <line />
     <div :style="{height:scrollHeight+'px'}" class="scroll">
-      <input id="title" v-model="words" type="text" placeholder="写个小话题（6个字内）" maxlength="6" />
+      <input id="title" v-model="words" type="text" placeholder="写个小话题（8个字内）" maxlength="8" />
       <p>热门小话题：</p>
       <div class="item">
         <itema v-for="(site,index) in sites" :key="site" v-if="index<9" :nameSet="site.name" @child="childSay"></itema>
@@ -52,7 +52,8 @@
         scrollHeight: "",
         build: "未来城",
         words: "",
-        des:'',
+        des: '',
+        tag:'',
         sites: [{
             name: '高铁杭州杭州'
           },
@@ -93,157 +94,239 @@
         images: [],
       }
     },
-    onLoad (){
+    onLoad() {
       let that = this
       wx.getStorage({
-                   key: 'real_estate_name', //楼盘名字
-                   success: function(res) {
-                   that.build = res.data
-                }
-               })
+        key: 'real_estate_name', //楼盘名字
+        success: function (res) {
+          that.build = res.data
+        }
+      })
     },
     onReady() {
-      console.log("ScrollViewHeight")
       this.ScrollViewHeight()
     },
     computed: {},
     methods: {
+      //childsay
       childSay: function (title) {
         this.words = title
       },
+      //-childsay
+
+      //ClickPublish
       ClickPublish: async function () { //上传数据
-          let that = this
-          let isLogin = await this.$isLogin()
-          console.log('888888', isLogin)
-          if (!isLogin) {
-            //handle error
-            return
-          }
-          let temp = {}
-          temp.tag_name = that.words
-          wx.getStorage({
-            key: 'real_estate_id',
-            success: function (res) {
-              console.log(res)
-              temp.real_estate_id = res.data
-              temp.user_id = isLogin
-              let param = {
-                'db': 'WpTagModel',
-                'model': 'edit',
-                'item': JSON.stringify(temp),
-                'items': JSON.stringify(temp)
-              }
-              if (that.words.length == 0) { //交互提示
-                wx.showToast({
-                  title: '小话题不能为空！',
-                  icon: 'loading',
-                  mask: true,
-                  duration: 1000
-                })
-                return;
-              } else {
-                wx.navigateTo({
-                  url: '/pages/qwb/main'
-                })
-                wx.showToast({
-                  title: '发布成功',
-                  icon: 'true',
-                  mask: true,
-                  duration: 1000
-                })
-              }
-              that.$get('api/update', param)
-              that.$get('api/update', param).then(function(res){ 
-              if(that.des){
-                let interact = {}
+        let that = this
+        let isLogin = await this.$isLogin()
+        console.log('888888', isLogin)
+        if (!isLogin) {
+          //handle error
+          return
+        }
+        if (that.words.length === 0) { //交互提示
+          wx.showToast({
+            title: '小话题不能为空！',
+            icon: 'loading',
+            mask: true,
+            duration: 1000
+          })
+          return;
+        }
+        let temp = {}
+        temp.tag_name = that.words
+        wx.getStorage({
+          key: 'real_estate_id',
+          success: function (res) {
+            console.log(res)
+            temp.real_estate_id = res.data
+            temp.user_id = isLogin
+            temp.views_num = '0'
+            let param = {
+              'db': 'WpTagModel',
+              'model': 'edit',
+              'item': JSON.stringify(temp),
+              'items': JSON.stringify(temp)
+            }
+            that.$get('api/update', param).then(function (res) {
+              that.tag = res.data
+              let interact = {}
+              if (that.des) {
                 interact.interact_content = that.des
-                interact.tag_id = res.data.id
-                interact.user_id = res.data.user_id
-                interact.interact_type = '评论'
-                interact.interact_status = '0'
-                let updateInteract = {
+              } else {
+                interact.interact_content = '"' + that.words + '"'
+              }
+              interact.tag_id = res.data.id
+              interact.user_id = res.data.user_id
+              interact.interact_type = '评论'
+              interact.interact_status = '0'
+              let updateInteract = {
                 'db': 'WpInteractModel',
                 'model': 'edit',
                 'item': JSON.stringify(interact),
                 'items': JSON.stringify(interact)
+              }
+              that.$get('api/update', updateInteract).then(function (res) {
+                let interactId = {
+                  id: res.data.tag_id,
+                  tag_content_id: res.data.id
                 }
-                that.$get('api/update', updateInteract).then(function(res){
-                  let interactId = {
-                    id:res.data.tag_id,
-                    tag_content_id:res.data.id
-                  }
-                  let updateInteractId = {
-                    'db': 'WpTagModel',
-                    'model': 'edit',
-                    'item': JSON.stringify(interactId),
-                    'items': JSON.stringify(interactId)
-                  }
-                  that.$get('api/update', updateInteractId).then(function(){
-                    console.log('更新成功了')
+                let updateInteractId = {
+                  'db': 'WpTagModel',
+                  'model': 'edit',
+                  'item': JSON.stringify(interactId),
+                  'items': JSON.stringify(interactId)
+                }
+                that.$get('api/update', updateInteractId).then(function () {
+                  that.words = ''
+                  that.des = ''
+                  wx.navigateTo({
+                    url:'/pages/topic/main?tag='+JSON.stringify(that.tag)
                   })
                 })
-              }
-              
+              })
             })
           }
         })
       },
-        ScrollViewHeight() {
-          let that = this
-          let windowHeight = wx.getSystemInfoSync().windowHeight;
-          let scrollHeight = windowHeight - 100;
-          that.scrollHeight = scrollHeight;
-          //读取机型全屏高度，减去固定高度获得scroll高度
-        },
-        upLoadImage() {
-          let that = this;
-          wx.chooseImage({
-            count: 6, //最多可以选择的图片总数 
-            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有 
-            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有 
-            success: function (res) {
-              let paths = res.tempFilePaths
-              wx.showToast({
-                title: '正在上传...',
-                icon: 'loading',
-                mask: true,
-                duration: 500
-              })
-              for (let i = 0; i < paths.length; i++) {
-                if (that.images.length < 6) {
-                  that.images.push(paths[i])
-                } else {
-                  wx.showModal({
-                    title: '温馨提示',
-                    content: '最多可上传六张照片',
-                    showCancel: false,
-                  })
-                }
-              }
-            },
-            fail: function (res) {
-              wx.hideToast();
-              wx.showModal({
-                title: '错误提示',
-                content: '上传图片失败',
-                showCancel: false,
-              })
-            }
-          })
-        },
-        preview: function () {
-          //图片预览
-          wx.previewImage({
-            current: '', // 当前显示图片的http链接
-            urls: this.images // 需要预览的图片http链接列表
-          })
-        },
-        removeImage(index) {
-          this.images.splice(index, 1)
-        },
-    }
-  }
+      //-ClickPublish
 
+      //ClickAnonymous
+      ClickAnonymous: async function () { //上传数据
+        let that = this
+        let isLogin = await this.$isLogin()
+        console.log('888888', isLogin)
+        if (!isLogin) {
+          //handle error
+          return
+        }
+        if (that.words.length === 0) { //交互提示
+          wx.showToast({
+            title: '小话题不能为空！',
+            icon: 'loading',
+            mask: true,
+            duration: 1000
+          })
+          return;
+        }
+        let temp = {}
+        temp.tag_name = that.words
+        wx.getStorage({
+          key: 'real_estate_id',
+          success: function (res) {
+            console.log(res)
+            temp.real_estate_id = res.data
+            temp.user_id = isLogin
+            temp.views_num = '0'
+            let param = {
+              'db': 'WpTagModel',
+              'model': 'edit',
+              'item': JSON.stringify(temp),
+              'items': JSON.stringify(temp)
+            }
+            that.$get('api/update', param).then(function (res) {
+              that.tag = res.data
+              let interact = {}
+              if (that.des) {
+                interact.interact_content = that.des
+              } else {
+                interact.interact_content = '"' + that.words + '"'
+              }
+              interact.tag_id = res.data.id
+              interact.user_id = res.data.user_id
+              interact.interact_type = '评论'
+              interact.interact_status = '0'
+              interact.user_type = '匿名'
+              let updateInteract = {
+                'db': 'WpInteractModel',
+                'model': 'edit',
+                'item': JSON.stringify(interact),
+                'items': JSON.stringify(interact)
+              }
+              that.$get('api/update', updateInteract).then(function (res) {
+                let interactId = {
+                  id: res.data.tag_id,
+                  tag_content_id: res.data.id
+                }
+                let updateInteractId = {
+                  'db': 'WpTagModel',
+                  'model': 'edit',
+                  'item': JSON.stringify(interactId),
+                  'items': JSON.stringify(interactId)
+                }
+                that.$get('api/update', updateInteractId).then(function () {
+                  console.log('话题描述发布成功')
+                  wx.navigateTo({
+                    url:'/pages/topic/main?tag='+JSON.stringify(that.tag)
+                  })
+                })
+              })
+            })
+          }
+        })
+      },
+      //-ClickAnonymous
+
+      //ScrollViewHeight
+      ScrollViewHeight() {
+        let that = this
+        let windowHeight = wx.getSystemInfoSync().windowHeight;
+        let scrollHeight = windowHeight - 100;
+        that.scrollHeight = scrollHeight;
+        //读取机型全屏高度，减去固定高度获得scroll高度
+      },
+      //-ScrollViewHeight
+
+      //upLoadImage
+      upLoadImage() {
+        let that = this;
+        wx.chooseImage({
+          count: 6, //最多可以选择的图片总数 
+          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有 
+          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有 
+          success: function (res) {
+            let paths = res.tempFilePaths
+            wx.showToast({
+              title: '正在上传...',
+              icon: 'loading',
+              mask: true,
+              duration: 500
+            })
+            for (let i = 0; i < paths.length; i++) {
+              if (that.images.length < 6) {
+                that.images.push(paths[i])
+              } else {
+                wx.showModal({
+                  title: '温馨提示',
+                  content: '最多可上传六张照片',
+                  showCancel: false,
+                })
+              }
+            }
+          },
+          fail: function (res) {
+            wx.hideToast();
+            wx.showModal({
+              title: '错误提示',
+              content: '上传图片失败',
+              showCancel: false,
+            })
+          }
+        })
+      },
+      //-upLoadImage
+
+      preview: function () {
+        //图片预览
+        wx.previewImage({
+          current: '', // 当前显示图片的http链接
+          urls: this.images // 需要预览的图片http链接列表
+        })
+      },
+      removeImage(index) {
+        this.images.splice(index, 1)
+      },
+    }//methods
+  }//export default
 </script>
 <style scoped>
   .loupan {
@@ -331,6 +414,7 @@
     top: 0;
     right: 0;
   }
+
   .box .box-img .big {
     width: 200rpx;
     height: 200rpx;

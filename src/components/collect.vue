@@ -1,25 +1,35 @@
 <template>
   <div class="collect">
-    <span class="collect-build">{{CollectBuild}}</span>
-    <div class="item">
-      <itemx></itemx>
-    </div>
-    <line />
+    <collectitem v-for="record in recordList" :key="record.id" :tag_id="record.tag_id"></collectitem>
   </div>
 </template>
 
 <script>
   import line from "@/components/line"
   import itemx from "@/components/itemx"
+  import collectitem from "@/components/collectItem"
   export default {
     components: {
       line,
-      itemx
+      itemx,
+      collectitem
     },
-
+    onLoad(){
+      let that = this
+      wx.getStorage({
+        key:'key',
+        success:function(res){
+          that.$get('api/queryUserDetail',{user_id:res.data.id}).then(function(obj){
+            that.recordList = obj.data.recordList.filter(function(ele){
+              return ele.record_type === '收藏记录'
+            })
+          })
+        }
+      })
+    },
     data() {
       return {
-        CollectBuild: "缦云芳",
+        recordList:''
       }
     },
     methods: {}

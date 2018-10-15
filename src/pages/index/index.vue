@@ -6,12 +6,9 @@
     <div>
       <page></page>
     </div>
-    <!-- <div class="timg">
-      <img src="/static/images/timg.jpg" />
-    </div> -->
     <topswiper :tops="tops"></topswiper>
     <div class="Hot">
-      <hot :item="site" v-for="site in sites" :key="site"></hot>
+      <hot :item="site" v-for="site in sites" :key="site.id"></hot>
     </div>
   </div>
 </template>

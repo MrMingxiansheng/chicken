@@ -8,19 +8,26 @@
       <input id="title" v-model="words" type="text" placeholder="小话题标题（限8个字内,讨论或问题皆可）" placeholder-style="font-size: 15px" maxlength="8" />
       <textarea cols="5" class="title1" placeholder="加点小话题的描述,限200个字内（可不填）" maxlength="200" placeholder-style="font-size: 15px" v-model="des"></textarea>
       <div class="box">
+<<<<<<< HEAD
         <div v-for="(img,index) in images" :key="index" v-if="index<6" class="box-img">
           <img :src="img" class="big" @click="preview(index)">
           <img src="/static/images/chacha.png" class="min" @click="removeImage(index)">
+=======
+        <div v-for="(img,index) in localImages" :key="index" v-if="index<6" class="box-img">
+          <img :src="img" class="big" @click="preview(index)">
+          <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         </div>
-        <div id="plus" v-if="images.length<6&&images.length>0">
+        <div id="plus" v-if="localImages.length<6&&localImages.length>0">
           <img src="/static/images/jiahao.png" @click="upLoadImage" />
         </div>
-        <div id="plus1" v-if="images.length===0">
+        <div id="plus1" v-if="localImages.length===0">
           <img src="/static/images/jiahao.png" @click="upLoadImage" />
           <span>图片(可不选)</span>
         </div>
       </div>
     </div>
+    <canvas canvas-id='attendCanvasId' class='myCanvas'></canvas>
     <div class="item1">
       <span>提示：可以匿名发小话题</span>
       <line />
@@ -49,6 +56,8 @@
         des: '',
         tag:'',
         images: [],
+        localImages:[],
+        uploadTasks:[]
       }
     },
     onLoad() {
@@ -246,6 +255,7 @@
       //upLoadImage
       upLoadImage() {
         let that = this
+<<<<<<< HEAD
         /*
         wx.chooseImage({
           count: 6, //最多可以选择的图片总数 
@@ -267,19 +277,87 @@
                   title: '温馨提示',
                   content: '最多可上传六张照片',
                   showCancel: false,
+=======
+        let num = 6 - that.localImages.length
+        if(num>0){
+          wx.chooseImage({
+            count: num,
+            sizeType: ['compressed'],
+            sourceType: ['album'],
+            success: function (res) {
+              that.getCanvasImg(0, 0, res.tempFilePaths) //进行压缩
+              wx.showLoading({
+                title:'正在上传图片',
+                mask:true
+              })
+              let timer = setTimeout(function(){
+                wx.hideLoading({
+                  success(){
+                    clearTimeout(timer)
+                    for(let i in res.tempFilePaths){
+                      that.localImages.push(res.tempFilePaths[i])
+                    }
+                  }
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
                 })
-              }
+              },3000)
             }
+          })
+        }
+      },
+
+      //压缩并获取图片，这里用了递归的方法来解决canvas的draw方法延时的问题
+      getCanvasImg: function (index,failNum, tempFilePaths){
+        console.log('2')
+        let that = this;
+        if (index < tempFilePaths.length){
+          const ctx = wx.createCanvasContext('attendCanvasId');
+          wx.getImageInfo({
+            src:tempFilePaths[index],
+            success(res){
+              let picH = res.height
+              let picW = res.width
+              ctx.drawImage(tempFilePaths[index], 0, 0, 150, 150*picH/picW);
+              ctx.draw(true, function () {
+                index = index + 1;//上传成功的数量，上传成功则加1
+                wx.canvasToTempFilePath({
+                  width:150,
+                  height:150*picH/picW,
+                  canvasId: 'attendCanvasId',
+                  success: function (res) {
+                    that.uploadCanvasImg(res.tempFilePath);
+                    that.getCanvasImg(index,failNum,tempFilePaths);
+                  }, 
+                  fail: function (e) {
+                    failNum += 1;//失败数量，可以用来提示用户
+                    that.getCanvasImg(inedx,failNum,tempFilePaths);
+                  }
+                });
+              });
+            }
+          })
+          
+        }
+      },
+
+      uploadCanvasImg: function (canvasImg){
+        let that = this;
+        let uploadTask = wx.uploadFile({
+          url: 'http://www.xaoji.com:3000/api/uploadImage',
+          filePath: canvasImg,
+          name: 'pic',
+          header:{
+            'content-type':'multipart/form-data'
           },
-          fail: function (res) {
-            wx.hideToast();
-            wx.showModal({
-              title: '错误提示',
-              content: '上传图片失败',
-              showCancel: false,
-            })
+          success: function (res) {
+            console.log('res',res)
+            console.log('JSON.parse(res.data)',JSON.parse(res.data))
+            let url = 'http://www.xaoji.com:3000'+JSON.parse(res.data).url
+            that.images.push(url)
+            // console.log(that.images)
           }
         })
+<<<<<<< HEAD
         */
         wx.chooseImage({
           count: 6, //最多可以选择的图片总数 
@@ -320,18 +398,36 @@
             
           }
         })
+=======
+        that.uploadTasks.push(uploadTask)
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
       },
       //-upLoadImage
 
       preview: function (index) {
         //图片预览
         wx.previewImage({
+<<<<<<< HEAD
           current: this.images[index], // 当前显示图片的http链接
           urls: this.images // 需要预览的图片http链接列表
+=======
+          current: this.localImages[index], // 当前显示图片的http链接
+          urls: this.localImages // 需要预览的图片http链接列表
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         })
       },
       removeImage(index) {
-        this.images.splice(index, 1)
+        let that = this
+        if(that.images[index]){
+          that.images.splice(index, 1)
+          that.localImages.splice(index, 1)
+          that.uploadTasks.splice(index, 1)
+        }else{
+          console.log('else')
+          that.uploadTasks[index].abort()
+          that.localImages.splice(index, 1)
+          that.uploadTasks.splice(index, 1)
+        }
       },
     }//methods
   }
@@ -447,7 +543,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+<<<<<<< HEAD
   }
+
+  #plus1 span {
+    font-size: 15px;
+    color: rgb(137, 145, 150);
+=======
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
+  }
+ 
 
   #plus1 span {
     font-size: 15px;
@@ -504,5 +609,14 @@
     border: none;
   }
   
+<<<<<<< HEAD
 
+=======
+  .myCanvas{
+    width: 2000px;
+    height: 2000px;
+    position: absolute;
+    left: -3000px;
+  }
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
 </style>

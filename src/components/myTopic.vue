@@ -34,6 +34,7 @@
           success: function (res) {
             if (res.confirm) {
               console.log('用户点击确定')
+<<<<<<< HEAD
               that.$get('api/update', updateTemp).then(function (res) {
                 let myDetail = wx.getStorageSync('myDetail')
                 for(let i=0; i<myDetail.tagList.length; i++){
@@ -50,6 +51,24 @@
                   }
                 })
                 console.log('成功', res)
+=======
+              let myDetail = wx.getStorageSync('myDetail')
+              for(let i=0; i<myDetail.tagList.length; i++){
+                if(myDetail.tagList[i].id === that.tag.id){
+                  myDetail.tagList.splice(i,1)
+                  break
+                }
+              }
+              wx.setStorage({
+                key:'myDetail',
+                data:myDetail,
+                success(){
+                  that.$emit('reGetStorage')
+                }
+              })
+              that.$get('api/update', updateTemp).then(function (res) {
+                console.log('删除话题成功', res)
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
               })
             } else if (res.cancel) {
               console.log('用户点击取消')

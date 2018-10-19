@@ -1,13 +1,19 @@
 <template>
   <div>
+<<<<<<< HEAD
     <button v-if="!userInfo.user_name" open-type="getUserInfo" @getuserinfo="handleUserInfo">授权登录</button>
+=======
+
+    <button v-if="!myDetail.user.user_name" open-type="getUserInfo" @getuserinfo="handleUserInfo">授权登录</button>
+
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     <div class="box">
       <div class="head">
-        <img :src="userInfo.head_url" class="avatarUrl" />
+        <img :src="myDetail.user.head_url" class="avatarUrl" />
       </div>
       <div class="box1">
         <div class="box2">
-          <div class="p1">{{userInfo.user_name}}{{identity}}</div>
+          <div class="p1">{{myDetail.user.user_name}}{{identity}}</div>
           <div class="p2">{{build}}</div>
         </div>
         <div class="p3" decode="emsp">{{praise}}赞 &emsp; {{step}}踩</div>
@@ -24,6 +30,7 @@
         <line />
         <div class="bd">
           <div class="mes" v-if="lanmu=='mes'">
+<<<<<<< HEAD
             <message v-for="msg in msgList" :key="msg.id" :msg="msg"></message>
           </div>
           <div class="col" v-if="lanmu=='col'">
@@ -31,6 +38,15 @@
           </div>
           <div class="mytopic" v-if="lanmu=='mytopic'">
             <mytopic v-for="tag in tagList" :key="tag.id" :tag="tag" @reGetStorage="reGetStorage"></mytopic>
+=======
+            <message v-for="msg in myDetail.msgList" :key="msg.id" :msg="msg"></message>
+          </div>
+          <div class="col" v-if="lanmu=='col'">
+            <collect v-for="record in myDetail.recordList" :key="record.id" :record="record"></collect>
+          </div>
+          <div class="mytopic" v-if="lanmu=='mytopic'">
+            <mytopic v-for="tag in myDetail.tagList" :key="tag.id" :tag="tag" @reGetStorage="reGetStorage"></mytopic>
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
           </div>
           <div class="sug" v-if="lanmu=='sug'">
             <suggest></suggest>
@@ -65,6 +81,7 @@
         praise: "25",
         step: "3",
         lanmu: "mes",
+<<<<<<< HEAD
         userInfo: {},
         msgList: '',
         recordList: '',
@@ -74,6 +91,13 @@
 
     onShow: function () {
       this.getStorage()
+=======
+        myDetail:''
+      }
+    },
+    onShow: function () {
+      this.getMyDetail()
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     },
 
     methods: {
@@ -109,7 +133,6 @@
                         }
                         that.$get('api/update', param)
                         console.log("发送")
-                        that.userInfo = temp
                         wx.setStorage({
                           key: 'key',
                           data: temp,
@@ -129,22 +152,37 @@
         }
       },
 
+<<<<<<< HEAD
       getStorage() {
+=======
+
+      getMyDetail(){
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         let that = this
         wx.getStorage({
           key: 'myDetail',
           success: function (res) {
+<<<<<<< HEAD
             console.log(res.data)
             that.userInfo = res.data.user
             that.tagList = res.data.tagList
             that.recordList = res.data.recordList
             that.msgList = res.data.msgList
+=======
+            console.log('获取myDetail成功',res.data)
+            that.myDetail = res.data
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
           }
         })
       },
 
+<<<<<<< HEAD
       reGetStorage() {
         this.getStorage()
+=======
+      reGetStorage(){
+        this.getMyDetail()
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
       }
     }
   }
@@ -193,7 +231,11 @@
     margin-top: 40rpx;
   }
 
+<<<<<<< HEAD
   .cur {
+=======
+  .cur{
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     color: #f3cc01;
   }
 

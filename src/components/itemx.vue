@@ -1,7 +1,7 @@
 <template>
   <div class="itemx" >
     <div class="tagList">
-      <div class="tag"  v-for="(site,index) in tagList" :key="site.id"  v-if="index<6" @click="toTopicPage(site)">{{ site.tag_name }}</div>
+      <div :class="currentIndex===index?'tag2':'tag1'"  v-for="(site,index) in tagList" :key="site.id"  v-if="index<6"  @click="toTopicPage(site)">{{ site.tag_name }}</div>
     </div>
   </div>
 </template>
@@ -9,9 +9,17 @@
 <script>
   export default {
     props: ['tagList'],
+    data(){
+      return{
+        currentIndex:''
+      }
+    },
     methods: {
       toTopicPage(site) {
+<<<<<<< HEAD
         console.log('taglist',this.tagList)
+=======
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         let obj = {
           tag_name:site.tag_name,
           views_num:site.views_num,
@@ -22,6 +30,13 @@
         wx.navigateTo({
           url:'/pages/qwb/main?tag='+JSON.stringify(obj)
         })
+      },
+
+      down(index){
+        this.currentIndex = index
+      },
+      up(){
+        this.currentIndex = ''
       }
     }
   };
@@ -37,7 +52,7 @@
     margin-left: 5rpx;
   }
 
-  .tag {
+  .tag1 {
     width: 230rpx;
     background-color: #f8f8f8;
     font-size: 13px;
@@ -47,5 +62,17 @@
     box-sizing: border-box;
     margin: 10rpx 10rpx;
   }
+
+  .tag2 {
+    width: 230rpx;
+    background-color: #ffe144;
+    font-size: 13px;
+    line-height: 60rpx;
+    border: 1px solid rgb(229, 229, 229);
+    text-align: center;
+    box-sizing: border-box;
+    margin: 10rpx 10rpx;
+  }
+
 
 </style>

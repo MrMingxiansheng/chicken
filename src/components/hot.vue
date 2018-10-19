@@ -1,12 +1,12 @@
 <template>
   <div class="hot" v-if="item.real_estate_name">
-    <div class="title" @click="real_estate_name"><a href="/pages/counter/main" hover-class="none">{{item.real_estate_name}}</a></div>
+    <div class="title" @click="toTopicPage"><a href="/pages/counter/main" hover-class="none">{{item.real_estate_name}}</a></div>
     <div class="view">
       <div class="num">
         <span class="tagNum">{{tagList.length}}话题</span>
         <span class="viewNum">&ensp;&ensp;{{item.views_num}}阅读</span>
       </div>
-      <div class="sendTopic" @click="sendTopic"><a href="/pages/qwa/main" hover-class="none">发话题</a></div>
+      <div class="sendTopic" @click="toTopicPage"><a href="/pages/counter/main" hover-class="none">发话题</a></div>
     </div>
     <itemx :tagList="tagList"></itemx>
     <line />
@@ -40,24 +40,7 @@
       });
     },
     methods: {
-      sendTopic: function () {
-        let that = this
-        wx.setStorage({
-          key: 'real_estate_id', //楼盘ID
-          data: that.item.id,
-          success: function (res) {
-
-          }
-        })
-        wx.setStorage({
-          key: 'real_estate_name', //楼盘名字
-          data: that.item.real_estate_name,
-          success: function (res) {
-
-          }
-        })
-      },
-      real_estate_name: function () {
+      toTopicPage: function () {
         let that = this
         wx.setStorage({
           key: 'real_estate_id', //楼盘ID

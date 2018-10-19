@@ -1,27 +1,10 @@
 <template>
   <div class="message">
-    <div class="build">{{build}}</div>
-    <div class="box1">
-      <a href="/pages/qwd/main" hover-class="none">
-        <div class="head"></div>
-      </a>
-      <div class="box2">
-        <div class="box3">
-          <p class="name">{{name1}}{{identity}}@{{name2}}{{identity}}</p>
-          <div class="words">{{words}}</div>
-        </div>
-        <div class="box4">
-          <p class="time">{{time}}</p>
-          <div class="box5">
-            <div class="praise-num">{{num1}}</div>
-            <div class="praise">赞</div>
-            <div class="step-num" decode="ensp">&ensp;{{num2}}</div>
-            <div class="step">踩</div>
-          </div>
-          <p class="reply" @click="ClickReply">回复</p>
-        </div>
-      </div>
-    </div>
+    <img :src="head_url" alt="">
+    <span class="nick">{{user_name}}</span>
+    给你
+    <span class="type">&nbsp;{{msg.interact_type}}</span>
+    <span class="content" v-if="msg.interact_content">&nbsp;{{msg.interact_content}}</span>
   </div>
 </template>
 
@@ -30,17 +13,19 @@
     components: {
 
     },
+    props:['msg'],
     data() {
       return {
-        build: "楼盘名称",
-        name1: "姓名",
-        identity: "(销售)",
-        name2: "拉拉",
-        time: "前天",
-        words: "看不到大客户读书森林防火双离合分那就回复您开户奥拉夫",
-        num1: "5",
-        num2: "5"
+        head_url:'',
+        user_name:''
       }
+    },
+    onLoad(){
+      let that = this
+      that.$get('api/queryUserDetail',{user_id:that.msg.user_id}).then(function(res){
+        that.head_url = res.data.user.head_url
+        that.user_name = res.data.user.user_name
+      })
     },
     methods: {}
   }
@@ -48,6 +33,7 @@
 </script>
 
 <style scoped>
+<<<<<<< HEAD
   .build {
     text-align: center;
     margin-top: 20rpx;
@@ -115,6 +101,11 @@
     width: 600rpx;
     white-space: normal;
     /*自动换行*/
+=======
+  img{
+    width: 40rpx;
+    height: 40rpx;
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
   }
 
 </style>

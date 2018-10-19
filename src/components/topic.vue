@@ -19,6 +19,10 @@
       </div>
       <div class="box2" v-if="item.interact.interact_content">
             <div class="words" @click="ClickTag(item)">{{content}}</div>
+<<<<<<< HEAD
+=======
+            <div class="article" @click="toArticlePage" v-if="articleSrc">文章链接</div>
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         <div class="images">
           <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)" class="img">
         </div>
@@ -38,6 +42,7 @@
     data() {
       return {
         content:'',
+<<<<<<< HEAD
         images:''
       };
     },
@@ -51,6 +56,33 @@
         console.log('arr',arr)
         this.images = JSON.parse(arr[1])
       }
+=======
+        images:'',
+        articleSrc:''
+      };
+    },
+    onLoad (){
+      let that = this
+      let allContent,articleArr
+      if(this.item.interact.interact_content.indexOf('images=')===-1){
+        //没有图片
+        allContent = this.item.interact.interact_content
+      }else{
+        //有图片
+        let arr = this.item.interact.interact_content.split('images=')
+        allContent = arr[0]
+        this.images = JSON.parse(arr[1])
+      }
+      if(allContent.indexOf('https://')===-1){
+        //没有连接
+        this.content = allContent
+      }else{
+        //有连接
+        let articleArr = allContent.split('https://')
+        this.content = articleArr[0]
+        this.articleSrc = 'https://' + articleArr[1]
+      }
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     },
     methods: {
       ClickTag: function (item) {
@@ -139,6 +171,14 @@
           }
         })
       },
+
+      toArticlePage(){
+        let that = this
+        wx.navigateTo({
+          url: '/pages/article/main?src='+that.articleSrc
+        })
+      },
+
     }
   };
 
@@ -249,4 +289,12 @@
     white-space: nowrap;
   }
 
+<<<<<<< HEAD
+=======
+  .article{
+    color:#f3cc01;
+    line-height: 50rpx;
+  }
+
+>>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
 </style>

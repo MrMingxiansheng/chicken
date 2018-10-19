@@ -6,19 +6,17 @@
     "pages/qwa/main",
     "pages/qwb/main",
     "pages/qwc/main",
-    "pages/qwd/main",
-    "pages/login/main"
+    "pages/qwd/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#ffe144",
     "navigationBarTitleText": "小鸡窝",
-    "navigationBarTextStyle": "black",
-    "enablePullDownRefresh": true
+    "navigationBarTextStyle": "black"
   },
   "tabBar": {
-    "color": "#000000",
-    "selectedColor": "#1aad19",
+    "color": "#8a8a8a",
+    "selectedColor": "#f3cc01",
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [{

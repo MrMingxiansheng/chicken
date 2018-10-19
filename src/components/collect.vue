@@ -1,57 +1,69 @@
 <template>
   <div class="collect">
-    <collectitem v-for="record in recordList" :key="record.id" :tag_id="record.tag_id"></collectitem>
+    <div class="item">
+      <div class="border" @click="test">{{ record.tag.tag_name }}</div>
+      <div class="collect-build">{{record.realEstate.real_estate_name}}</div>
+    </div>
+    <line />
   </div>
 </template>
 
 <script>
   import line from "@/components/line"
   import itemx from "@/components/itemx"
-  import collectitem from "@/components/collectItem"
   export default {
     components: {
       line,
-      itemx,
-      collectitem
+      itemx
     },
+    props:['record'],
     onLoad(){
-      let that = this
-      wx.getStorage({
-        key:'key',
-        success:function(res){
-          that.$get('api/queryUserDetail',{user_id:res.data.id}).then(function(obj){
-            that.recordList = obj.data.recordList.filter(function(ele){
-              return ele.record_type === '收藏记录'
-            })
-          })
-        }
-      })
+      
     },
     data() {
       return {
-        recordList:''
+       
       }
     },
-    methods: {}
+    methods: {
+      test(){
+        let obj = {
+          tag_name:this.record.tag.tag_name,
+          views_num:this.record.tag.views_num,
+          user_id:this.record.tag.user_id,
+          real_estate_id:this.record.realEstate.real_estate_id,
+          id:this.record.tag.id
+        }
+        wx.navigateTo({
+          url: '/pages/qwb/main?tag=' + JSON.stringify(obj)
+        })
+      },
+    }
   };
 
 </script>
 
 <style scoped>
-  .collect {
+  .item {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: 13px;
+    align-items: baseline;
   }
 
   .collect-build {
-    text-align: center;
-    margin-top: 20rpx;
+    margin-right: 20rpx;
   }
 
-  .item {
-    margin-top: 10rpx;
-    margin-bottom: 10rpx;
-    margin-left: 30rpx;
+  .border {
+    width: 230rpx;
+    /* background-color: #f8f8f8; */
+    line-height: 60rpx;
+    border: 1px solid rgb(229, 229, 229);
+    text-align: center;
+    box-sizing: border-box;
+    margin: 20rpx 20rpx;
   }
 
 </style>

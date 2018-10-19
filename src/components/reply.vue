@@ -1,8 +1,8 @@
 <template>
   <div class="reply">
     <div class="avatar">
-      <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner">
-      <img :src="reply.user.head_url"  v-if="user_type !== '匿名'" @click="test">
+      <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner" @click="test">
+      <img :src="reply.user.head_url"  v-else @click="test">
     </div>
     <div class="content">
       <div class="content-in">
@@ -19,7 +19,11 @@
           <span v-if="reply.interact_type==='回复'">&nbsp;&nbsp;回复&nbsp;&nbsp;{{reply.to_interact.user.user_name}}<span v-if="reply.to_interact.user_id===owner">(题主)</span></span>
         </div>
         <div class="words">
-          {{reply.interact_content}}
+          <span>{{content}}</span>
+          <div class="article" @click="toArticlePage" v-if="articleSrc">文章链接</div>
+        </div>
+        <div class="images">
+          <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)">
         </div>
         <div class="time">
           {{reply.update_time}}
@@ -46,10 +50,36 @@
 
 <script>
   export default {
-    props: ["reply","owner","hideUser","user_type"],
+    props: ["reply","owner","hideUser","user_type","myDetail"],
     data() {
       return {
-        // praiseStatus:'赞',
+        content:'',
+        images:'',
+        articleSrc:'',
+        stepLock:true,
+        praiseLock:true,
+      }
+    },
+    onLoad(){
+      let that = this
+      let allContent,articleArr
+      if(this.reply.interact_content.indexOf('images=')===-1){
+        //没有图片
+        allContent = this.reply.interact_content
+      }else{
+        //有图片
+        let arr = this.reply.interact_content.split('images=')
+        allContent = arr[0]
+        this.images = JSON.parse(arr[1])
+      }
+      if(allContent.indexOf('https://')===-1){
+        //没有连接
+        this.content = allContent
+      }else{
+        //有连接
+        let articleArr = allContent.split('https://')
+        this.content = articleArr[0]
+        this.articleSrc = 'https://' + articleArr[1]
       }
     },
     methods: {
@@ -59,144 +89,184 @@
       clickPraise() {
         console.log('点了一下赞')
         let that = this
-        wx.getStorage({
-          key: 'key',
-          success: function (res) {
-            let myUserId = res.data.id
-            let to_interact_id = that.reply.id
-            let tag_id = that.reply.tag_id
-            let interact = {}
-            let todo = ''
-            that.$get("api/queryUserDetail", {
-              user_id: myUserId
-            }).then(function (res) {
-              let interactList = res.data.interactList
-              let arr = interactList.filter(function (ele) {
-                return ele.to_interact_id === to_interact_id
-              })
-              let arr1 = arr.filter(function (e) {
-                return e.interact_type === '点赞'
-              })
-              if (arr.length > 0) {
-                if (arr1.length > 0) {
-                  todo = '取消赞'
-                } else {
-                  todo = '点赞'
-                }
-              } else {
-                todo = '点赞'
-              }
-              if (todo === '点赞') {
-                interact.tag_id = tag_id
-                interact.user_id = myUserId
-                interact.interact_type = '点赞'
-                interact.to_interact_id = to_interact_id
-                interact.interact_status = '0'
-                let updateInteract = {
-                  'db': 'WpInteractModel',
-                  'model': 'edit',
-                  'item': JSON.stringify(interact),
-                  'items': JSON.stringify(interact)
-                }
-                that.$get('api/update', updateInteract).then(function () {
-                  that.reply.interact_status = parseInt(that.reply.interact_status) + 1
-                })
-              } else if (todo === '取消赞') {
-                interact.id = arr1[0].id
-                interact.interact_type = '取消赞'
-                interact.tag_id = tag_id
-                interact.user_id = myUserId
-                interact.to_interact_id = to_interact_id
-                interact.interact_status = '0'
-                let updateInteract = {
-                  'db': 'WpInteractModel',
-                  'model': 'edit',
-                  'item': JSON.stringify(interact),
-                  'items': JSON.stringify(interact)
-                }
-                that.$get('api/update', updateInteract).then(function () {
-                  that.reply.interact_status = parseInt(that.reply.interact_status) - 1
-                })
-              }
-            })
+        if(!that.praiseLock){
+          return
+        }
+        that.praiseLock = !that.praiseLock
+        let interact = {} 
+        let todo = ''
+        let praiseId = ''
+        let interactList = that.myDetail.interactList
+        if(interactList.length > 0){
+          //有交互
+          for(let i=0; i<interactList.length; i++){
+            if(interactList[i].to_interact_id === that.reply.id && interactList[i].interact_type === '点赞'){
+              //已经有点赞,要取消赞
+              todo = '取消赞'
+              praiseId = interactList[i].id
+              break
+            }
           }
-        })
+          if(todo !== '取消赞'){
+            todo = '点赞'
+          }
+        }else{
+          //没交互
+          todo = '点赞'
+        }
+        if (todo === '点赞') {
+          that.reply.interact_status = parseInt(that.reply.interact_status) + 1
+          interact.tag_id = that.reply.tag_id
+          interact.user_id = that.myDetail.user.id
+          interact.interact_type = '点赞'
+          interact.to_interact_id = that.reply.id
+          interact.interact_status = '0'
+          that.myDetail.interactList.push(interact)
+          that.reSetMyDetail(that.myDetail)
+          let updateInteract = {
+            'db': 'WpInteractModel',
+            'model': 'edit',
+            'item': JSON.stringify(interact),
+            'items': JSON.stringify(interact)
+          }
+          that.$get('api/update', updateInteract).then(function (res) {
+            console.log('点赞返回',res.data)
+            that.praiseLock = !that.praiseLock
+          })
+        }else if (todo === '取消赞') {
+          that.reply.interact_status = parseInt(that.reply.interact_status) - 1
+          for(let i=0; i<that.myDetail.interactList.length; i++){
+            if(that.myDetail.interactList[i].id===praiseId){
+              that.myDetail.interactList.splice(i,1)
+              break
+            }
+          }
+          that.reSetMyDetail(that.myDetail)
+          interact.id = praiseId
+          interact.interact_type = '取消赞'
+          interact.tag_id = that.reply.tag_id
+          interact.user_id = that.myDetail.user.id
+          interact.to_interact_id = that.reply.id
+          interact.interact_status = '0'
+          let updateInteract = {
+            'db': 'WpInteractModel',
+            'model': 'edit',
+            'item': JSON.stringify(interact),
+            'items': JSON.stringify(interact)
+          }
+          that.$get('api/update', updateInteract).then(function (res) {
+            console.log('取消赞返回',res.data)
+            that.praiseLock = !that.praiseLock
+          })
+        }
       },
       clickStep() {
         console.log('点了一下踩')
         let that = this
-        wx.getStorage({
-          key: 'key',
-          success: function (res) {
-            let myUserId = res.data.id
-            let to_interact_id = that.reply.id
-            let tag_id = that.reply.tag_id
-            let interact = {}
-            let todo = ''
-            that.$get("api/queryUserDetail", {
-              user_id: myUserId
-            }).then(function (res) {
-              let interactList = res.data.interactList
-              let arr = interactList.filter(function (ele) {
-                return ele.to_interact_id === to_interact_id
-              })
-              let arr1 = arr.filter(function (e) {
-                return e.interact_type === '点踩'
-              })
-              if (arr.length > 0) {
-                if (arr1.length > 0) {
-                  todo = '取消踩'
-                } else {
-                  todo = '点踩'
-                }
-              } else {
-                todo = '点踩'
-              }
-              if (todo === '点踩') {
-                interact.tag_id = tag_id
-                interact.user_id = myUserId
-                interact.interact_type = '点踩'
-                interact.to_interact_id = to_interact_id
-                interact.interact_status = '0'
-                let updateInteract = {
-                  'db': 'WpInteractModel',
-                  'model': 'edit',
-                  'item': JSON.stringify(interact),
-                  'items': JSON.stringify(interact)
-                }
-                that.$get('api/update', updateInteract).then(function () {
-                  that.reply.cnum = parseInt(that.reply.cnum) + 1
-                })
-              } else if (todo === '取消踩') {
-                interact.id = arr1[0].id
-                interact.interact_type = '取消踩'
-                interact.tag_id = tag_id
-                interact.user_id = myUserId
-                interact.to_interact_id = to_interact_id
-                interact.interact_status = '0'
-                let updateInteract = {
-                  'db': 'WpInteractModel',
-                  'model': 'edit',
-                  'item': JSON.stringify(interact),
-                  'items': JSON.stringify(interact)
-                }
-                that.$get('api/update', updateInteract).then(function () {
-                  that.reply.cnum = parseInt(that.reply.cnum) - 1
-                })
-              }
-            })
+        if(!that.stepLock){
+          return
+        }
+        that.stepLock = !that.stepLock
+        let interact = {} 
+        let todo = ''
+        let stepId = ''
+        let interactList = that.myDetail.interactList
+        if(interactList.length > 0){
+          //有交互
+          for(let i=0; i<interactList.length; i++){
+            if(interactList[i].to_interact_id === that.reply.id && interactList[i].interact_type === '点踩'){
+              //已经有点踩,要取消踩
+              todo = '取消踩'
+              stepId = interactList[i].id
+              break
+            }
           }
-        })
+          if(todo !== '取消踩'){
+            todo = '点踩'
+          }
+        }else{
+          //没交互
+          todo = '点踩'
+        }
+        if (todo === '点踩') {
+          that.reply.cnum = parseInt(that.reply.cnum) + 1
+          interact.tag_id = that.reply.tag_id
+          interact.user_id = that.myDetail.user.id
+          interact.interact_type = '点踩'
+          interact.to_interact_id = that.reply.id
+          interact.interact_status = '0'
+          that.myDetail.interactList.push(interact)
+          that.reSetMyDetail(that.myDetail)
+          let updateInteract = {
+            'db': 'WpInteractModel',
+            'model': 'edit',
+            'item': JSON.stringify(interact),
+            'items': JSON.stringify(interact)
+          }
+          that.$get('api/update', updateInteract).then(function (res) {
+            console.log('点踩返回',res.data)
+            that.stepLock = !that.stepLock
+          })
+        }else if (todo === '取消踩') {
+          that.reply.cnum = parseInt(that.reply.cnum) - 1
+          for(let i=0; i<that.myDetail.interactList.length; i++){
+            if(that.myDetail.interactList[i].id===stepId){
+              that.myDetail.interactList.splice(i,1)
+              break
+            }
+          }
+          that.reSetMyDetail(that.myDetail)
+          interact.id = stepId
+          interact.interact_type = '取消踩'
+          interact.tag_id = that.reply.tag_id
+          interact.user_id = that.myDetail.user.id
+          interact.to_interact_id = that.reply.id
+          interact.interact_status = '0'
+          let updateInteract = {
+            'db': 'WpInteractModel',
+            'model': 'edit',
+            'item': JSON.stringify(interact),
+            'items': JSON.stringify(interact)
+          }
+          that.$get('api/update', updateInteract).then(function (res) {
+            console.log('取消踩返回',res.data)
+            that.stepLock = !that.stepLock
+          })
+        }
       },
       test(){
-        console.log('用户id',this.reply.user_id)
-        this.$get('api/queryUserDetail',{user_id:this.reply.user_id}).then(function(res){
-          console.log(res.data)
+        let that = this
+        console.log('点击')
+        that.$get('api/queryTagDetail',{tag_id: that.reply.tag_id}).then(function(res){
+          console.log('交互列表',res.data.interactList)
         })
-        
-         
+      },
+      preview: function (index) {
+        //图片预览
+        wx.previewImage({
+          current: this.images[index], // 当前显示图片的http链接
+          urls: this.images // 需要预览的图片http链接列表
+        })
+      },
+
+      toArticlePage(){
+        let that = this
+        wx.navigateTo({
+          url: '/pages/article/main?src='+that.articleSrc
+        })
+      },
+
+      reSetMyDetail(data){
+        wx.setStorage({
+          key:'myDetail',
+          data:data,
+          success(){
+            console.log('myDetail缓存设置成功')
+          }
+        })
       }
-    }
+
+    }//methods下括号
   }
 
 </script>
@@ -230,17 +300,34 @@
   .content-in .user {
     color: rgb(137, 145, 150);
     font-size: 15px;
+    overflow: hidden; /*自动隐藏文字*/
+    text-overflow: ellipsis;/*文字隐藏后添加省略号*/
+    white-space: nowrap;/*强制不换行*/
   }
 
   .content-in .words {
+    word-wrap:break-word; 
+    word-break:normal; 
     color: #000;
     margin: 20rpx 0;
     font-size: 17px;
   }
 
+  .words .article{
+    color:#f3cc01;
+    line-height: 50rpx;
+  }
+  
+  .content-in .images img {
+    width: 105rpx;
+    height: 105rpx;
+    margin-right: 10rpx;
+    margin-bottom: 10rpx;
+  }
+
   .content-in .time {
     color: rgb(137, 145, 150);
-    font-size: 15px;
+    font-size: 13px;
   }
 
   .interact {

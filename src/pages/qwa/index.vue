@@ -8,15 +8,9 @@
       <input id="title" v-model="words" type="text" placeholder="小话题标题（限8个字内,讨论或问题皆可）" placeholder-style="font-size: 15px" maxlength="8" />
       <textarea cols="5" class="title1" placeholder="加点小话题的描述,限200个字内（可不填）" maxlength="200" placeholder-style="font-size: 15px" v-model="des"></textarea>
       <div class="box">
-<<<<<<< HEAD
-        <div v-for="(img,index) in images" :key="index" v-if="index<6" class="box-img">
-          <img :src="img" class="big" @click="preview(index)">
-          <img src="/static/images/chacha.png" class="min" @click="removeImage(index)">
-=======
         <div v-for="(img,index) in localImages" :key="index" v-if="index<6" class="box-img">
           <img :src="img" class="big" @click="preview(index)">
           <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         </div>
         <div id="plus" v-if="localImages.length<6&&localImages.length>0">
           <img src="/static/images/jiahao.png" @click="upLoadImage" />
@@ -255,29 +249,6 @@
       //upLoadImage
       upLoadImage() {
         let that = this
-<<<<<<< HEAD
-        /*
-        wx.chooseImage({
-          count: 6, //最多可以选择的图片总数 
-          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有 
-          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有 
-          success: function (res) {
-            let paths = res.tempFilePaths
-            wx.showToast({
-              title: '正在上传...',
-              icon: 'loading',
-              mask: true,
-              duration: 500
-            })
-            for (let i = 0; i < paths.length; i++) {
-              if (that.images.length < 6) {
-                that.images.push(paths[i])
-              } else {
-                wx.showModal({
-                  title: '温馨提示',
-                  content: '最多可上传六张照片',
-                  showCancel: false,
-=======
         let num = 6 - that.localImages.length
         if(num>0){
           wx.chooseImage({
@@ -298,7 +269,6 @@
                       that.localImages.push(res.tempFilePaths[i])
                     }
                   }
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
                 })
               },3000)
             }
@@ -357,63 +327,15 @@
             // console.log(that.images)
           }
         })
-<<<<<<< HEAD
-        */
-        wx.chooseImage({
-          count: 6, //最多可以选择的图片总数 
-          sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有 
-          sourceType: ['album'], // 可以指定来源是相册还是相机，默认二者都有 
-          success (res) {
-            const tempFilePaths = res.tempFilePaths
-            for(let i=0; i<tempFilePaths.length; i++){
-              wx.uploadFile({
-                url: 'http://www.xaoji.com:3000/api/uploadImage', 
-                filePath: tempFilePaths[i],
-                name: 'pic',
-                header:{
-                  'content-type':'multipart/form-data'
-                },
-                success (res){
-                  console.log('传图成功',res)
-                  let url = 'http://www.xaoji.com:3000'+JSON.parse(res.data).url
-                  console.log('url',url)
-                  if (that.images.length < 6) {
-                  that.images.push(url)
-                  } else {
-                  wx.showModal({
-                  title: '温馨提示',
-                  content: '最多可上传六张照片',
-                  showCancel: false,
-                })
-              }
-                  console.log('that.images',that.images)
-                  // const data = res.data
-                },
-                fail(err){
-                  console.log('传图失败',err)
-                }
-              })
-
-            }
-            
-          }
-        })
-=======
         that.uploadTasks.push(uploadTask)
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
       },
       //-upLoadImage
 
       preview: function (index) {
         //图片预览
         wx.previewImage({
-<<<<<<< HEAD
-          current: this.images[index], // 当前显示图片的http链接
-          urls: this.images // 需要预览的图片http链接列表
-=======
           current: this.localImages[index], // 当前显示图片的http链接
           urls: this.localImages // 需要预览的图片http链接列表
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         })
       },
       removeImage(index) {
@@ -543,14 +465,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-<<<<<<< HEAD
-  }
-
-  #plus1 span {
-    font-size: 15px;
-    color: rgb(137, 145, 150);
-=======
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
   }
  
 
@@ -609,14 +523,10 @@
     border: none;
   }
   
-<<<<<<< HEAD
-
-=======
   .myCanvas{
     width: 2000px;
     height: 2000px;
     position: absolute;
     left: -3000px;
   }
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
 </style>

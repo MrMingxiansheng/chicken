@@ -1,13 +1,8 @@
 <template>
   <div class="reply">
     <div class="avatar">
-<<<<<<< HEAD
-      <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner">
-      <img :src="reply.user.head_url" v-else @click="test">
-=======
       <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner" @click="test">
       <img :src="reply.user.head_url"  v-else @click="test">
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     </div>
     <div class="content">
       <div class="content-in">
@@ -24,12 +19,8 @@
           <span v-if="reply.interact_type==='回复'">&nbsp;&nbsp;回复&nbsp;&nbsp;{{reply.to_interact.user.user_name}}<span v-if="reply.to_interact.user_id===owner">(题主)</span></span>
         </div>
         <div class="words">
-<<<<<<< HEAD
-          {{content}}
-=======
           <span>{{content}}</span>
           <div class="article" @click="toArticlePage" v-if="articleSrc">文章链接</div>
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         </div>
         <div class="images">
           <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)">
@@ -63,19 +54,6 @@
     data() {
       return {
         content:'',
-<<<<<<< HEAD
-        images:''
-      }
-    },
-    onLoad(){
-      console.log('reply',this.reply)
-      if(this.reply.interact_content.indexOf('images=')===-1){
-        this.content = this.reply.interact_content
-      }else{
-        let arr = this.reply.interact_content.split('images=')
-        this.content = arr[0]
-        this.images = JSON.parse(arr[1])
-=======
         images:'',
         articleSrc:'',
         stepLock:true,
@@ -102,7 +80,6 @@
         let articleArr = allContent.split('https://')
         this.content = articleArr[0]
         this.articleSrc = 'https://' + articleArr[1]
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
       }
     },
     methods: {
@@ -287,18 +264,6 @@
             console.log('myDetail缓存设置成功')
           }
         })
-<<<<<<< HEAD
-        
-         
-      },
-      preview: function (index) {
-        //图片预览
-        wx.previewImage({
-          current: this.images[index], // 当前显示图片的http链接
-          urls: this.images // 需要预览的图片http链接列表
-        })
-=======
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
       }
 
     }//methods下括号

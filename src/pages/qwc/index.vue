@@ -63,15 +63,6 @@ onUnload() {
                   that.sites.push(res.data[i])
                 }
                that.$get('api/queryRealEstateDetail', {real_estate_id:res.data[i].id}).then(function (res) {
-<<<<<<< HEAD
-                wx.showToast({
-                    title: '正在搜索...',
-                    icon: 'loading',
-                    mask: true,
-                    duration: 1500
-                  })
-=======
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
                for (let j=0; j< res.data.tagList.length; j++) {
                  res.data.tagList[j].show = false
                 if (res.data.tagList[j].tag_name.indexOf(searchValue) >= 0) { //insecOf用法

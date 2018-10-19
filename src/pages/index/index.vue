@@ -51,24 +51,6 @@
 
     onShow() {
       let that = this
-<<<<<<< HEAD
-      wx.getStorage({
-        key: 'key',
-        success(res) {
-          that.$get('api/queryUserDetail', {
-            user_id: res.data.id
-          }).then(function (obj) {
-            wx.setStorage({
-              key: 'myDetail',
-              data: obj.data,
-              success() {
-                console.log('myDetail设置成功')
-              }
-            })
-          })
-        }
-      })
-=======
       wx.login({
         success: function (res) {
           let code = res.code;
@@ -116,7 +98,6 @@
     onShow(){
       let that = this
       
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     },
     // 下拉刷新回调接口
     onPullDownRefresh: function () {
@@ -139,67 +120,6 @@
     methods: {
       Login() {
         let that = this
-<<<<<<< HEAD
-        wx.login({
-          success: function (res) {
-            let code = res.code;
-            if (code) {
-              console.log('获取用户登录凭证：' + code);
-              // --------- 发送凭证 ------------------
-              wx.request({
-                url: 'http://www.xaoji.com/api/getUser',
-                data: {
-                  code: code
-                },
-                success(res) {
-                  console.log('发送code成功', res.data)
-                  let msg = res.data.msg
-                  if (msg == 'have data') {
-                    wx.setStorage({
-                      key: 'key',
-                      data: res.data.data[0],
-                      success: function (res) {
-                        console.log(res)
-                      }
-                    })
-                  } else {
-                    console.log('open_id_test:', JSON.parse(res.data.data).openid)
-                    wx.setStorage({
-                      key: 'open_id',
-                      data: JSON.parse(res.data.data).openid,
-                      success: function (res) {
-                        console.log(res)
-                      }
-                    })
-                  }
-                }
-              })
-              // ------------------------------------
-            } else {
-              console.log('获取用户登录态失败：' + res.errMsg);
-            }
-          }
-        })
-      },
-      RealEstateList() {
-        let that = this
-        that.sites = []
-        that.$get('api/queryRealEstateList').then(function (res) {
-          console.log('返回数据:', res)
-          that.sites = res.data
-          wx.setStorage({
-            key: 'queryRealEstateList',
-            data: res.data,
-            success: function (res) {
-              console.log(res)
-            }
-          })
-        }, function (res) {
-          // failure
-        })
-      }
-    }
-=======
         that.sites = []
         that.getRealEstate()
     },
@@ -249,22 +169,11 @@
           }
         })
       }
-
-    }//methods下括号
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
+    }
   }
-
+}
 </script>
 
 <style scoped>
-  /*.timg {
-    width: 750rpx;
-    height: 200rpx;
-  }
-
-  .timg img {
-    width: 100%;
-    height: 100%;
-  } */
 
 </style>

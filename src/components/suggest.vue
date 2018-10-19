@@ -29,13 +29,8 @@
     },
     onLoad (){
       let that = this
-<<<<<<< HEAD
-      that.first_scene = '/static/images/kefu.jpg'
-      that.second_scene = '/static/images/xaoji.jpg'
-=======
       that.first_scene = ''
       that.second_scene = ''
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
       that.a ='that.first_scene,that.second_scene'
       that.b = that.a.split(',')
     },

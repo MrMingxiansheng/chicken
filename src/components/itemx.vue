@@ -16,10 +16,6 @@
     },
     methods: {
       toTopicPage(site) {
-<<<<<<< HEAD
-        console.log('taglist',this.tagList)
-=======
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         let obj = {
           tag_name:site.tag_name,
           views_num:site.views_num,

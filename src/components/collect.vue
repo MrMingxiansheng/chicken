@@ -50,23 +50,6 @@
     justify-content: space-between;
     font-size: 13px;
     align-items: baseline;
-<<<<<<< HEAD
-=======
-  }
-
-  .collect-build {
-    margin-right: 20rpx;
-  }
-
-  .border {
-    width: 230rpx;
-    /* background-color: #f8f8f8; */
-    line-height: 60rpx;
-    border: 1px solid rgb(229, 229, 229);
-    text-align: center;
-    box-sizing: border-box;
-    margin: 20rpx 20rpx;
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
   }
 
   .collect-build {

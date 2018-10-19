@@ -6,15 +6,9 @@
     </div>
     <line />
     <scroll-view scroll-y="true" :style="{height:scrollHeight+'rpx'}" class="item">
-<<<<<<< HEAD
-      <div class="box">
-        <topic v-for="(site,index) in dataList" :item="site" :key="index"></topic>
-      </div>
-=======
         <div class="box">
           <topic v-for="(site,index) in dataList" :item="site" :key="index"></topic>
         </div>
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     </scroll-view>
     <canvas canvas-id='attendCanvasId' class='myCanvas'></canvas>
     <div class="footer">
@@ -55,11 +49,7 @@
         scrollHeight: "",
         views_num: "",
         real_estate_name: "",
-<<<<<<< HEAD
-        real_estate_id: '',
-=======
         real_estate_id:'',
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         dataList: [],
         words:'',
         images:[],
@@ -83,10 +73,6 @@
     },
 
     onLoad() {
-<<<<<<< HEAD
-      this.ScrollViewHeight()
-      this.getdDataList()
-=======
       let that = this
       that.ScrollViewHeight()
       wx.getStorage({
@@ -130,7 +116,6 @@
       this.dataList = []
       this.focusState = false
       this.user_status = '匿名'
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     },
 
     onUnload() {
@@ -138,11 +123,6 @@
       this.views_num = ''
       this.dataList = []
     },
-<<<<<<< HEAD
-
-    // 计算属性
-=======
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     computed: {},
     methods: {
       //计算滚动高度
@@ -153,62 +133,6 @@
         let rwindowWidth = 750
         let px_to_rpx = rwindowWidth / windowWidth
         let rWindowHeight = windowHeight * px_to_rpx
-<<<<<<< HEAD
-        that.scrollHeight = rWindowHeight - 180;
-        //读取机型全屏高度，减去固定高度获得scroll高度
-      },
-
-      ClickPublish: function () {
-        let that = this
-        wx.setStorage({
-          key: 'real_estate_id', //楼盘ID
-          data: that.real_estate_id,
-          success: function (res) {}
-        })
-        wx.setStorage({
-          key: 'real_estate_name', //楼盘名字
-          data: that.real_estate_name,
-          success: function (res) {}
-        })
-        wx.navigateTo({
-          url: '/pages/qwa/main'
-        })
-      },
-
-      getdDataList() {
-        let that = this
-        wx.getStorage({
-          key: 'real_estate_name', //楼盘名字
-          success: function (res) {
-            that.real_estate_name = res.data
-          }
-        })
-        wx.getStorage({
-          key: 'real_estate_id', //楼盘ID
-          success: function (res) {
-            that.real_estate_id = res.data
-            let param = {
-              real_estate_id: res.data
-            };
-            that.$get('api/queryRealEstateDetail', param).then(function (res) {
-              that.views_num = res.data.realEstate.views_num
-              for (let i = 0; i < res.data.tagList.length; i++) {
-                that.dataList = res.data.tagList
-                let second_tag_id = {
-                  tag_id: that.dataList[i].id
-                }
-                that.$get('api/queryTagDetail', second_tag_id).then(function (res) {
-                  that.dataList[i].cnum = res.data.interactList[0].cnum
-                  that.dataList[i].length = res.data.interactList.length
-                  let temp = JSON.parse(JSON.stringify(that.dataList))
-                  that.dataList = []
-                  that.dataList = temp
-                })
-              }
-            })
-          }
-        })
-=======
         that.scrollHeight = rWindowHeight - 270;
         //读取机型全屏高度，减去固定高度获得scroll高度
       },
@@ -500,7 +424,6 @@
           this.user_status = '匿名'
         }
         this.focusState = false
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
       }
 
 
@@ -556,16 +479,6 @@
   #enter {
     width: 600rpx;
     height: 70rpx;
-<<<<<<< HEAD
-    color: #f3cc01;
-    font-size: 20px;
-    text-align: center;
-    padding: 0px;
-    vertical-align: middle;
-    line-height: 50rpx;
-    border: none;
-=======
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
   }
 
   .send_arr {

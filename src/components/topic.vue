@@ -19,10 +19,7 @@
       </div>
       <div class="box2" v-if="item.interact.interact_content">
             <div class="words" @click="ClickTag(item)">{{content}}</div>
-<<<<<<< HEAD
-=======
             <div class="article" @click="toArticlePage" v-if="articleSrc">文章链接</div>
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         <div class="images">
           <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)" class="img">
         </div>
@@ -42,21 +39,6 @@
     data() {
       return {
         content:'',
-<<<<<<< HEAD
-        images:''
-      };
-    },
-    onLoad (){
-      console.log('uu',this.item)
-      if(this.item.interact.interact_content.indexOf('images=')===-1){
-        this.content = this.item.interact.interact_content
-      }else{
-        let arr = this.item.interact.interact_content.split('images=')
-        this.content = arr[0]
-        console.log('arr',arr)
-        this.images = JSON.parse(arr[1])
-      }
-=======
         images:'',
         articleSrc:''
       };
@@ -82,7 +64,6 @@
         this.content = articleArr[0]
         this.articleSrc = 'https://' + articleArr[1]
       }
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     },
     methods: {
       ClickTag: function (item) {
@@ -289,12 +270,9 @@
     white-space: nowrap;
   }
 
-<<<<<<< HEAD
-=======
   .article{
     color:#f3cc01;
     line-height: 50rpx;
   }
 
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
 </style>

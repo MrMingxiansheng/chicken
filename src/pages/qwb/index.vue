@@ -7,21 +7,12 @@
     </div>
     <scroll-view scroll-y="true" :style="{height:scrollHight+'rpx'}">
       <div class="content">
-<<<<<<< HEAD
-        <speak v-for="obj in interactList" :key="obj.id" :reply="obj" :owner="user_id" :user_type="user_type" :hideUser="hideUser"
-          @toReplyName="toReplyName"></speak>
-=======
         <speak v-for="obj in interactList" :key="obj.id" :reply="obj" :owner="tag.user_id" :user_type="user_type" :hideUser="hideUser" :myDetail="myDetail" @toReplyName="toReplyName"></speak>
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
       </div>
     </scroll-view>
     <canvas canvas-id='attendCanvasId' class='myCanvas'></canvas>
     <div class="footer">
-<<<<<<< HEAD
-      <div v-for="(img,index) in images" :key="index" v-if="index<6" class="box-img">
-=======
       <div v-for="(img,index) in localImages" :key="index" v-if="index<6" class="box-img">
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         <img :src="img" class="big" @click="preview">
         <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
       </div>
@@ -37,12 +28,9 @@
         </li>
         <li>
           <button plain="true" class="collect" @click.stop="clickCollect">{{collect_status}}</button>
-<<<<<<< HEAD
-=======
         </li>
         <li>
           <button class="userstatus" plain="true" @click="changeUserStatus()">{{user_status}}</button>
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
         </li>
         <li>
           <button open-type="share" class="share" plain="true" @click="ClickShare">分享</button>
@@ -62,26 +50,6 @@
     },
     data() {
       return {
-<<<<<<< HEAD
-        scrollHight: '',
-        focusState: false,
-        collect_status: '',
-        collectId: '',
-        words: '',
-        images: [],
-        interactList: '',
-        tag_id: '',
-        tag_name: '',
-        user_id: '',
-        my_user_id: '',
-        myDetail: '',
-        user_type: '',
-        hideUser: '',
-        real_estate_name: '',
-        to_interact_id: '',
-        views_num: '',
-        cursor: -1
-=======
         scrollHight: '',        //滚动高度
         focusState: false,      //输入框是否聚焦
         collect_status:'',      //收藏状态,是<收藏>还是<已收藏>
@@ -101,7 +69,6 @@
         cursor: -1,             //光标位置
         tag:'',                 //包含tag_name,views_num,user_id(传给reply,用来判断是不是题主),tag_id(单独提出来了)
         user_status:'匿名'
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
       }
     },
 
@@ -120,11 +87,8 @@
       this.hideUser = ''
       this.collect_status = ''
       this.images = []
-<<<<<<< HEAD
-=======
       this.localImages = []
       this.user_status = '匿名'
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     },
 
     methods: {
@@ -179,12 +143,6 @@
                       interact.interact_type = '回复'
                       interact.to_interact_id = that.to_interact_id
                       arr.splice(0, 1)
-<<<<<<< HEAD
-                      if (that.images.length === 0) {
-                        interact.interact_content = arr.join(':')
-                      } else {
-                        interact.interact_content = arr.join(':') + 'images=' + JSON.stringify(that.images)
-=======
                       if(that.localImages.length === 0){
                         interact.interact_content = arr.join(':')
                       }else{
@@ -199,7 +157,6 @@
                           })
                           return;
                         }
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
                       }
                     } else {
                       wx.showToast({
@@ -221,12 +178,6 @@
                   }
                 } else {
                   interact.interact_type = '评论'
-<<<<<<< HEAD
-                  if (that.images.length === 0) {
-                    interact.interact_content = that.words
-                  } else {
-                    interact.interact_content = that.words + 'images=' + JSON.stringify(that.images)
-=======
                   if(that.localImages.length === 0){
                     interact.interact_content = that.words
                   }else{
@@ -241,18 +192,10 @@
                       })
                       return;
                     }
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
                   }
                 }
               } else {
                 interact.interact_type = '评论'
-<<<<<<< HEAD
-                if (that.images.length === 0) {
-                  interact.interact_content = that.words
-                } else {
-                  interact.interact_content = that.words + 'images=' + JSON.stringify(that.images)
-                }
-=======
                 if(that.localImages.length === 0){
                   interact.interact_content = that.words
                 }else{
@@ -271,7 +214,6 @@
               }
               if(that.user_status === '已匿名'){
                 interact.user_type = '匿名'
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
               }
               interact.tag_id = that.tag_id
               interact.user_id = res.data.id
@@ -291,19 +233,12 @@
               that.$get('api/update', updateInteract).then(function (obj) {
                 that.words = ''
                 that.images = []
-<<<<<<< HEAD
-                that.reloadTopicPage()
-                console.log('到底了')
-              })
-              that.$nextTick(function () {
-=======
                 that.localImages = []
                 that.user_status = '匿名'
                 that.reloadTopicPage()
                 console.log('到底了')
               })
               that.$nextTick(function(){
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
                 that.focusState = false
               })
             }
@@ -340,14 +275,7 @@
             that.myDetail.recordList.reverse()
             that.myDetail.recordList.push(res.data)
             that.myDetail.recordList.reverse()
-<<<<<<< HEAD
-            wx.setStorage({
-              key: 'myDetail',
-              data: that.myDetail
-            })
-=======
             that.reSetMyDetail(that.myDetail)
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
             console.log('收藏成功')
           })
         } else if (that.collect_status === '已收藏') {
@@ -362,33 +290,17 @@
           }
           that.$get('api/update', uploadRecord).then(function (res) {
             that.collect_status = '收藏'
-<<<<<<< HEAD
-            for (let i = 0; i < that.myDetail.recordList.length; i++) {
-              if (that.myDetail.recordList[i].tag_id === that.tag_id) {
-=======
             for(let i=0; i<that.myDetail.recordList.length; i++){
               if(that.myDetail.recordList[i].tag_id===that.tag_id){
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
                 that.myDetail.recordList.splice(i, 1)
                 break
               }
             }
-<<<<<<< HEAD
-            wx.setStorage({
-              key: 'myDetail',
-              data: that.myDetail
-            })
-            console.log('取消收藏成功')
-          })
-        }
-        that.$nextTick(function () {
-=======
             that.reSetMyDetail(that.myDetail)
             console.log('取消收藏成功')
           })
         }
         that.$nextTick(function(){
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
           that.focusState = false
         })
       },
@@ -427,17 +339,6 @@
         let that = this
         wx.getStorage({
           key: 'myDetail',
-<<<<<<< HEAD
-          success(res) {
-            that.myDetail = res.data
-            that.my_user_id = res.data.user.id
-            let recordList = res.data.recordList
-            if (recordList.length === 0) {
-              that.collect_status = '收藏'
-            } else {
-              for (let i = 0; i < recordList.length; i++) {
-                if (recordList[i].tag_id === that.tag_id) {
-=======
           success: function (res) {
             console.log('获取myDetail成功')
             that.myDetail = res.data
@@ -448,59 +349,19 @@
             }else{
               for(let i=0; i<recordList.length; i++){
                 if(recordList[i].tag_id === that.tag_id){
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
                   that.collectId = recordList[i].id
                   that.collect_status = '已收藏'
                   break
                 }
               }
-<<<<<<< HEAD
-              if (that.collect_status === '') {
-                that.collect_status = '收藏'
-              }
-            }
-=======
               if(that.collect_status === ''){
                 that.collect_status = '收藏'
               }
             }  
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
           }
         })
       },
 
-<<<<<<< HEAD
-      upLoadImage() {
-        let that = this
-        wx.chooseImage({
-          count: 6, //最多可以选择的图片总数 
-          sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有 
-          sourceType: ['album'], // 可以指定来源是相册还是相机，默认二者都有 
-          success(res) {
-            const tempFilePaths = res.tempFilePaths
-            for (let i = 0; i < tempFilePaths.length; i++) {
-              wx.uploadFile({
-                url: 'http://www.xaoji.com:3000/api/uploadImage',
-                filePath: tempFilePaths[i],
-                name: 'pic',
-                header: {
-                  'content-type': 'multipart/form-data'
-                },
-                success(res) {
-                  console.log('传图成功', res)
-                  let url = 'http://www.xaoji.com:3000' + JSON.parse(res.data).url
-                  console.log('url', url)
-                  that.images.push(url)
-                  console.log('that.images', that.images)
-                  // const data = res.data
-                },
-                fail(err) {
-                  console.log('传图失败', err)
-                }
-              })
-            }
-
-=======
       //上传图片
       upLoadImage() {
         let that = this
@@ -622,19 +483,10 @@
           success: function (res) {
             console.log('获取myDetail成功',res.data)
             that.myDetail = res.data
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
           }
         })
       },
 
-<<<<<<< HEAD
-      removeImage(index) {
-        this.images.splice(index, 1)
-      },
-
-    },
-
-=======
       changeUserStatus(){
         let that = this
         if(this.user_status === '匿名'){
@@ -648,7 +500,6 @@
 
     }//methods下括号
     
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
   }
 
 </script>
@@ -728,13 +579,7 @@
     left: 20rpx;
   }
 
-<<<<<<< HEAD
-  .collect,
-  .share,
-  .image {
-=======
   .collect,.share,.image,.userstatus{
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
     width: 120rpx;
     height: 70rpx;
     color: #f3cc01;
@@ -760,14 +605,6 @@
     position: absolute;
     top: 0;
     right: 0;
-<<<<<<< HEAD
-  }
-
-  .box-img .big {
-    width: 115rpx;
-    height: 115rpx;
-=======
->>>>>>> 243ba1fcd661f77b4395f19a357b9cb9444bfac3
   }
 
   .box-img .big {

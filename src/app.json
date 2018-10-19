@@ -6,7 +6,8 @@
     "pages/qwa/main",
     "pages/qwb/main",
     "pages/qwc/main",
-    "pages/qwd/main"
+    "pages/qwd/main",
+    "pages/article/main"
   ],
   "window": {
     "backgroundTextStyle": "light",

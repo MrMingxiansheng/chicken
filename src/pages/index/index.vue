@@ -8,13 +8,12 @@
     </div>
     <topswiper :tops="tops"></topswiper>
     <div class="Hot">
-      <hot :item="site" v-for="site in sites" :key="site.id"></hot>
+      <hot :item="site" v-for="site in sites" :key="site"></hot>
     </div>
   </div>
 </template>
 
 <script>
-  //导入组件
   import line from "@/components/line"
   import hot from "@/components/hot"
   import page from "@/components/page"
@@ -25,7 +24,7 @@
       hot,
       page,
       topswiper
-    }, //声明在当前组件下使用组件
+    },
     data() {
       return {
         sites: [],
@@ -41,7 +40,7 @@
         ]
       }
     },
-    onLoad() {
+    onLoad(){
       let that = this
       wx.login({
         success: function (res) {
@@ -150,14 +149,5 @@
 </script>
 
 <style scoped>
-  /*.timg {
-    width: 750rpx;
-    height: 200rpx;
-  }
-
-  .timg img {
-    width: 100%;
-    height: 100%;
-  } */
-
+ 
 </style>

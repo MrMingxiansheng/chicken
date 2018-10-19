@@ -4,7 +4,7 @@
     <div class="search" @click="suo">
       <div class="search_arr">
         <icon class="searchcion" size="20" type="search"></icon>
-        <input type="text" placeholder="输入楼盘名称或小话题搜索" disabled="true" placeholder-style="font-size:13px"/>
+        <input type="text" placeholder="输入楼盘名称或小话题搜索" disabled="true" />
       </div>
     </div>
   </div>

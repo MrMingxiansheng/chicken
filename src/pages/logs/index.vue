@@ -1,8 +1,6 @@
 <template>
   <div>
-
     <button v-if="!userInfo.user_name" open-type="getUserInfo" @getuserinfo="handleUserInfo">授权登录</button>
-
     <div class="box">
       <div class="head">
         <img :src="userInfo.head_url" class="avatarUrl" />
@@ -20,19 +18,19 @@
         <div class="hd">
           <div :class="{cur:lanmu=='mes'}" @click="change('mes')">消息</div>
           <div :class="{cur:lanmu=='col'}" @click="change('col')">收藏</div>
-          <div :class="{cur:lanmu=='my'}" @click="change('my')">我的</div>
+          <div :class="{cur:lanmu=='mytopic'}" @click="change('mytopic')">话题</div>
           <div :class="{cur:lanmu=='sug'}" @click="change('sug')">反馈</div>
         </div>
         <line />
         <div class="bd">
           <div class="mes" v-if="lanmu=='mes'">
-            <message></message>
+            <message v-for="msg in msgList" :key="msg.id" :msg="msg"></message>
           </div>
           <div class="col" v-if="lanmu=='col'">
-            <collect></collect>
+            <collect v-for="record in recordList" :key="record.id" :record="record"></collect>
           </div>
-          <div class="my" v-if="lanmu=='my'">
-            <see></see>
+          <div class="mytopic" v-if="lanmu=='mytopic'">
+            <mytopic v-for="tag in tagList" :key="tag.id" :tag="tag" @reGetStorage="reGetStorage"></mytopic>
           </div>
           <div class="sug" v-if="lanmu=='sug'">
             <suggest></suggest>
@@ -47,46 +45,42 @@
   import line from "@/components/line"
   import message from "@/components/message"
   import collect from "@/components/collect"
-  import my from "@/components/my"
+  import mytopic from "@/components/myTopic"
   import suggest from "@/components/suggest"
   export default {
     components: {
       line,
       message,
       collect,
-      my,
+      mytopic,
       suggest,
     },
 
     data() {
       return {
         //canIUse: wx.canIUse('button.open-type.getUserInfo'), //判断小程序的API，回调，参数，组件等是否在当前版本可用
-        user: "姓名",
-        identity: "(销售)",
-        build: "未来悦",
+        user: "",
+        identity: "",
+        build: "",
         praise: "25",
         step: "3",
         lanmu: "mes",
         userInfo: {},
+        msgList: '',
+        recordList: '',
+        tagList: ''
       }
     },
-    onLoad: function () {
-      let that = this
-      wx.getStorage({
-        //获取数据的key
-        key: 'key',
-        success: function (res) {
-          console.log(res)
-          that.userInfo = res.data
-        },
-        fail() {
-        }
-      })
+
+    onShow: function () {
+      this.getStorage()
     },
+
     methods: {
       change: function (str) {
         this.lanmu = str;
       },
+
       handleUserInfo(e) {
         console.log(e)
         if (e.mp.detail.rawData) {
@@ -107,7 +101,7 @@
                       success: function (res) {
                         console.log(res)
                         temp.open_id = res.data
-                        let param = {    //数据库查询
+                        let param = { //数据库查询
                           'db': 'WpUserModel',
                           'model': 'edit',
                           'item': JSON.stringify(temp),
@@ -133,51 +127,63 @@
             }
           })
         }
+      },
+
+      getStorage() {
+        let that = this
+        wx.getStorage({
+          key: 'myDetail',
+          success: function (res) {
+            console.log(res.data)
+            that.userInfo = res.data.user
+            that.tagList = res.data.tagList
+            that.recordList = res.data.recordList
+            that.msgList = res.data.msgList
+          }
+        })
+      },
+
+      reGetStorage() {
+        this.getStorage()
       }
     }
   }
 
 </script>
 <style scoped>
-  .head {
-    border: 1px solid #d0d0d0;
-    margin-left: 10rpx;
-    margin-top: 10rpx;
-    height: 100rpx;
-    width: 100rpx;
-  }
-
   .avatarUrl {
     height: 100rpx;
     width: 100rpx;
   }
 
   .box {
-    display: inline-flex;
+    display: flex;
     flex-direction: row;
     margin-top: 20rpx;
+    margin-left: 20rpx;
   }
 
   .box1 {
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
-    margin-top: 5rpx;
+    margin-left: 10rpx;
   }
 
   .box2 {
-    display: inline-flex;
+    display: flex;
     flex-direction: row;
+    align-items: baseline;
+    font-size: 17px;
+    position: relative;
+    top: 0
   }
-
-  .p1 {
-    margin-left: 10rpx;
-  }
-
 
   .p3 {
-    margin-left: 10rpx;
-    margin-top: 32rpx;
-    color: #888888;
+    position: relative;
+    bottom: 0;
+    font-size: 16px;
+    color: rgb(137, 145, 150);
+    align-items: baseline;
   }
 
   .hd {
@@ -185,6 +191,10 @@
     flex-direction: row;
     justify-content: space-around;
     margin-top: 40rpx;
+  }
+
+  .cur {
+    color: #f3cc01;
   }
 
 </style>

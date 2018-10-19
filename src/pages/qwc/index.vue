@@ -7,8 +7,16 @@
       </div>
       <div class="sousuo" @click="suo">搜索</div>
     </div>
+    <div class="content">{{content}}</div>
     <div class="Hot">
       <hot :item="site" v-for="site in sites" :key="site"></hot>
+    </div>
+    <div class="collect" v-for="(list,index) in dataList" :key="index">
+    <div class="item">
+      <div class="border" @click="toTopicPage(list)">{{ list.tag_name }}</div>
+      <div class="collect-build">{{list.real_estate_name}}</div>
+    </div>
+    <line />
     </div>
   </div>
 </template>
@@ -24,36 +32,61 @@
     data() {
       return {
         sites: [],
-        arr: [],
-        searchValue: "",
+        dataList: [],
+        searchValue: '',
+        content:'',
       };
     },
-
+onUnload() {
+      this.searchValue = ''
+      this.content = ''
+      this.sites = []
+      this.dataList = []
+    },
     methods: {
       suo: function () {
         let that = this;
-        that.arr = [] //空值
-        that.sites = []
+        that.sites = [] //空值
+        that.dataList = []
         let searchValue = that.searchValue
         console.log('长度', searchValue.length)
         if (searchValue.length > 0) {
-          let sites = wx.getStorage({
+          wx.getStorage({
             key: 'queryRealEstateList',
             success: function (res) {
-              console.log('搜索：', res)
               //查找匹配搜索
-              for (let i in res.data) {
+               for (let i in res.data) {
                 res.data[i].show = false
                 if (res.data[i].real_estate_name.indexOf(searchValue) >= 0) { //insecOf用法
+                  that.content = ''
                   res.data[i].show = true
-                  that.arr.push(res.data[i])
+                  that.sites.push(res.data[i])
                 }
-              }
-              if (that.arr.length == 0) {
-
-              } else {
-                that.sites = that.arr
-              }
+               that.$get('api/queryRealEstateDetail', {real_estate_id:res.data[i].id}).then(function (res) {
+                wx.showToast({
+                    title: '正在搜索...',
+                    icon: 'loading',
+                    mask: true,
+                    duration: 1500
+                  })
+               for (let j=0; j< res.data.tagList.length; j++) {
+                 res.data.tagList[j].show = false
+                if (res.data.tagList[j].tag_name.indexOf(searchValue) >= 0) { //insecOf用法
+                  that.content = ''
+                  res.data.tagList[j].show = true
+                  res.data.tagList[j].real_estate_name = res.data.realEstate.real_estate_name
+                  that.dataList.push(res.data.tagList[j])
+                  let temp = JSON.parse(JSON.stringify(that.dataList))
+                  that.dataList = []
+                  that.dataList = temp
+                }
+                 
+                }
+                if (that.dataList.length  == 0 && that.sites.length == 0) {
+                  that.content = 'Sorry!没有搜到相关信息。。'
+                }
+               })
+               }
             },
             fail() {
               wx.showToast({
@@ -62,9 +95,22 @@
               })
             }
           })
-        }
       }
-    }
+    },
+    toTopicPage(list) {
+        console.log('taglist',this.dataList)
+        let obj = {
+          tag_name:list.tag_name,
+          views_num:list.views_num,
+          user_id:list.user_id,
+          real_estate_id:list.real_estate_id,
+          id:list.id
+        }
+        wx.navigateTo({
+          url:'/pages/qwb/main?tag='+JSON.stringify(obj)
+        })
+      }
+  }
   }
 
 </script>
@@ -107,6 +153,12 @@
     /*input框内*/
   }
 
+  .content {
+    text-align: center;
+    margin-top:20rpx;
+    font-size: 16px;
+    color: rgb(137, 145, 150);
+  }
 
   .sousuo {
     font-size: 17px;
@@ -118,5 +170,29 @@
     border: 1px solid #d0d0d0;
     border-radius: 10rpx;
   }
+
+  
+  .item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: 13px;
+    align-items: baseline;
+  }
+
+  .collect-build{
+    margin-right: 15rpx;
+  }
+
+  .border {
+    width: 230rpx;
+    background-color: #f8f8f8;
+    line-height: 60rpx;
+    border: 1px solid rgb(229, 229, 229);
+    text-align: center;
+    box-sizing: border-box;
+    margin: 20rpx 15rpx;
+  }
+
 
 </style>

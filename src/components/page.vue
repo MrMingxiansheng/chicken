@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <a href="/pages/login/main"><span class="p">{{city}}</span></a>
+    <span class="p">{{city}}</span>
     <div class="search" @click="suo">
       <div class="search_arr">
         <icon class="searchcion" size="20" type="search"></icon>

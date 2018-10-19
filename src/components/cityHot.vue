@@ -8,18 +8,18 @@
       </div>
       <div class="sendTopic" @click="sendTopic"><a href="/pages/qwa/main" hover-class="none">发话题</a></div>
     </div>
-    <itemx :tagList="tagList"></itemx>
+    <city :tagList="tagList"></city>
     <line />
   </div>
 </template>
 
 <script>
-  import itemx from "@/components/itemx"
+  import city from "@/components/city"
   import line from "@/components/line"
   export default {
     components: {
-      itemx,
-      line
+      line,
+      city
     },
     props: ['item'],
     data() {
@@ -33,7 +33,7 @@
         real_estate_id: this.item.id
       }
       that.$get('api/queryRealEstateDetail', param).then(function (res) {
-        that.tagList = res.data.tagList || []
+        that.tagList.push(res.data.tagList[0])
         console.log('tag',that.tagList)
       }, function (res) {
         // failure

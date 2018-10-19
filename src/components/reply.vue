@@ -2,7 +2,7 @@
   <div class="reply">
     <div class="avatar">
       <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner">
-      <img :src="reply.user.head_url"  v-if="user_type !== '匿名'" @click="test">
+      <img :src="reply.user.head_url" v-else @click="test">
     </div>
     <div class="content">
       <div class="content-in">
@@ -19,7 +19,10 @@
           <span v-if="reply.interact_type==='回复'">&nbsp;&nbsp;回复&nbsp;&nbsp;{{reply.to_interact.user.user_name}}<span v-if="reply.to_interact.user_id===owner">(题主)</span></span>
         </div>
         <div class="words">
-          {{reply.interact_content}}
+          {{content}}
+        </div>
+        <div class="images">
+          <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)">
         </div>
         <div class="time">
           {{reply.update_time}}
@@ -49,7 +52,18 @@
     props: ["reply","owner","hideUser","user_type"],
     data() {
       return {
-        // praiseStatus:'赞',
+        content:'',
+        images:''
+      }
+    },
+    onLoad(){
+      console.log('reply',this.reply)
+      if(this.reply.interact_content.indexOf('images=')===-1){
+        this.content = this.reply.interact_content
+      }else{
+        let arr = this.reply.interact_content.split('images=')
+        this.content = arr[0]
+        this.images = JSON.parse(arr[1])
       }
     },
     methods: {
@@ -195,6 +209,13 @@
         })
         
          
+      },
+      preview: function (index) {
+        //图片预览
+        wx.previewImage({
+          current: this.images[index], // 当前显示图片的http链接
+          urls: this.images // 需要预览的图片http链接列表
+        })
       }
     }
   }
@@ -219,7 +240,6 @@
 
   .content {
     width: 490rpx;
-
     line-height: 18px;
   }
 
@@ -230,17 +250,29 @@
   .content-in .user {
     color: rgb(137, 145, 150);
     font-size: 15px;
+    overflow: hidden; /*自动隐藏文字*/
+    text-overflow: ellipsis;/*文字隐藏后添加省略号*/
+    white-space: nowrap;/*强制不换行*/
   }
 
   .content-in .words {
+    word-wrap:break-word; 
+    word-break:normal; 
     color: #000;
     margin: 20rpx 0;
     font-size: 17px;
   }
+  
+  .content-in .images img {
+    width: 105rpx;
+    height: 105rpx;
+    margin-right: 10rpx;
+    margin-bottom: 10rpx;
+  }
 
   .content-in .time {
     color: rgb(137, 145, 150);
-    font-size: 15px;
+    font-size: 13px;
   }
 
   .interact {

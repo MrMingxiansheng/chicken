@@ -1,32 +1,28 @@
 <template>
   <div class="all">
     <div class="loupan">
-      <div class="build-left">{{build}}</div>
       <div class="topic-center">发布小话题</div>
     </div>
     <line />
     <div :style="{height:scrollHeight+'px'}" class="scroll">
-      <input id="title" v-model="words" type="text" placeholder="写个小话题（8个字内）" maxlength="8" />
-      <p>热门小话题：</p>
-      <div class="item">
-        
-      </div>
-      <textarea cols="5" class="title1" placeholder="写点小话题描述（200字内）" maxlength="200" v-model="des"></textarea>
+      <input id="title" v-model="words" type="text" placeholder="小话题标题（限8个字内,讨论或问题皆可）" placeholder-style="font-size: 15px" maxlength="8" />
+      <textarea cols="5" class="title1" placeholder="加点小话题的描述,限200个字内（可不填）" maxlength="200" placeholder-style="font-size: 15px" v-model="des"></textarea>
       <div class="box">
-        <div v-for="(img,index) in images" :key="img" v-if="index<6" class="box-img">
-          <img :src="img" class="big" @click="preview">
-          <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
+        <div v-for="(img,index) in images" :key="index" v-if="index<6" class="box-img">
+          <img :src="img" class="big" @click="preview(index)">
+          <img src="/static/images/chacha.png" class="min" @click="removeImage(index)">
         </div>
         <div id="plus" v-if="images.length<6&&images.length>0">
           <img src="/static/images/jiahao.png" @click="upLoadImage" />
         </div>
         <div id="plus1" v-if="images.length===0">
           <img src="/static/images/jiahao.png" @click="upLoadImage" />
+          <span>图片(可不选)</span>
         </div>
       </div>
     </div>
     <div class="item1">
-      <span>小提示：小话题必选,可以匿名发布</span>
+      <span>提示：可以匿名发小话题</span>
       <line />
       <ul>
         <li>
@@ -52,7 +48,6 @@
         words: "",
         des: '',
         tag:'',
-        sites: [],
         images: [],
       }
     },
@@ -65,6 +60,7 @@
         }
       })
     },
+    
     onReady() {
       this.ScrollViewHeight()
     },
@@ -113,9 +109,17 @@
               that.tag = res.data
               let interact = {}
               if (that.des) {
-                interact.interact_content = that.des
+                if(that.images.length===0){
+                  interact.interact_content = that.des
+                }else{
+                  interact.interact_content = that.des+'images='+JSON.stringify(that.images)
+                }
               } else {
-                interact.interact_content = '"' + that.words + '"'
+                if(that.images.length===0){
+                  interact.interact_content = '"' + that.words + '"'
+                }else{
+                  interact.interact_content = '"' + that.words + '"'+'images='+JSON.stringify(that.images)
+                }
               }
               interact.tag_id = res.data.id
               interact.user_id = res.data.user_id
@@ -141,8 +145,9 @@
                 that.$get('api/update', updateInteractId).then(function () {
                   that.words = ''
                   that.des = ''
-                  wx.navigateTo({
-                    url:'/pages/topic/main?tag='+JSON.stringify(that.tag)
+                  that.images = []
+                  wx.redirectTo({
+                    url:'/pages/qwb/main?tag='+JSON.stringify(that.tag)
                   })
                 })
               })
@@ -218,7 +223,7 @@
                 that.$get('api/update', updateInteractId).then(function () {
                   console.log('话题描述发布成功')
                   wx.navigateTo({
-                    url:'/pages/topic/main?tag='+JSON.stringify(that.tag)
+                    url:'/pages/qwb/main?tag='+JSON.stringify(that.tag)
                   })
                 })
               })
@@ -240,7 +245,8 @@
 
       //upLoadImage
       upLoadImage() {
-        let that = this;
+        let that = this
+        /*
         wx.chooseImage({
           count: 6, //最多可以选择的图片总数 
           sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有 
@@ -274,13 +280,53 @@
             })
           }
         })
+        */
+        wx.chooseImage({
+          count: 6, //最多可以选择的图片总数 
+          sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有 
+          sourceType: ['album'], // 可以指定来源是相册还是相机，默认二者都有 
+          success (res) {
+            const tempFilePaths = res.tempFilePaths
+            for(let i=0; i<tempFilePaths.length; i++){
+              wx.uploadFile({
+                url: 'http://www.xaoji.com:3000/api/uploadImage', 
+                filePath: tempFilePaths[i],
+                name: 'pic',
+                header:{
+                  'content-type':'multipart/form-data'
+                },
+                success (res){
+                  console.log('传图成功',res)
+                  let url = 'http://www.xaoji.com:3000'+JSON.parse(res.data).url
+                  console.log('url',url)
+                  if (that.images.length < 6) {
+                  that.images.push(url)
+                  } else {
+                  wx.showModal({
+                  title: '温馨提示',
+                  content: '最多可上传六张照片',
+                  showCancel: false,
+                })
+              }
+                  console.log('that.images',that.images)
+                  // const data = res.data
+                },
+                fail(err){
+                  console.log('传图失败',err)
+                }
+              })
+
+            }
+            
+          }
+        })
       },
       //-upLoadImage
 
-      preview: function () {
+      preview: function (index) {
         //图片预览
         wx.previewImage({
-          current: '', // 当前显示图片的http链接
+          current: this.images[index], // 当前显示图片的http链接
           urls: this.images // 需要预览的图片http链接列表
         })
       },
@@ -288,8 +334,9 @@
         this.images.splice(index, 1)
       },
     }//methods
-  }//export default
+  }
 </script>
+
 <style scoped>
   .loupan {
     display: flex;
@@ -351,7 +398,7 @@
 
   .box {
     width: 660rpx;
-    margin: 0 auto;
+    margin: 20rpx auto;
   }
 
   .box img {
@@ -368,6 +415,7 @@
   .box .box-img {
     position: relative;
   }
+  
 
   .box .box-img .min {
     width: 50rpx;
@@ -382,8 +430,8 @@
     height: 200rpx;
   }
 
-  #plus,
-  #plus1 {
+  
+  #plus {
     padding: 50rpx;
     box-sizing: border-box;
   }
@@ -396,7 +444,16 @@
 
   #plus1 {
     margin-left: 230rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
+
+  #plus1 span {
+    font-size: 15px;
+    color: rgb(137, 145, 150);
+  }
+ 
 
   .item1 {
     width: 100%;
@@ -420,6 +477,7 @@
 
   .item1 span {
     font-size: 15px;
+    color: rgb(137, 145, 150);
   }
 
   .publish {
@@ -445,5 +503,6 @@
     line-height: 50rpx;
     border: none;
   }
+  
 
 </style>

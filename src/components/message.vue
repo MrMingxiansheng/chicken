@@ -104,7 +104,7 @@
   }
 
   .reply {
-    color: #c5a500;
+    color: #f3cc01;
     position: absolute;
     right: 20rpx;
   }

@@ -1,7 +1,7 @@
 <template>
   <div class="itemx" >
     <div class="tagList">
-      <div class="tag"  v-for="(site,index) in tagList" :key="site.id"  v-if="index<6" @click="toTopicPage(site)">{{ site.tag_name }}</div>
+      <div class="tag"  v-for="(site,index) in tagList" :key="site.id"  v-if="index<9" @click="toTopicPage(site)">{{ site.tag_name }}</div>
     </div>
   </div>
 </template>

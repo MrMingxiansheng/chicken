@@ -2,5 +2,9 @@
   "navigationBarTitleText": "小鸡笼",
   "usingComponents": {
     "i-badge": "../../static/iview/badge/index"
+<<<<<<< HEAD
   } 
+=======
+  }  
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
 }

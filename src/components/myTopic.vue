@@ -16,8 +16,11 @@
       line
     },
     props:['tag','myDetail'],
+<<<<<<< HEAD
     onLoad(){
     },
+=======
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
     methods: {
       removeImage() {
         let that = this

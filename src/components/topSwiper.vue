@@ -19,15 +19,15 @@
 
 <style scoped>
   swiper {
-    width: 740rpx;
-    height: 200rpx;
-    margin-left: 5rpx;
+    width: 750rpx;
+    height: 330rpx;
     overflow: hidden;
+    margin-top: 76rpx;
   }
 
   swiper img {
-    width: 740rpx;
-    height: 200rpx;
+    width: 750rpx;
+    height: 330rpx;
   }
 
 </style>

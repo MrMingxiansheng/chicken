@@ -352,8 +352,9 @@
         }
       },
     }//methods
-  }//export default
+  }
 </script>
+
 <style scoped>
   .loupan {
     display: flex;
@@ -465,6 +466,7 @@
     flex-direction: column;
     align-items: center;
   }
+ 
 
   #plus1 span {
     font-size: 15px;

@@ -1,7 +1,11 @@
 <template>
   <div class="itemx" >
     <div class="tagList">
+<<<<<<< HEAD
       <div class="tag"  v-for="(site,index) in tagList" :key="site.id"  v-if="index<6 || (real_estate_name === '杭州楼市小闲话' && index<9)"  @click="toTopicPage(site)">{{ site.tag_name }}</div>
+=======
+      <div class="tag"  v-for="(site,index) in tagList" :key="site.id"  v-if="index<6"  @click="toTopicPage(site)">{{ site.tag_name }}</div>
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
     </div>
   </div>
 </template>
@@ -34,7 +38,11 @@
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 10rpx;
+<<<<<<< HEAD
     margin-left: 6rpx;
+=======
+    margin-left: 5rpx;
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
   }
 
   .tag {
@@ -49,6 +57,7 @@
     box-sizing: border-box;
     margin: 10rpx 10rpx;
   }
+<<<<<<< HEAD
   
   .tag:hover {
     width: 230rpx;
@@ -63,5 +72,7 @@
     box-sizing: border-box;
     margin: 10rpx 10rpx;
   }
+=======
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
 
 </style>

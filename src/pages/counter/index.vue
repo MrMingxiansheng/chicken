@@ -17,8 +17,15 @@
         <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
       </div>
       <div class="send_arr">
+<<<<<<< HEAD
         <input id="enter" v-model.lazy="words" maxlength="200" 
         placeholder="在此发话题,前8个字重点显示"
+=======
+        <input id="enter"
+        v-model.lazy="words"
+        maxlength="200" 
+        placeholder="  在此发话题,前8个字重点显示"
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
         placeholder-style="font-size: 14px"
         />
         <div class="send" @click="sendTopic()">发送</div>
@@ -60,6 +67,7 @@
         real:''                 //楼盘列表中的一项
       }
     },
+
     onShareAppMessage: function (res) {
       if (res.from === 'button') {
         // 来自页面内转发按钮
@@ -82,6 +90,15 @@
       that.$get('api/queryRealEstateDetail',{real_estate_id:that.real.id}).then(function(res){
         that.dataList = res.data.tagList
         wx.hideLoading()
+<<<<<<< HEAD
+=======
+      })
+      wx.getStorage({
+        key:'myDetail',
+        success(res){
+          that.myDetail = res.data
+        }
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       })
       that.myDetail = wx.getStorageSync('myDetail')
     },
@@ -98,6 +115,7 @@
     methods: {
       //计算滚动高度
       ScrollViewHeight() {
+<<<<<<< HEAD
         let windowWidth = wx.getSystemInfoSync().windowWidth
         let windowHeight = wx.getSystemInfoSync().windowHeight
         let statusBarHeight = wx.getSystemInfoSync().statusBarHeight
@@ -106,6 +124,17 @@
         let rWindowHeight = windowHeight * px_to_rpx
         let rStatusBarHeight = statusBarHeight * px_to_rpx
         this.scrollHight = rWindowHeight - rStatusBarHeight - 230
+=======
+        let that = this
+        wx.getSystemInfo({
+          success(res){
+            let px_to_rpx = 750 / res.windowWidth
+            let height = res.windowHeight*px_to_rpx
+            let statusBarHeight = res.statusBarHeight*px_to_rpx
+            that.scrollHight = height - statusBarHeight - 230
+          }
+        })
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
         //读取机型全屏高度，减去固定高度获得scroll高度
       },
       

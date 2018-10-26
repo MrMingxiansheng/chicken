@@ -1,6 +1,7 @@
 <template>
   <div class="topic" v-if="item.tag_name">
     <div class="box">
+<<<<<<< HEAD
           <div class="title" @click="ClickTag(item)" decode="ensp">#&ensp;{{item.tag_name}}</div>
       <div class="box2" v-if="item.interact.interact_content">
             <div class="words" @click="ClickTag(item)" v-if="content.length >= 8">{{content}}</div>
@@ -9,6 +10,9 @@
           <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)" class="img">
         </div>
       </div>
+=======
+          <div class="title" @click="ClickTag(item)"># {{item.tag_name}}</div>
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       <div class="box1">
           <div class="bor" @click="ClickTag(item)">
             <div class="border">
@@ -17,11 +21,18 @@
             <span decode="ensp">&ensp;{{item.interact.user.user_name}}&ensp;发布</span>
           </div>
         <div class="talk">
+<<<<<<< HEAD
           <span class="views_num" @click="ClickTag(item)">{{length}}讨论</span>
         <div class="step" @click="clickStep">
           <span class="step-num">{{item.interact.cnum}}</span>
           <img :src="stepSrc" class="step-str"/>
           <!-- <span class="step-str">踩</span> -->
+=======
+          <span class="views_num" @click="ClickTag(item)">{{interactList.length}}讨论</span>
+          <div class="step" @click="clickStep">
+          <span class="step-num">{{item.interact.cnum}}</span>
+          <span class="step-str">踩</span>
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
         </div>
         </div>
       </div>
@@ -44,8 +55,12 @@
         images:'',
         articleSrc:'',
         stepLock:true,
+<<<<<<< HEAD
         length:'',
         stepSrc:'/static/images/cai.png'
+=======
+        interactList:''
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       };
     },
     onLoad (){
@@ -71,11 +86,16 @@
         this.articleSrc = 'https://' + articleArr[1]
       }
       that.$get('api/queryTagDetail',{tag_id:that.item.id}).then(function(res){
+<<<<<<< HEAD
         that.length = res.data.interactList.length
+=======
+        that.interactList = res.data.interactList
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       })
     },
     methods: {
       ClickTag: function (item) {
+        let that = this
         let obj = {
           tag_name:item.tag_name,
           views_num:item.views_num,
@@ -84,6 +104,7 @@
           id:item.id
         }
         console.log('obj',obj)
+        //+'interactList='+JSON.stringify(that.interactList)
         wx.navigateTo({
           url:'/pages/qwb/main?tag='+JSON.stringify(obj)
         })
@@ -111,7 +132,10 @@
           for(let i=0; i<interactList.length; i++){
             if(interactList[i].to_interact_id === that.item.interact.id && interactList[i].interact_type === '点踩'){
               //已经有点踩,要取消踩
+<<<<<<< HEAD
               that.stepSrc = '/static/images/cai.png'
+=======
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
               todo = '取消踩'
               console.log('interactList[i]',interactList[i])
               stepId = interactList[i].id
@@ -121,16 +145,25 @@
           }
           if(todo !== '取消踩'){
             todo = '点踩'
+<<<<<<< HEAD
             that.stepSrc = '/static/images/cai1.png'
+=======
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
           }
         }else{
           //没交互
           todo = '点踩'
+<<<<<<< HEAD
           that.stepSrc = '/static/images/cai1.png'
         }
         if (todo === '点踩') {
           that.stepSrc = '/static/images/cai1.png'
           that.item.interact.cnum = parseInt(that.item.interact.cnum) + 1
+=======
+        }
+        if (todo === '点踩') {
+          that.item.cnum = parseInt(that.item.cnum) + 1
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
           interact.tag_id = that.item.interact.tag_id
           interact.user_id = that.myDetail.user.id
           interact.interact_type = '点踩'
@@ -149,8 +182,12 @@
             that.stepLock = !that.stepLock
           })
         }else if (todo === '取消踩') {
+<<<<<<< HEAD
           that.stepSrc = '/static/images/cai.png'
           that.item.interact.cnum = parseInt(that.item.interact.cnum) - 1
+=======
+          that.item.cnum = parseInt(that.item.cnum) - 1
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
           for(let i=0; i<that.myDetail.interactList.length; i++){
             if(that.myDetail.interactList[i].id===stepId){
               that.myDetail.interactList.splice(i,1)
@@ -191,6 +228,7 @@
             console.log('myDetail缓存设置成功')
           }
         })
+<<<<<<< HEAD
       },
        praiseStatus (){
         let that = this
@@ -201,6 +239,10 @@
          } 
         }
        }
+=======
+      }
+
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
     }
   };
 
@@ -215,11 +257,16 @@
   }
 
   .title {
+<<<<<<< HEAD
     margin-left:70rpx;
     font-size: 18px;
     margin-top:10rpx;
     margin-bottom:10rpx;
     font-weight:700;/*字体加粗*/
+=======
+    text-align: center;
+    font-size: 18px;
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
   }
 
   .avatarUrl {

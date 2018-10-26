@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "usingComponents": {
     "i-notice-bar": "../../static/iview/notice-bar/index",
     "i-collapse": "../../static/iview/collapse/index",
@@ -6,4 +7,10 @@
   },
   "navigationBarTitleText": "小鸡笼",
   "enablePullDownRefresh": true
+=======
+  
+  "navigationBarTitleText": "小鸡评房",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
 }

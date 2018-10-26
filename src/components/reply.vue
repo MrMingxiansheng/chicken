@@ -1,7 +1,11 @@
 <template>
   <div class="reply">
     <div class="avatar">
+<<<<<<< HEAD
       <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner" @click="test">
+=======
+      <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner">
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       <img :src="reply.user.head_url"  v-else>
     </div>
     <div class="content">
@@ -138,6 +142,10 @@
             'items': JSON.stringify(interact)
           }
           that.$get('api/update', updateInteract).then(function (res) {
+<<<<<<< HEAD
+=======
+            that.$sendMessage(JSON.stringify(res.data))
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
             that.myDetail.interactList.push(res.data)
             that.reSetMyDetail(that.myDetail)
             console.log('点赞返回',res.data)
@@ -255,6 +263,7 @@
 
       praiseStatus (){
         let that = this
+<<<<<<< HEAD
         for(let i=0; i<that.myDetail.interactList.length; i++){
          if(that.myDetail.interactList[i].to_interact_id === that.reply.id && that.myDetail.interactList[i].interact_type === '点赞'){
             that.praiseSrc = '/static/images/zan1.png'
@@ -265,6 +274,17 @@
         }
        
 
+=======
+        wx.showLoading({
+          title:'加载中',
+          mask:true
+        })
+        console.log('外面')
+        that.$get('api/testSpeed').then(function(res){
+          console.log('里面')
+          wx.hideLoading()
+        })
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       },
      
       preview: function (index) {
@@ -338,6 +358,16 @@
     margin: 20rpx 0;
     font-size: 17px;
     line-height: 24px
+<<<<<<< HEAD
+=======
+  }
+  
+  .content-in .images img {
+    width: 105rpx;
+    height: 105rpx;
+    margin-right: 10rpx;
+    margin-bottom: 10rpx;
+>>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
   }
 
   .words .article{

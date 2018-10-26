@@ -3,8 +3,10 @@
     <span class="p">{{city}}</span>
     <div class="search" @click="suo">
       <div class="search_arr">
-        <icon class="searchcion" size="20" type="search"></icon>
-        <input type="text" placeholder="输入楼盘名称或小话题搜索" disabled="true" />
+        <icon class="searchcion" size="15" type="search"></icon>
+        <input type="text" placeholder="输入楼盘名称或小话题搜索" disabled="true" 
+        placeholder-style="font-size:13px;color:#ccc"
+        />
       </div>
     </div>
   </div>
@@ -30,15 +32,20 @@
 
 <style scoped>
   .page {
+    width: 100%;
     display: flex;
     flex-direction: row;
     /*整体*/
-    margin-top: 20rpx;
+    background-color: #ffe144;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 88;
   }
 
   .p {
-    margin-left: 20rpx;
-    font-size: 18px;
+    margin-left: 30rpx;
+    font-size: 16px;
     position: relative;
     top: 8rpx;
   }
@@ -46,22 +53,19 @@
   .search_arr {
     display: flex;
     flex-direction: row;
-    border: 1px solid #d0d0d0;
     width: 600rpx;
     height: 60rpx;
     margin-bottom: 20rpx;
-    margin-left: 20rpx;
+    margin-left: 30rpx;
+    background-color: #fff;
+    border-radius: 7px;
   }
 
   .searchcion {
-    margin: 10rpx 10rpx 10rpx 10rpx;
-    position: absolute;
-    left: 110rpx;
-    z-index: 2;
-    width: 40rpx;
-    height: 40rpx;
+    margin: 15rpx;
     text-align: center;
     /*搜索图标*/
+
   }
 
   .search_arr input {
@@ -72,5 +76,7 @@
     font-size: 17px;
     /*input框内*/
   }
+  
+  
 
 </style>

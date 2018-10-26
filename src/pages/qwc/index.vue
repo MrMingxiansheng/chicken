@@ -12,11 +12,11 @@
       <hot :item="site" v-for="site in sites" :key="site"></hot>
     </div>
     <div class="collect" v-for="(list,index) in dataList" :key="index">
-    <div class="item">
-      <div class="border" @click="toTopicPage(list)">{{ list.tag_name }}</div>
-      <div class="collect-build">{{list.real_estate_name}}</div>
-    </div>
-    <line />
+      <div class="item">
+        <div class="border" @click="toTopicPage(list)">{{ list.tag_name }}</div>
+        <div class="collect-build">{{list.real_estate_name}}</div>
+      </div>
+      <line />
     </div>
   </div>
 </template>
@@ -34,10 +34,10 @@
         sites: [],
         dataList: [],
         searchValue: '',
-        content:'',
+        content: '',
       };
     },
-onUnload() {
+    onUnload() {
       this.searchValue = ''
       this.content = ''
       this.sites = []
@@ -46,6 +46,7 @@ onUnload() {
     methods: {
       suo: function () {
         let that = this;
+        that.content = ''
         that.sites = [] //空值
         that.dataList = []
         let searchValue = that.searchValue
@@ -55,32 +56,39 @@ onUnload() {
             key: 'queryRealEstateList',
             success: function (res) {
               //查找匹配搜索
-               for (let i in res.data) {
-                res.data[i].show = false
+              for (let i in res.data) {
+                wx.showLoading({
+                  title: '正在加载',
+                  mask: true
+                })
                 if (res.data[i].real_estate_name.indexOf(searchValue) >= 0) { //insecOf用法
                   that.content = ''
-                  res.data[i].show = true
                   that.sites.push(res.data[i])
                 }
-               that.$get('api/queryRealEstateDetail', {real_estate_id:res.data[i].id}).then(function (res) {
-               for (let j=0; j< res.data.tagList.length; j++) {
-                 res.data.tagList[j].show = false
-                if (res.data.tagList[j].tag_name.indexOf(searchValue) >= 0) { //insecOf用法
-                  that.content = ''
-                  res.data.tagList[j].show = true
-                  res.data.tagList[j].real_estate_name = res.data.realEstate.real_estate_name
-                  that.dataList.push(res.data.tagList[j])
-                  let temp = JSON.parse(JSON.stringify(that.dataList))
-                  that.dataList = []
-                  that.dataList = temp
+                for (let j = 0; j < res.data[i].tagList.length; j++) {
+                  if (res.data[i].tagList[j].tag_name.indexOf(searchValue) >= 0) { //insecOf用法
+                    res.data[i].tagList[j].real_estate_name = res.data[i].real_estate_name
+                    that.content = ''
+                    that.dataList.push(res.data[i].tagList[j])
+                    let temp = JSON.parse(JSON.stringify(that.dataList))
+                    that.dataList = []
+                    that.dataList = temp
+                  }
                 }
-                 
+                if (that.sites.length !== 0 || that.dataList.length !== 0) {
+                  wx.hideLoading({
+                    success() {
+                      that.content = ''
+                    }
+                  })
+                } else {
+                  wx.hideLoading({
+                    success() {
+                      that.content = 'Sorry!没有搜到相关信息。。'
+                    }
+                  })
                 }
-                if (that.dataList.length  == 0 && that.sites.length == 0) {
-                  that.content = 'Sorry!没有搜到相关信息。。'
-                }
-               })
-               }
+              }
             },
             fail() {
               wx.showToast({
@@ -89,22 +97,22 @@ onUnload() {
               })
             }
           })
-      }
-    },
-    toTopicPage(list) {
-        console.log('taglist',this.dataList)
+        }
+      },
+      toTopicPage(list) {
+        console.log('taglist', this.dataList)
         let obj = {
-          tag_name:list.tag_name,
-          views_num:list.views_num,
-          user_id:list.user_id,
-          real_estate_id:list.real_estate_id,
-          id:list.id
+          tag_name: list.tag_name,
+          views_num: list.views_num,
+          user_id: list.user_id,
+          real_estate_name: list.real_estate_name,
+          id: list.id
         }
         wx.navigateTo({
-          url:'/pages/qwb/main?tag='+JSON.stringify(obj)
+          url: '/pages/qwb/main?tag=' + JSON.stringify(obj)
         })
       }
-  }
+    }
   }
 
 </script>
@@ -149,7 +157,7 @@ onUnload() {
 
   .content {
     text-align: center;
-    margin-top:20rpx;
+    margin-top: 20rpx;
     font-size: 16px;
     color: rgb(137, 145, 150);
   }
@@ -165,7 +173,7 @@ onUnload() {
     border-radius: 10rpx;
   }
 
-  
+
   .item {
     display: flex;
     flex-direction: row;
@@ -174,7 +182,7 @@ onUnload() {
     align-items: baseline;
   }
 
-  .collect-build{
+  .collect-build {
     margin-right: 15rpx;
   }
 
@@ -187,6 +195,5 @@ onUnload() {
     box-sizing: border-box;
     margin: 20rpx 15rpx;
   }
-
 
 </style>

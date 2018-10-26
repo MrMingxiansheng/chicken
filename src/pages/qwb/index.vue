@@ -1,25 +1,25 @@
 <template>
   <div class="topic">
     <div class="header">
-      <div class="building">{{real_estate_name}}</div>
-      <div class="topicTitle">{{tag.tag_name}}</div>
+      <!-- <div class="building">{{real_estate_name}}</div> -->
+      <div class="topicTitle"># {{tag.tag_name}}</div>
       <div class="topicViews">{{tag.views_num}}浏览</div>
     </div>
     <scroll-view scroll-y="true" :style="{height:scrollHight+'rpx'}">
       <div class="content">
-        <speak v-for="obj in interactList" :key="obj.id" :reply="obj" :owner="tag.user_id" :user_type="user_type" :hideUser="hideUser" :myDetail="myDetail" @toReplyName="toReplyName"></speak>
+        <speak v-for="obj in interactList" :key="obj.id" :reply="obj" :owner="tag.user_id" :user_type="user_type"
+          :hideUser="hideUser" :myDetail="myDetail" @toReplyName="toReplyName"></speak>
       </div>
     </scroll-view>
     <canvas canvas-id='attendCanvasId' class='myCanvas'></canvas>
     <div class="footer">
-      <div v-for="(img,index) in localImages" :key="index" v-if="index<6" class="box-img">
+      <div v-for="(img,index) in showImages" :key="index" v-if="index<6" class="box-img">
         <img :src="img" class="big" @click="preview">
         <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
       </div>
       <div class="send_arr">
-        <input id="enter" v-model="words" :focus="focusState" @input="keyInput" :cursor="cursor" @focus="focus" 
-          maxlength="200" />
-        <div class="send" @click="clickSend">发送</div>
+        <input id="enter" v-model.lazy="words" :focus="focusState" @focus="focus" @input="keyInput" @blur="leave()" maxlength="200" />
+        <div class="send" @click="timeOut()">发送</div>
       </div>
       <line />
       <ul>
@@ -50,29 +50,32 @@
     },
     data() {
       return {
-        scrollHight: '',        //滚动高度
-        focusState: false,      //输入框是否聚焦
-        collect_status:'',      //收藏状态,是<收藏>还是<已收藏>
-        collectId:'',           //一条收藏的id,用来取消收藏的时候覆盖
-        words: '',              //输入框的内容
-        images:[],              //图片列表
-        localImages:[],
-        uploadTasks:[],
-        interactList: '',       //交互列表,给reply组件加载评论和回复
-        tag_id: '',             //当前话题的id,用来刷新评论和回复
-        my_user_id:'',          //用于收藏
-        myDetail:'',            //我的recordList,msgList,tagList,user
-        user_type:'',           //传给reply,判断是不是匿名
-        hideUser:'',            //传给reply,匿名的头像和昵称
-        real_estate_name: '',   //楼盘名
-        to_interact_id: '',     //用来判断是评论还是回复,回复那条交互
-        cursor: -1,             //光标位置
-        tag:'',                 //包含tag_name,views_num,user_id(传给reply,用来判断是不是题主),tag_id(单独提出来了)
-        user_status:'匿名'
+        scrollHight: '', //滚动高度
+        focusState: false, //输入框是否聚焦
+        collect_status: '', //收藏状态,是<收藏>还是<已收藏>
+        collectId: '', //一条收藏的id,用来取消收藏的时候覆盖
+        words: '', //输入框的内容
+        images: [], //图片列表
+        localImage: '',
+        showImages: [],
+        interactList: '', //交互列表,给reply组件加载评论和回复
+        tag_id: '', //当前话题的id,用来刷新评论和回复
+        myDetail: '', //我的recordList,msgList,tagList,user
+        user_type: '', //传给reply,判断是不是匿名
+        hideUser: '', //传给reply,匿名的头像和昵称
+        real_estate_name: '', //楼盘名
+        to_interact_id: '', //用来判断是评论还是回复,回复哪条交互
+        tag: '', //包含tag_name,views_num,user_id(传给reply,用来判断是不是题主),tag_id(单独提出来了)
+        user_status: '匿名',
+        collectLock: true
       }
     },
 
     onLoad(option) {
+      wx.showLoading({
+        title: '加载中',
+        mask: true
+      })
       this.size()
       this.loadTopicPage(option)
       this.collectStatus()
@@ -87,32 +90,36 @@
       this.hideUser = ''
       this.collect_status = ''
       this.images = []
-      this.localImages = []
+      this.localImage = ''
+      this.showImages = []
       this.user_status = '匿名'
     },
     methods: {
       loadTopicPage(option) {
-        console.log('开始加载话题页面')
         let that = this
         let tag = JSON.parse(option.tag)
         that.tag = tag
         that.tag_id = tag.id
-        let uploadEstateId = {
-          real_estate_id: tag.real_estate_id
+        that.real_estate_name = tag.real_estate_name
+        if(option.interactList){
+          console.log('有交互列表')
+          return;
         }
-        that.$get("api/queryRealEstateDetail", uploadEstateId).then(function (d) {
-          that.real_estate_name = d.data.realEstate.real_estate_name //通过楼盘id拿到楼盘名
-        })
         let uploadTagId = {
           tag_id: tag.id
         }
+        console.log('外面')
         that.$get("api/queryTagDetail", uploadTagId).then(function (tagDetail) {
+          console.log('里面')
           that.interactList = tagDetail.data.interactList //通过话题id拿到该话题的交互列表
           that.user_type = that.interactList[0].user_type || ''
           that.hideUser = that.interactList[0].user
+          that.$nextTick(function(){
+            wx.hideLoading()
+          })
         })
       },
-      reloadTopicPage(){
+      reloadTopicPage() {
         let that = this
         let uploadTagId = {
           tag_id: this.tag_id
@@ -121,127 +128,95 @@
           that.interactList = tagDetail.data.interactList //通过话题id拿到该话题的交互列表
           that.user_type = that.interactList[0].user_type || ''
           that.hideUser = that.interactList[0].user
-        }).catch(function(err){
+        }).catch(function (err) {
           console.log(err)
         })
       },
-      clickSend() {
+      timeOut(){
+        this.focusState = false
         let that = this
+        let timer = setTimeout(function(){
         if (that.words) {
-          wx.getStorage({
-            key: 'key',
-            success: function (res) {
-              let interact = {}
-              if (that.words.indexOf(':') !== -1) {
-                let arr = that.words.split(':')
-                if (arr[0].indexOf('回复') === 0) {
-                  if (arr[1]) {
-                    if (that.to_interact_id) {
-                      interact.interact_type = '回复'
-                      interact.to_interact_id = that.to_interact_id
-                      arr.splice(0, 1)
-                      if(that.localImages.length === 0){
-                        interact.interact_content = arr.join(':')
-                      }else{
-                        if(that.images.length === that.localImages.length){
-                          interact.interact_content = arr.join(':') + 'images='+ JSON.stringify(that.images)
-                        }else{
-                          wx.showToast({
-                            title: '图片上传中,稍后再发送！',
-                            icon: 'none',
-                            mask: true,
-                            duration: 1000
-                          })
-                          return;
-                        }
-                      }
-                    } else {
-                      wx.showToast({
-                        title: '找不到回复对象！',
-                        icon: 'none',
-                        mask: true,
-                        duration: 1000
-                      })
-                      return;
-                    }
+          let interact = {}
+          if (that.words.indexOf(':') !== -1) {
+            let arr = that.words.split(':')
+            if (arr[0].indexOf('回复') === 0) {
+              if (arr[1]) {
+                if (that.to_interact_id) {
+                  interact.interact_type = '回复'
+                  interact.to_interact_id = that.to_interact_id
+                  arr.splice(0, 1)
+                  if (that.showImages.length === 0) {
+                    interact.interact_content = arr.join(':')
                   } else {
-                    wx.showToast({
-                      title: '回复内容为空！',
-                      icon: 'none',
-                      mask: true,
-                      duration: 1000
-                    })
-                    return;
+                    interact.interact_content = arr.join(':') + 'images=' + JSON.stringify(that.images)
                   }
                 } else {
-                  interact.interact_type = '评论'
-                  if(that.localImages.length === 0){
-                    interact.interact_content = that.words
-                  }else{
-                    if(that.images.length === that.localImages.length){
-                      interact.interact_content = that.words + 'images=' + JSON.stringify(that.images)
-                    }else{
-                       wx.showToast({
-                        title: '图片上传中,稍后再发送！',
-                        icon: 'none',
-                        mask: true,
-                        duration: 1000
-                      })
-                      return;
-                    }
-                  }
+                  wx.showToast({
+                    title: '找不到回复对象！',
+                    icon: 'none',
+                    mask: true,
+                    duration: 1000
+                  })
+                  return;
                 }
               } else {
-                interact.interact_type = '评论'
-                if(that.localImages.length === 0){
-                  interact.interact_content = that.words
-                }else{
-                  if(that.images.length === that.localImages.length){
-                    interact.interact_content = that.words + 'images=' + JSON.stringify(that.images)
-                  }else{
-                    wx.showToast({
-                      title: '图片上传中,稍后再发送！',
-                      icon: 'none',
-                      mask: true,
-                      duration: 1000
-                    })
-                    return;
-                  }
-                }
+                wx.showToast({
+                  title: '回复内容为空！',
+                  icon: 'none',
+                  mask: true,
+                  duration: 1000
+                })
+                return;
               }
-              if(that.user_status === '已匿名'){
-                interact.user_type = '匿名'
+            } else {
+              interact.interact_type = '评论'
+              if (that.showImages.length === 0) {
+                interact.interact_content = that.words
+              } else {
+                interact.interact_content = that.words + 'images=' + JSON.stringify(that.images)
               }
-              interact.tag_id = that.tag_id
-              interact.user_id = res.data.id
-              interact.interact_status = '0'
-              let updateInteract = {
-                'db': 'WpInteractModel',
-                'model': 'edit',
-                'item': JSON.stringify(interact),
-                'items': JSON.stringify(interact)
-              }
-              wx.showToast({
-                title: '发送中',
-                icon: 'loading',
-                mask: true,
-                duration: 2500
-              })
-              that.$get('api/update', updateInteract).then(function (obj) {
-                that.words = ''
-                that.images = []
-                that.localImages = []
-                that.user_status = '匿名'
-                that.reloadTopicPage()
-                console.log('到底了')
-              })
-              that.$nextTick(function(){
-                that.focusState = false
-              })
             }
+          } else {
+            interact.interact_type = '评论'
+            if (that.showImages.length === 0) {
+              interact.interact_content = that.words
+            } else {
+              interact.interact_content = that.words + 'images=' + JSON.stringify(that.images)
+            }
+          }
+          if (that.user_status === '已匿名') {
+            interact.user_type = '匿名'
+          }
+          interact.tag_id = that.tag_id
+          interact.user_id = that.myDetail.user.id
+          interact.interact_status = '0'
+          let updateInteract = {
+            'db': 'WpInteractModel',
+            'model': 'edit',
+            'item': JSON.stringify(interact),
+            'items': JSON.stringify(interact)
+          }
+          wx.showLoading({
+            title: '发送中',
+            mask: true
           })
+          that.$get('api/update', updateInteract).then(function (obj) {
+            that.$sendMessage(JSON.stringify(obj.data))
+            that.words = ''
+            that.showImages = []
+            that.images = []
+            that.localImage = ''
+            that.user_status = '匿名'
+            clearTimeout(timer)
+            that.reloadTopicPage()
+            wx.hideLoading()
+          })
+          // that.$nextTick(function(){
+          //   that.focusState = false
+          // })
         } else {
-           wx.showToast({
+          wx.showToast({
             title: '评论内容为空！',
             icon: 'none',
             mask: true,
@@ -249,15 +224,21 @@
           })
           return;
         }
+        },100)
       },
-      clickCollect(){
-        console.log('点击收藏按钮')
+      
+      clickCollect() {
+        this.focusState = false
         let that = this
+        if (!that.collectLock) {
+          return;
+        }
+        that.collectLock = !that.collectLock
         let record = {}
-        if(that.collect_status === '收藏'){
-          console.log('开始收藏')
+        if (that.collect_status === '收藏') {
+          that.collect_status = '已收藏'
           record.record_type = '收藏记录'
-          record.user_id = that.my_user_id
+          record.user_id = that.myDetail.user.id
           record.tag_id = that.tag_id
           let uploadRecord = {
             'db': 'WpRecordModel',
@@ -265,17 +246,20 @@
             'item': JSON.stringify(record),
             'items': JSON.stringify(record)
           }
-          that.$get('api/update',uploadRecord).then(function(res){
-            that.collect_status = '已收藏'
+          that.$get('api/update', uploadRecord).then(function (res) {
+            res.data.tag = that.tag
+            res.data.realEstate = {
+              real_estate_name: that.real_estate_name
+            }
             that.collectId = res.data.id
             that.myDetail.recordList.reverse()
             that.myDetail.recordList.push(res.data)
             that.myDetail.recordList.reverse()
             that.reSetMyDetail(that.myDetail)
-            console.log('收藏成功')
+            that.collectLock = !that.collectLock
           })
-        }else if(that.collect_status === '已收藏'){
-          console.log('开始取消收藏')
+        } else if (that.collect_status === '已收藏') {
+          that.collect_status = '收藏'
           record.record_type = '取消收藏'
           record.id = that.collectId
           let uploadRecord = {
@@ -284,21 +268,20 @@
             'item': JSON.stringify(record),
             'items': JSON.stringify(record)
           }
-          that.$get('api/update',uploadRecord).then(function(res){
-            that.collect_status = '收藏'
-            for(let i=0; i<that.myDetail.recordList.length; i++){
-              if(that.myDetail.recordList[i].tag_id===that.tag_id){
+          that.$get('api/update', uploadRecord).then(function (res) {
+            for (let i = 0; i < that.myDetail.recordList.length; i++) {
+              if (that.myDetail.recordList[i].tag_id === that.tag_id) {
                 that.myDetail.recordList.splice(i, 1)
                 break
               }
             }
             that.reSetMyDetail(that.myDetail)
-            console.log('取消收藏成功')
+            that.collectLock = !that.collectLock
           })
         }
-        that.$nextTick(function(){
-          that.focusState = false
-        })
+        // that.$nextTick(function(){
+        //   that.focusState = false
+        // })
       },
       toReplyName(name, id) {
         this.to_interact_id = id
@@ -318,180 +301,164 @@
         }
       },
       size() {
-        let windowWidth = wx.getSystemInfoSync().windowWidth
-        let windowHeight = wx.getSystemInfoSync().windowHeight
-        let statusBarHeight = wx.getSystemInfoSync().statusBarHeight
-        let rWindowWidth = 750
-        let px_to_rpx = rWindowWidth / windowWidth
-        let rWindowHeight = windowHeight * px_to_rpx
-        let rStatusBarHeight = statusBarHeight * px_to_rpx
-        this.scrollHight = rWindowHeight - rStatusBarHeight - 240
+        let that = this
+        wx.getSystemInfo({
+          success(res) {
+            let px_to_rpx = 750 / res.windowWidth
+            let height = res.windowHeight * px_to_rpx
+            let statusBarHeight = res.statusBarHeight * px_to_rpx
+            that.scrollHight = height - statusBarHeight - 230
+          }
+        })
       },
-      collectStatus(){
+      collectStatus() {
         let that = this
         wx.getStorage({
           key: 'myDetail',
           success: function (res) {
-            console.log('获取myDetail成功')
             that.myDetail = res.data
-            that.my_user_id = res.data.user.id
             let recordList = res.data.recordList
-            if(recordList.length === 0){
+            if (recordList.length === 0) {
               that.collect_status = '收藏'
-            }else{
-              for(let i=0; i<recordList.length; i++){
-                if(recordList[i].tag_id === that.tag_id){
+            } else {
+              for (let i = 0; i < recordList.length; i++) {
+                if (recordList[i].tag_id === that.tag_id) {
                   that.collectId = recordList[i].id
                   that.collect_status = '已收藏'
                   break
                 }
               }
-              if(that.collect_status === ''){
+              if (that.collect_status === '') {
                 that.collect_status = '收藏'
               }
-            }  
+            }
           }
         })
       },
 
       //上传图片
       upLoadImage() {
+        this.focusState = false
         let that = this
-        let num = 6 - that.localImages.length
-        if(num>0){
+        let num = 6 - that.showImages.length
+        if (num > 0) {
           wx.chooseImage({
-            count: num,
+            count: 1,
             sizeType: ['compressed'],
             sourceType: ['album'],
             success: function (res) {
-              that.getCanvasImg(0, 0, res.tempFilePaths) //进行压缩
               wx.showLoading({
-                title:'正在上传图片',
-                mask:true
+                title: '正在上传图片',
+                mask: true
               })
-              let timer = setTimeout(function(){
-                wx.hideLoading({
-                  success(){
-                    clearTimeout(timer)
-                    for(let i in res.tempFilePaths){
-                      that.localImages.push(res.tempFilePaths[i])
-                    }
-                  }
-                })
-              },3000)
+              that.getCanvasImg(res.tempFilePaths[0]) //进行压缩
             }
           })
+        } else {
+          wx.showToast({
+            title: '最多6张图片！',
+            icon: 'none',
+            mask: true,
+            duration: 1000
+          })
+          return;
         }
-        that.$nextTick(function(){
-          that.focusState = false
-        })
       },
-      getCanvasImg: function (index,failNum, tempFilePaths){
-        console.log('2')
+      getCanvasImg: function (tempFilePath) {
         let that = this;
-        if (index < tempFilePaths.length){
-          const ctx = wx.createCanvasContext('attendCanvasId');
-          wx.getImageInfo({
-            src:tempFilePaths[index],
-            success(res){
-              let picH = res.height
-              let picW = res.width
-              ctx.drawImage(tempFilePaths[index], 0, 0, 150, 150*picH/picW);
-              ctx.draw(true, function () {
-                index = index + 1;//上传成功的数量，上传成功则加1
-                wx.canvasToTempFilePath({
-                  width:150,
-                  height:150*picH/picW,
-                  canvasId: 'attendCanvasId',
-                  success: function (res) {
-                    that.uploadCanvasImg(res.tempFilePath);
-                    that.getCanvasImg(index,failNum,tempFilePaths);
-                  }, 
-                  fail: function (e) {
-                    failNum += 1;//失败数量，可以用来提示用户
-                    that.getCanvasImg(inedx,failNum,tempFilePaths);
-                  }
-                });
+
+        const ctx = wx.createCanvasContext('attendCanvasId');
+        wx.getImageInfo({
+          src: tempFilePath,
+          success(res) {
+            let picH = res.height
+            let picW = res.width
+            let d = picH / picW
+            if (picW > 300) {
+              picW = 300
+              picH = parseInt(300 * d)
+            }
+            ctx.drawImage(tempFilePath, 0, 0, picW, picH);
+            ctx.draw(true, function () {
+              wx.canvasToTempFilePath({
+                width: picW,
+                height: picH,
+                fileType: 'jpg',
+                canvasId: 'attendCanvasId',
+                success: function (res) {
+                  that.localImage = res.tempFilePath
+                  that.uploadCanvasImg(res.tempFilePath);
+                  let url = res.tempFilePath.replace('http://tmp/',
+                    'https://www.xaoji.com/upload/image/')
+                  that.images.push(url)
+                }
               });
-            }
-          })
-          
-        }
-        that.$nextTick(function(){
-          that.focusState = false
-        })
-      },
-      uploadCanvasImg: function (canvasImg){
-        console.log('uploadtask')
-        let that = this;
-        let uploadTask = wx.uploadFile({
-          url: 'http://www.xaoji.com:3000/api/uploadImage',
-          filePath: canvasImg,
-          name: 'pic',
-          header:{
-            'content-type':'multipart/form-data'
-          },
-          success: function (res) {
-            console.log('res',res)
-            console.log('JSON.parse(res.data)',JSON.parse(res.data))
-            let url = 'http://www.xaoji.com:3000'+JSON.parse(res.data).url
-            that.images.push(url)
-            // console.log(that.images)
+            });
           }
         })
-        that.uploadTasks.push(uploadTask)
-        that.$nextTick(function(){
-          that.focusState = false
+
+      },
+      uploadCanvasImg: function (canvasImg) {
+        let that = this;
+        wx.uploadFile({
+          url: 'https://www.xaoji.com/api/uploadImage',
+          filePath: canvasImg,
+          name: 'pic',
+          header: {
+            'content-type': 'multipart/form-data'
+          },
+          success: function (res) {
+            wx.hideLoading({
+              success() {
+                that.showImages.push(that.localImage)
+              }
+            })
+
+            // }
+          }
         })
       },
       //-上传图片
 
+
+      //删除图片
       removeImage(index) {
-        let that = this
-        if(that.images[index]){
-          that.images.splice(index, 1)
-          that.localImages.splice(index, 1)
-          that.uploadTasks.splice(index, 1)
-        }else{
-          console.log('else')
-          that.uploadTasks[index].abort()
-          that.localImages.splice(index, 1)
-          that.uploadTasks.splice(index, 1)
-        }
+        this.focusState = false
+        this.images.splice(index, 1)
+        this.showImages.splice(index, 1)
       },
-      reSetMyDetail(data){
-        wx.setStorage({
-          key:'myDetail',
-          data:data,
-          success(){
-            console.log('myDetail缓存设置成功')
-          }
-        })
-      },
-      getMyDetail(){
-        let that = this
-        wx.getStorage({
-          key: 'myDetail',
-          success: function (res) {
-            console.log('获取myDetail成功',res.data)
-            that.myDetail = res.data
-          }
+      preview: function (index) {
+        this.focusState = false
+        wx.previewImage({
+          current: this.showImages[index], // 当前显示图片的http链接
+          urls: this.showImages // 需要预览的图片http链接列表
         })
       },
 
-      changeUserStatus(){
+      reSetMyDetail(data) {
+        wx.setStorage({
+          key: 'myDetail',
+          data: data,
+        })
+      },
+
+      //改变匿名状态
+      changeUserStatus() {
+        this.focusState = false
         let that = this
-        if(this.user_status === '匿名'){
+        if (this.user_status === '匿名') {
           this.user_status = '已匿名'
-        }else if(this.user_status === '已匿名'){
+        } else if (this.user_status === '已匿名') {
           this.user_status = '匿名'
         }
-        this.focusState = false
+      },
+      leave(){
+        
       }
 
 
-    }//methods下括号
-    
+    } //methods下括号
+
   }
 
 </script>
@@ -571,7 +538,10 @@
     left: 20rpx;
   }
 
-  .collect,.share,.image,.userstatus{
+  .collect,
+  .share,
+  .image,
+  .userstatus {
     width: 120rpx;
     height: 70rpx;
     color: #f3cc01;
@@ -604,12 +574,11 @@
     height: 115rpx;
   }
 
-  .myCanvas{
+  .myCanvas {
     width: 2000px;
     height: 2000px;
     position: absolute;
     left: -3000px;
   }
-
 
 </style>

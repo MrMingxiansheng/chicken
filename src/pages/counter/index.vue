@@ -1,29 +1,34 @@
 <template>
   <div>
     <div class="home">
-      <div class="home-center">{{real_estate_name}}</div>
-      <div class="browse-right">{{views_num}}浏览</div>
+      <div class="home-center">{{real.real_estate_name}}</div>
+      <div class="browse-right">{{real.views_num}}浏览</div>
     </div>
     <line />
-    <scroll-view scroll-y="true" :style="{height:scrollHeight+'rpx'}" class="item">
+    <scroll-view scroll-y="true" :style="{height:scrollHight+'rpx'}" class="item">
         <div class="box">
-          <topic v-for="(site,index) in dataList" :item="site" :key="index"></topic>
+          <topic v-for="site in dataList" :item="site" :key="site.id" :myDetail="myDetail" :real_estate_name="real.real_estate_name"></topic>
         </div>
     </scroll-view>
     <canvas canvas-id='attendCanvasId' class='myCanvas'></canvas>
     <div class="footer">
-      <div v-for="(img,index) in localImages" :key="index" v-if="index<6" class="box-img">
+      <div v-for="(img,index) in showImages" :key="index" v-if="index<6" class="box-img">
         <img :src="img" class="big" @click="preview(index)">
         <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
       </div>
       <div class="send_arr">
-        <input id="enter" v-model="words" :focus="focusState" @focus="focus" maxlength="200" />
-        <div class="send" @click="sendTopic">发送</div>
+        <input id="enter"
+        v-model.lazy="words"
+        maxlength="200" 
+        placeholder="  在此发话题,前8个字重点显示"
+        placeholder-style="font-size: 14px"
+        />
+        <div class="send" @click="sendTopic()">发送</div>
       </div>
       <line />
       <ul>
         <li>
-          <button plain="true" class="image" @click="upLoadImage">图片</button>
+          <button plain="true" class="image" @click="upLoadImage()">图片</button>
         </li>
         <li>
           <button plain="true" class="userstatus" @click="changeUserStatus()">{{user_status}}</button>
@@ -38,27 +43,23 @@
 
 <script>
   import line from "@/components/line"
-  import itemx from "@/components/itemx"
   import topic from "@/components/topic"
   export default {
     components: {
       line,
-      itemx,
       topic
     }, // 数据
     data() {
       return {
-        scrollHeight: "",
-        views_num: "",
-        real_estate_name: "",
-        real_estate_id:'',
+        scrollHight: "",
         dataList: [],
         words:'',
         images:[],
-        localImages:[],
-        focusState:false,
-        uploadTasks:[],
-        user_status:'匿名'
+        showImages:[],
+        localImage:'',
+        user_status:'匿名',
+        myDetail:'',
+        real:''                 //楼盘列表中的一项
       }
     },
     onShareAppMessage: function (res) {
@@ -72,65 +73,47 @@
         imageUrl: ''
       }
     },
-    onLoad() {
+    onLoad(option) {
+      wx.showLoading({
+        title:'加载中',
+        mask:true
+      })
       let that = this
       that.ScrollViewHeight()
-      wx.getStorage({
-        key: 'real_estate_name', //楼盘名字
-        success: function (res) {
-          that.real_estate_name = res.data
-          console.log('楼盘',that.real_estate_name)
-        }
+      that.real = JSON.parse(option.real)
+      that.$get('api/queryRealEstateDetail',{real_estate_id:that.real.id}).then(function(res){
+        that.dataList = res.data.tagList
+        wx.hideLoading()
       })
       wx.getStorage({
-        key: 'real_estate_id', //楼盘ID
-        success: function (res) { 
-        that.real_estate_id = res.data
-        let param={
-             real_estate_id: res.data
-           };  
-            that.$get('api/queryRealEstateDetail',param).then(function (res){
-              that.views_num = res.data.realEstate.views_num
-              for (let i=0;i<res.data.tagList.length;i++){ 
-              that.dataList = res.data.tagList
-                   let second_tag_id={
-                  tag_id: that.dataList[i].id
-                }
-                that.$get('api/queryTagDetail',second_tag_id).then(function (res){
-                  that.dataList[i].length = res.data.interactList.length
-                  that.dataList[i].cnum = res.data.interactList[0].cnum
-                  console.log('num',that.dataList[0].cnum)
-                    let temp = JSON.parse(JSON.stringify(that.dataList))
-                      that.dataList = []
-                      that.dataList = temp
-                        console.log('楼盘',that.dataList) 
-                }) 
-              }
-              })
-           }      
+        key:'myDetail',
+        success(res){
+          that.myDetail = res.data
+        }
       })
     },
     onUnload() {
-      this.real_estate_name = ''
-      this.views_num = ''
+      this.real = ''
       this.dataList = []
-      this.focusState = false
       this.user_status = '匿名'
+      this.words = ''
+      this.localImage = ''
+      this.images = []
+      this.showImages = []
     },
-    onPullDownRefresh: function(){
-
-    },
-    computed: {},
+   
     methods: {
       //计算滚动高度
       ScrollViewHeight() {
         let that = this
-        let windowWidth = wx.getSystemInfoSync().windowWidth;
-        let windowHeight = wx.getSystemInfoSync().windowHeight;
-        let rwindowWidth = 750
-        let px_to_rpx = rwindowWidth / windowWidth
-        let rWindowHeight = windowHeight * px_to_rpx
-        that.scrollHeight = rWindowHeight - 270;
+        wx.getSystemInfo({
+          success(res){
+            let px_to_rpx = 750 / res.windowWidth
+            let height = res.windowHeight*px_to_rpx
+            let statusBarHeight = res.statusBarHeight*px_to_rpx
+            that.scrollHight = height - statusBarHeight - 230
+          }
+        })
         //读取机型全屏高度，减去固定高度获得scroll高度
       },
       
@@ -138,9 +121,8 @@
       sendTopic () {
         let that = this
         let topicTitle = {} //话题标题
-        let topicDes = {} //话题内容
-        let my_user_id = wx.getStorageSync('key').id || ''
-        if(!my_user_id){
+        let interact = {}
+        if(!that.myDetail.user.id){
           //没有读取到我的id
           wx.showToast({
             title: '请先登录！',
@@ -160,57 +142,54 @@
           })
           return;
         }
+        if(that.images.length!==0){
+          //有图片
+          interact.interact_content = that.words.trim()+'images='+JSON.stringify(that.images)
+        }else{
+          //没有图片
+          interact.interact_content = that.words.trim()
+        }
         if(that.words.indexOf('https://')!==-1){
           //有网址
           let wordsArr = that.words.split('https://')
           let words = wordsArr[0]
-          if(words.indexOf(' ')!==-1){
-            //有空格
-            let trimWords = words.trim()
-            let noSpaceArr = trimWords.split(' ')
-            if(noSpaceArr[0].length<=8){
-              //8个字内
-              topicTitle.tag_name = noSpaceArr[0]
-            }else{
-              //超过8个字
-              topicTitle.tag_name = noSpaceArr[0].slice(0,7)
-            }
+          let trimWords = words.trim()
+          if(trimWords.length===0){
+            wx.showToast({
+              title: '内容为空！',
+              icon: 'none',
+              mask: true,
+              duration: 1000
+            })
+            return;
+          }else if(trimWords.length<=8){
+            //8个字内
+            topicTitle.tag_name = trimWords.replace(/\s*/g,"")
           }else{
-            //没有空格
-            if(words.length<=8){
-              //8个字内
-              topicTitle.tag_name = words
-            }else{
-              //超过8个字
-              topicTitle.tag_name = words.slice(0,7)
-            }
+            //超过8个字
+            topicTitle.tag_name = trimWords.slice(0,7).replace(/\s*/g,"")
           }
         }else{
           //没有网址
-          if(that.words.indexOf(' ')!==-1){
-            //有空格
-            let trimWords = that.words.trim()
-            let noSpaceArr = trimWords.split(' ')
-            if(noSpaceArr[0].length<=8){
-              //8个字内
-              topicTitle.tag_name = noSpaceArr[0]
-            }else{
-              //超过8个字
-              topicTitle.tag_name = noSpaceArr[0].slice(0,7)
-            }
+          let trimWords = that.words.trim()
+          if(trimWords.length===0){
+            wx.showToast({
+              title: '内容为空！',
+              icon: 'none',
+              mask: true,
+              duration: 1000
+            })
+            return;
+          }else if(trimWords.length<=8){
+            //8个字内
+            topicTitle.tag_name = trimWords.replace(/\s*/g,"")
           }else{
-            //没有空格
-            if(that.words.length<=8){
-              //8个字内
-              topicTitle.tag_name = that.words
-            }else{
-              //超过8个字
-             topicTitle.tag_name = that.words.slice(0,7)
-            }
+            //超过8个字
+            topicTitle.tag_name = trimWords.slice(0,7).replace(/\s*/g,"")
           }
         }
-        topicTitle.real_estate_id = that.real_estate_id
-        topicTitle.user_id = my_user_id
+        topicTitle.real_estate_id = that.real.id
+        topicTitle.user_id = that.myDetail.user.id
         topicTitle.views_num = '0'
         let param = {
           'db': 'WpTagModel',
@@ -218,35 +197,19 @@
           'item': JSON.stringify(topicTitle),
           'items': JSON.stringify(topicTitle)
         }
-        wx.showToast({
-          title: '发送中',
-          icon: 'loading',
-          mask: true,
-          duration: 2500
+        wx.showLoading({
+          title:'发送中',
+          mask:true
         })
         that.$get('api/update', param).then(function (res) {
+          console.log('发送标题成功')
+          res.data.realEstate = {real_estate_name:that.real.real_estate_name}
+          res.data.real_estate_name = that.real.real_estate_name
           that.tag = res.data //跳转页面用
-          console.log('that.tag',that.tag)
-          let interact = {}
-          if(that.localImages.length!==0){
-            //有图片
-            if(that.localImages.length === that.images.length){
-              //可以直接发送
-              interact.interact_content = that.words+'images='+JSON.stringify(that.images)
-            }else{
-              //等图片地址返回再发送
-              wx.showToast({
-                title: '图片上传中',
-                icon: 'loading',
-                mask: true,
-                duration: 3000
-              })
-              return;
-            }
-          }else{
-            //没有图片
-            interact.interact_content = that.words
-          }
+          that.myDetail.tagList.reverse()
+          that.myDetail.tagList.push(res.data)
+          that.myDetail.tagList.reverse()
+          that.reSetMyDetail(that.myDetail)
           if(that.user_status === '已匿名'){
             interact.user_type = '匿名'
           }
@@ -261,6 +224,7 @@
             'items': JSON.stringify(interact)
           }
           that.$get('api/update', updateInteract).then(function (res) {
+            console.log('发送描述成功',res.data)
             let interactId = {
               id: res.data.tag_id,
               tag_content_id: res.data.id
@@ -272,111 +236,95 @@
               'items': JSON.stringify(interactId)
             }
             that.$get('api/update', updateInteractId).then(function () {
-              that.words = ''
-              that.images = []
-              that.localImages = []
+              console.log('绑定交互成功',res.data)
+              wx.hideLoading()
               wx.redirectTo({
                 url:'/pages/qwb/main?tag='+JSON.stringify(that.tag)
               })
-
-                
             })
           })
         })
-        that.$nextTick(function(){
-          that.focusState = false
-        })
-        
       },
       //-发送话题
 
       //上传图片
       upLoadImage() {
         let that = this
-        let num = 6 - that.localImages.length
+        let num = 6 - that.showImages.length
         if(num>0){
           wx.chooseImage({
-            count: num,
+            count: 1,
             sizeType: ['compressed'],
             sourceType: ['album'],
             success: function (res) {
-              that.getCanvasImg(0, 0, res.tempFilePaths) //进行压缩
               wx.showLoading({
                 title:'正在上传图片',
                 mask:true
               })
-              let timer = setTimeout(function(){
-                wx.hideLoading({
-                  success(){
-                    clearTimeout(timer)
-                    for(let i in res.tempFilePaths){
-                      that.localImages.push(res.tempFilePaths[i])
-                    }
-                  }
-                })
-              },3000)
+              that.getCanvasImg(res.tempFilePaths[0]) //进行压缩
             }
           })
+        }else{
+          wx.showToast({
+            title: '最多6张图片！',
+            icon: 'none',
+            mask: true,
+            duration: 1000
+          })
+          return;
         }
-        that.$nextTick(function(){
-          that.focusState = false
-        })
       },
-      getCanvasImg: function (index,failNum, tempFilePaths){
-        console.log('2')
+      getCanvasImg: function (tempFilePath){
         let that = this;
-        if (index < tempFilePaths.length){
+        
           const ctx = wx.createCanvasContext('attendCanvasId');
           wx.getImageInfo({
-            src:tempFilePaths[index],
+            src:tempFilePath,
             success(res){
               let picH = res.height
               let picW = res.width
-              ctx.drawImage(tempFilePaths[index], 0, 0, 150, 150*picH/picW);
+              let d = picH/picW
+              if(picW>300){
+                picW = 300
+                picH = parseInt(300*d)
+              }
+              ctx.drawImage(tempFilePath, 0, 0, picW, picH);
               ctx.draw(true, function () {
-                index = index + 1;//上传成功的数量，上传成功则加1
                 wx.canvasToTempFilePath({
-                  width:150,
-                  height:150*picH/picW,
+                  width:picW,
+                  height:picH,
+                  fileType:'jpg',
                   canvasId: 'attendCanvasId',
                   success: function (res) {
+                    that.localImage = res.tempFilePath
                     that.uploadCanvasImg(res.tempFilePath);
-                    that.getCanvasImg(index,failNum,tempFilePaths);
-                  }, 
-                  fail: function (e) {
-                    failNum += 1;//失败数量，可以用来提示用户
-                    that.getCanvasImg(inedx,failNum,tempFilePaths);
+                    let url = res.tempFilePath.replace('http://tmp/','https://www.xaoji.com/upload/image/')
+                    that.images.push(url)
                   }
                 });
               });
             }
           })
-          
-        }
-        that.$nextTick(function(){
-          that.focusState = false
-        })
+        
       },
       uploadCanvasImg: function (canvasImg){
         let that = this;
-        let uploadTask = wx.uploadFile({
-          url: 'http://www.xaoji.com:3000/api/uploadImage',
+        wx.uploadFile({
+          url: 'https://www.xaoji.com/api/uploadImage',
           filePath: canvasImg,
           name: 'pic',
           header:{
             'content-type':'multipart/form-data'
           },
           success: function (res) {
-            console.log('res',res)
-            console.log('JSON.parse(res.data)',JSON.parse(res.data))
-            let url = 'http://www.xaoji.com:3000'+JSON.parse(res.data).url
-            that.images.push(url)
-            // console.log(that.images)
+            wx.hideLoading({
+              success(){
+                that.showImages.push(that.localImage)
+              }
+            })
+            
+            // }
           }
-        })
-        that.uploadTasks.push(uploadTask)
-        that.$nextTick(function(){
-          that.focusState = false
         })
       },
       //-上传图片
@@ -384,33 +332,15 @@
       //图片预览
       preview: function (index) {
         wx.previewImage({
-          current: this.localImages[index], // 当前显示图片的http链接
-          urls: this.localImages // 需要预览的图片http链接列表
+          current: this.showImages[index], // 当前显示图片的http链接
+          urls: this.showImages // 需要预览的图片http链接列表
         })
       },
 
       //删除图片
       removeImage(index) {
-        let that = this
-        if(that.images[index]){
-          that.images.splice(index, 1)
-          that.localImages.splice(index, 1)
-          that.uploadTasks.splice(index, 1)
-        }else{
-          console.log('else')
-          that.uploadTasks[index].abort()
-          that.localImages.splice(index, 1)
-          that.uploadTasks.splice(index, 1)
-        }
-      },
-
-      //输入框聚焦
-      focus(){
-        this.focusState = true
-      },
-      //输入框失去焦点
-      leave(){
-        this.focusState = false
+        this.images.splice(index, 1)
+        this.showImages.splice(index, 1)
       },
 
       changeUserStatus(){
@@ -420,8 +350,23 @@
         }else if(this.user_status === '已匿名'){
           this.user_status = '匿名'
         }
-        this.focusState = false
+      },
+
+      reSetMyDetail(data){
+        wx.setStorage({
+          key:'myDetail',
+          data:data,
+        })
+      },
+
+      reLoadRealEstatePage(){
+        let that = this
+        that.$get('api/queryRealEstateDetail',{real_estate_id:that.real.id}).then(function(res){
+          that.dataList = res.data.tagList
+        })
       }
+
+     
 
 
     }//methods的下括号
@@ -510,9 +455,8 @@
   .box-img {
     position: relative;
     display: inline-block;
-    width: 115rpx;
-    height: 115rpx;
-    margin-right: 10rpx;
+    width: 125rpx;
+    height: 125rpx;
   }
 
   .box-img .min {
@@ -524,8 +468,8 @@
   }
 
   .box-img .big {
-    width: 115rpx;
-    height: 115rpx;
+    width: 125rpx;
+    height: 125rpx;
   }
 
   .myCanvas{

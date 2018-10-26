@@ -1,8 +1,8 @@
 <template>
   <div class="reply">
     <div class="avatar">
-      <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner" @click="test">
-      <img :src="reply.user.head_url"  v-else @click="test">
+      <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner">
+      <img :src="reply.user.head_url"  v-else>
     </div>
     <div class="content">
       <div class="content-in">
@@ -104,6 +104,7 @@
               //已经有点赞,要取消赞
               todo = '取消赞'
               praiseId = interactList[i].id
+              console.log('点赞交互',interactList[i])
               break
             }
           }
@@ -121,8 +122,6 @@
           interact.interact_type = '点赞'
           interact.to_interact_id = that.reply.id
           interact.interact_status = '0'
-          that.myDetail.interactList.push(interact)
-          that.reSetMyDetail(that.myDetail)
           let updateInteract = {
             'db': 'WpInteractModel',
             'model': 'edit',
@@ -130,6 +129,9 @@
             'items': JSON.stringify(interact)
           }
           that.$get('api/update', updateInteract).then(function (res) {
+            that.$sendMessage(JSON.stringify(res.data))
+            that.myDetail.interactList.push(res.data)
+            that.reSetMyDetail(that.myDetail)
             console.log('点赞返回',res.data)
             that.praiseLock = !that.praiseLock
           })
@@ -177,7 +179,9 @@
             if(interactList[i].to_interact_id === that.reply.id && interactList[i].interact_type === '点踩'){
               //已经有点踩,要取消踩
               todo = '取消踩'
+              console.log('interactList[i]',interactList[i])
               stepId = interactList[i].id
+              console.log('for循环,stepid',stepId)
               break
             }
           }
@@ -195,8 +199,6 @@
           interact.interact_type = '点踩'
           interact.to_interact_id = that.reply.id
           interact.interact_status = '0'
-          that.myDetail.interactList.push(interact)
-          that.reSetMyDetail(that.myDetail)
           let updateInteract = {
             'db': 'WpInteractModel',
             'model': 'edit',
@@ -204,6 +206,8 @@
             'items': JSON.stringify(interact)
           }
           that.$get('api/update', updateInteract).then(function (res) {
+            that.myDetail.interactList.push(res.data)
+            that.reSetMyDetail(that.myDetail)
             console.log('点踩返回',res.data)
             that.stepLock = !that.stepLock
           })
@@ -236,9 +240,14 @@
       },
       test(){
         let that = this
-        console.log('点击')
-        that.$get('api/queryTagDetail',{tag_id: that.reply.tag_id}).then(function(res){
-          console.log('交互列表',res.data.interactList)
+        wx.showLoading({
+          title:'加载中',
+          mask:true
+        })
+        console.log('外面')
+        that.$get('api/testSpeed').then(function(res){
+          console.log('里面')
+          wx.hideLoading()
         })
       },
       preview: function (index) {
@@ -294,7 +303,7 @@
   }
 
   .content .content-in {
-    width: 460rpx;
+    width: 480rpx;
   }
 
   .content-in .user {
@@ -311,6 +320,7 @@
     color: #000;
     margin: 20rpx 0;
     font-size: 17px;
+    line-height: 24px
   }
 
   .words .article{
@@ -326,7 +336,7 @@
   }
 
   .content-in .time {
-    color: rgb(137, 145, 150);
+    color: #ccc;
     font-size: 13px;
   }
 
@@ -357,7 +367,7 @@
   }
 
   .step .step-num {
-    color: #ccc;
+    color: rgb(137, 145, 150);
     text-align: right;
   }
 
@@ -373,7 +383,7 @@
   }
 
   .praise .praise-num {
-    color: #ccc;
+    color: rgb(137, 145, 150);
     text-align: right;
   }
 

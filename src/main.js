@@ -4,7 +4,7 @@ import App from './App'
 Vue.config.productionTip = false
 App.mpType = 'app'
 
-let serverPath = 'http://www.xaoji.com:3000/'
+let serverPath = 'https://www.xaoji.com/'
 let Methods = function get(url, data) {
   return new Promise((resolve, reject) => {
     wx.request({
@@ -47,8 +47,52 @@ let isLogin = async function () {
   }
 }
 
+function initMessage(){
+  console.log('开始连接ws')
+  wx.connectSocket({
+    url: 'ws://www.xaoji.com:3001'
+  })
+  wx.onSocketClose(function(){
+    console.log('连接关闭')
+    wx.connectSocket({
+      url: 'ws://www.xaoji.com:3001'
+    })
+  })
+  wx.onSocketMessage(function(res){
+    let obj = JSON.parse(res.data)
+    wx.getStorage({
+      key:'myDetail',
+      success(res){
+        res.data.msgList.reverse()
+        res.data.msgList.push(obj)
+        res.data.msgList.reverse()
+        wx.setStorage({
+          key:'myDetail',
+          data:res.data,
+          success(){
+            console.log('缓存成功')
+          }
+        })
+      }
+    })
+  })
+}
+
+function sendMessage(msg){
+  console.log('sendmessage')
+  wx.sendSocketMessage({
+    data:msg,
+    success(){
+      console.log('发送成功')
+    }
+  })
+}
+
+
+
 Vue.prototype.$isLogin = isLogin
 Vue.prototype.$get = Methods
-
+Vue.prototype.$initMessage = initMessage
+Vue.prototype.$sendMessage = sendMessage
 const app = new Vue(App)
 app.$mount()

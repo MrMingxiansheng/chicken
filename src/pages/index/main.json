@@ -1,9 +1,6 @@
 {
-  "usingComponents": {
-    "i-notice-bar": "../../static/iview/notice-bar/index",
-    "i-collapse": "../../static/iview/collapse/index",
-    "i-collapse-item": "../../static/iview/collapse-item/index"
-  },
+  
   "navigationBarTitleText": "小鸡评房",
-  "enablePullDownRefresh": true
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
 }

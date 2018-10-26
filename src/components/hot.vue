@@ -1,14 +1,14 @@
 <template>
   <div class="hot" v-if="item.real_estate_name">
-    <div class="title" @click="toTopicPage"><a href="/pages/counter/main" hover-class="none">{{item.real_estate_name}}</a></div>
+    <div class="title" @click="toRealEstatePage()">{{item.real_estate_name}}</div>
     <div class="view">
       <div class="num">
-        <span class="tagNum">{{tagList.length}}话题</span>
+        <span class="tagNum">{{item.tagList.length}}话题</span>
         <span class="viewNum">&ensp;&ensp;{{item.views_num}}阅读</span>
       </div>
-      <div class="sendTopic" @click="toTopicPage"><a href="/pages/counter/main" hover-class="none">发话题</a></div>
+      <div class="sendTopic" @click="toRealEstatePage()">发话题</div>
     </div>
-    <itemx :tagList="tagList"></itemx>
+    <itemx :tagList="item.tagList" :real_estate_name="item.real_estate_name"></itemx>
     <line />
   </div>
 </template>
@@ -22,36 +22,11 @@
       line
     },
     props: ['item'],
-    data() {
-      return {
-        tagList:''
-      }
-    },
-    onLoad() {
-      let that = this
-      let param = {
-        real_estate_id: this.item.id
-      }
-      that.$get('api/queryRealEstateDetail', param).then(function (res) {
-        that.tagList = res.data.tagList || []
-      }, function (res) {
-        // failure
-      });
-    },
     methods: {
-      toTopicPage: function () {
+      toRealEstatePage(){
         let that = this
-        wx.setStorage({
-          key: 'real_estate_id', //楼盘ID
-          data: that.item.id,
-          success: function (res) {}
-        })
-        wx.setStorage({
-          key: 'real_estate_name', //楼盘名字
-          data: that.item.real_estate_name,
-          success: function (res) {
-
-          }
+        wx.navigateTo({
+          url:'/pages/counter/main?real='+JSON.stringify(that.item)
         })
       }
     }

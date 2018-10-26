@@ -1,7 +1,7 @@
 <template>
   <div class="topic" v-if="item.tag_name">
     <div class="box">
-          <div class="title" @click="ClickTag(item)">{{item.tag_name}}</div>
+          <div class="title" @click="ClickTag(item)"># {{item.tag_name}}</div>
       <div class="box1">
           <div class="bor" @click="ClickTag(item)">
             <div class="border">
@@ -10,9 +10,9 @@
             <span decode="ensp">&ensp;{{item.interact.user.user_name}}&ensp;发布</span>
           </div>
         <div class="talk">
-          <span class="views_num" @click="ClickTag(item)">{{item.length}}讨论</span>
+          <span class="views_num" @click="ClickTag(item)">{{interactList.length}}讨论</span>
           <div class="step" @click="clickStep">
-          <span class="step-num">{{item.cnum}}</span>
+          <span class="step-num">{{item.interact.cnum}}</span>
           <span class="step-str">踩</span>
         </div>
         </div>
@@ -35,12 +35,14 @@
     components: {
       line
     },
-    props: ['item'],
+    props: ['item','myDetail','real_estate_name'],
     data() {
       return {
         content:'',
         images:'',
-        articleSrc:''
+        articleSrc:'',
+        stepLock:true,
+        interactList:''
       };
     },
     onLoad (){
@@ -64,17 +66,22 @@
         this.content = articleArr[0]
         this.articleSrc = 'https://' + articleArr[1]
       }
+      that.$get('api/queryTagDetail',{tag_id:that.item.id}).then(function(res){
+        that.interactList = res.data.interactList
+      })
     },
     methods: {
       ClickTag: function (item) {
+        let that = this
         let obj = {
           tag_name:item.tag_name,
           views_num:item.views_num,
           user_id:item.user_id,
-          real_estate_id:item.real_estate_id,
+          real_estate_name:this.real_estate_name,
           id:item.id
         }
         console.log('obj',obj)
+        //+'interactList='+JSON.stringify(that.interactList)
         wx.navigateTo({
           url:'/pages/qwb/main?tag='+JSON.stringify(obj)
         })
@@ -89,68 +96,78 @@
       clickStep() {
         console.log('点了一下踩')
         let that = this
-        wx.getStorage({
-          key: 'key',
-          success: function (res) {
-            let myUserId = res.data.id
-            let to_interact_id = that.item.interact.id
-            let tag_id = that.item.interact.tag_id
-            let interact = {}
-            let todo = ''
-            that.$get("api/queryUserDetail", {
-              user_id: myUserId
-            }).then(function (res) {
-              let interactList = res.data.interactList
-              let arr = interactList.filter(function (ele) {
-                return ele.to_interact_id === to_interact_id
-              })
-              let arr1 = arr.filter(function (e) {
-                return e.interact_type === '点踩'
-              })
-              if (arr.length > 0) {
-                if (arr1.length > 0) {
-                  todo = '取消踩'
-                } else {
-                  todo = '点踩'
-                }
-              } else {
-                todo = '点踩'
-              }
-              if (todo === '点踩') {
-                interact.tag_id = tag_id
-                interact.user_id = myUserId
-                interact.interact_type = '点踩'
-                interact.to_interact_id = to_interact_id
-                interact.interact_status = '0'
-                let updateInteract = {
-                  'db': 'WpInteractModel',
-                  'model': 'edit',
-                  'item': JSON.stringify(interact),
-                  'items': JSON.stringify(interact)
-                }
-                that.$get('api/update', updateInteract).then(function () {
-                  that.item.cnum = parseInt(that.item.cnum) + 1
-                })
-              } else if (todo === '取消踩') {
-                interact.id = arr1[0].id
-                interact.interact_type = '取消踩'
-                interact.tag_id = tag_id
-                interact.user_id = myUserId
-                interact.to_interact_id = to_interact_id
-                interact.interact_status = '0'
-                let updateInteract = {
-                  'db': 'WpInteractModel',
-                  'model': 'edit',
-                  'item': JSON.stringify(interact),
-                  'items': JSON.stringify(interact)
-                }
-                that.$get('api/update', updateInteract).then(function () {
-                  that.item.cnum = parseInt(that.item.cnum) - 1
-                })
-              }
-            })
+        if(!that.stepLock){
+          return
+        }
+        that.stepLock = !that.stepLock
+        let interact = {} 
+        let todo = ''
+        let stepId = ''
+        let interactList = that.myDetail.interactList
+        if(interactList.length > 0){
+          //有交互
+          for(let i=0; i<interactList.length; i++){
+            if(interactList[i].to_interact_id === that.item.interact.id && interactList[i].interact_type === '点踩'){
+              //已经有点踩,要取消踩
+              todo = '取消踩'
+              console.log('interactList[i]',interactList[i])
+              stepId = interactList[i].id
+              console.log('for循环,stepid',stepId)
+              break
+            }
           }
-        })
+          if(todo !== '取消踩'){
+            todo = '点踩'
+          }
+        }else{
+          //没交互
+          todo = '点踩'
+        }
+        if (todo === '点踩') {
+          that.item.cnum = parseInt(that.item.cnum) + 1
+          interact.tag_id = that.item.interact.tag_id
+          interact.user_id = that.myDetail.user.id
+          interact.interact_type = '点踩'
+          interact.to_interact_id = that.item.interact.id
+          interact.interact_status = '0'
+          let updateInteract = {
+            'db': 'WpInteractModel',
+            'model': 'edit',
+            'item': JSON.stringify(interact),
+            'items': JSON.stringify(interact)
+          }
+          that.$get('api/update', updateInteract).then(function (res) {
+            that.myDetail.interactList.push(res.data)
+            that.reSetMyDetail(that.myDetail)
+            console.log('点踩返回',res.data)
+            that.stepLock = !that.stepLock
+          })
+        }else if (todo === '取消踩') {
+          that.item.cnum = parseInt(that.item.cnum) - 1
+          for(let i=0; i<that.myDetail.interactList.length; i++){
+            if(that.myDetail.interactList[i].id===stepId){
+              that.myDetail.interactList.splice(i,1)
+              break
+            }
+          }
+          that.reSetMyDetail(that.myDetail)
+          interact.id = stepId
+          interact.interact_type = '取消踩'
+          interact.tag_id = that.item.interact.tag_id
+          interact.user_id = that.myDetail.user.id
+          interact.to_interact_id = that.item.interact.id
+          interact.interact_status = '0'
+          let updateInteract = {
+            'db': 'WpInteractModel',
+            'model': 'edit',
+            'item': JSON.stringify(interact),
+            'items': JSON.stringify(interact)
+          }
+          that.$get('api/update', updateInteract).then(function (res) {
+            console.log('取消踩返回',res.data)
+            that.stepLock = !that.stepLock
+          })
+        }
       },
 
       toArticlePage(){
@@ -159,6 +176,15 @@
           url: '/pages/article/main?src='+that.articleSrc
         })
       },
+      reSetMyDetail(data){
+        wx.setStorage({
+          key:'myDetail',
+          data:data,
+          success(){
+            console.log('myDetail缓存设置成功')
+          }
+        })
+      }
 
     }
   };
@@ -175,7 +201,7 @@
 
   .title {
     text-align: center;
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .avatarUrl {

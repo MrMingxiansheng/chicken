@@ -15,7 +15,9 @@
     components: {
       line
     },
-    props:['tag'],
+    props:['tag','myDetail'],
+    onLoad(){
+    },
     methods: {
       removeImage() {
         let that = this
@@ -33,22 +35,32 @@
           content: '确定要删除话题吗?',
           success: function (res) {
             if (res.confirm) {
-              console.log('用户点击确定')
-              let myDetail = wx.getStorageSync('myDetail')
-              for(let i=0; i<myDetail.tagList.length; i++){
-                if(myDetail.tagList[i].id === that.tag.id){
-                  myDetail.tagList.splice(i,1)
-                  break
-                }
-              }
-              wx.setStorage({
-                key:'myDetail',
-                data:myDetail,
-                success(){
-                  that.$emit('reGetStorage')
-                }
+              wx.showLoading({
+                title:'删除中',
+                mask:true
               })
+              console.log('用户点击确定')
               that.$get('api/update', updateTemp).then(function (res) {
+                wx.hideLoading()
+                for(let i=0; i<that.myDetail.tagList.length; i++){
+                  if(that.myDetail.tagList[i].id === that.tag.id){
+                    that.myDetail.tagList.splice(i,1)
+                    break
+                  }
+                }
+                for(let i=0; i<that.myDetail.recordList.length; i++){
+                  if(that.myDetail.recordList[i].tag_id === that.tag.id){
+                    that.myDetail.recordList.splice(i,1)
+                    break
+                  }
+                }
+                wx.setStorage({
+                  key:'myDetail',
+                  data:that.myDetail,
+                  success(){
+                    console.log('设置myDetail成功')
+                  }
+                })
                 console.log('删除话题成功', res)
               })
             } else if (res.cancel) {
@@ -62,9 +74,8 @@
       ClickTag_name: function () {
         let obj = {
           tag_name: this.tag.tag_name,
-          views_num: this.tag.views_num,
           user_id: this.tag.user_id,
-          real_estate_id: this.tag.realEstate.id,
+          real_estate_name: this.tag.realEstate.real_estate_name,
           id: this.tag.id
         }
         wx.navigateTo({

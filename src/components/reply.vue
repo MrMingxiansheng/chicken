@@ -2,7 +2,7 @@
   <div class="reply">
     <div class="avatar">
       <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner" @click="test">
-      <img :src="reply.user.head_url"  v-else @click="test">
+      <img :src="reply.user.head_url"  v-else>
     </div>
     <div class="content">
       <div class="content-in">
@@ -22,7 +22,7 @@
           <span>{{content}}</span>
           <div class="article" @click="toArticlePage" v-if="articleSrc">文章链接</div>
         </div>
-        <div class="images">
+        <div class="images" v-if="images">
           <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)">
         </div>
         <div class="time">
@@ -34,14 +34,16 @@
       <div class="interact-in">
         <div class="step" @click="clickStep">
           <span class="step-num">{{reply.cnum}}</span>
-          <span class="step-str">踩</span>
+          <img :src="stepSrc" class="step-str"/>
+          <!-- <span class="step-str">踩</span> -->
         </div>
         <div class="praise" @click="clickPraise">
           <span class="praise-num">{{reply.interact_status}}</span>
-          <span class="praise-str">赞</span>
+          <img :src="praiseSrc" class="praise-str"/>
+          <!-- <span class="praise-str">赞</span> -->
         </div>
         <div class="say" @click="clickReply">
-          回复
+          <img src="/static/images/reply.png" class="say1"/>
         </div>
       </div>
     </div>
@@ -58,10 +60,13 @@
         articleSrc:'',
         stepLock:true,
         praiseLock:true,
+        praiseSrc: '/static/images/zan.png',
+        stepSrc:'/static/images/cai.png'
       }
     },
     onLoad(){
       let that = this
+      that.praiseStatus()
       let allContent,articleArr
       if(this.reply.interact_content.indexOf('images=')===-1){
         //没有图片
@@ -102,27 +107,30 @@
           for(let i=0; i<interactList.length; i++){
             if(interactList[i].to_interact_id === that.reply.id && interactList[i].interact_type === '点赞'){
               //已经有点赞,要取消赞
+              that.praiseSrc = '/static/images/zan.png'
               todo = '取消赞'
               praiseId = interactList[i].id
+              console.log('点赞交互',interactList[i])
               break
             }
           }
           if(todo !== '取消赞'){
             todo = '点赞'
+            that.praiseSrc = '/static/images/zan1.png'
           }
         }else{
           //没交互
           todo = '点赞'
+          that.praiseSrc = '/static/images/zan1.png'
         }
         if (todo === '点赞') {
+          that.praiseSrc = '/static/images/zan1.png'
           that.reply.interact_status = parseInt(that.reply.interact_status) + 1
           interact.tag_id = that.reply.tag_id
           interact.user_id = that.myDetail.user.id
           interact.interact_type = '点赞'
           interact.to_interact_id = that.reply.id
           interact.interact_status = '0'
-          that.myDetail.interactList.push(interact)
-          that.reSetMyDetail(that.myDetail)
           let updateInteract = {
             'db': 'WpInteractModel',
             'model': 'edit',
@@ -130,10 +138,13 @@
             'items': JSON.stringify(interact)
           }
           that.$get('api/update', updateInteract).then(function (res) {
+            that.myDetail.interactList.push(res.data)
+            that.reSetMyDetail(that.myDetail)
             console.log('点赞返回',res.data)
             that.praiseLock = !that.praiseLock
           })
         }else if (todo === '取消赞') {
+          that.praiseSrc = '/static/images/zan.png'
           that.reply.interact_status = parseInt(that.reply.interact_status) - 1
           for(let i=0; i<that.myDetail.interactList.length; i++){
             if(that.myDetail.interactList[i].id===praiseId){
@@ -176,27 +187,31 @@
           for(let i=0; i<interactList.length; i++){
             if(interactList[i].to_interact_id === that.reply.id && interactList[i].interact_type === '点踩'){
               //已经有点踩,要取消踩
+              that.stepSrc = '/static/images/cai.png'
               todo = '取消踩'
+              console.log('interactList[i]',interactList[i])
               stepId = interactList[i].id
+              console.log('for循环,stepid',stepId)
               break
             }
           }
           if(todo !== '取消踩'){
             todo = '点踩'
+            that.stepSrc = '/static/images/cai1.png'
           }
         }else{
           //没交互
           todo = '点踩'
+          that.stepSrc = '/static/images/cai1.png'
         }
         if (todo === '点踩') {
+          that.stepSrc = '/static/images/cai1.png'
           that.reply.cnum = parseInt(that.reply.cnum) + 1
           interact.tag_id = that.reply.tag_id
           interact.user_id = that.myDetail.user.id
           interact.interact_type = '点踩'
           interact.to_interact_id = that.reply.id
           interact.interact_status = '0'
-          that.myDetail.interactList.push(interact)
-          that.reSetMyDetail(that.myDetail)
           let updateInteract = {
             'db': 'WpInteractModel',
             'model': 'edit',
@@ -204,10 +219,13 @@
             'items': JSON.stringify(interact)
           }
           that.$get('api/update', updateInteract).then(function (res) {
+            that.myDetail.interactList.push(res.data)
+            that.reSetMyDetail(that.myDetail)
             console.log('点踩返回',res.data)
             that.stepLock = !that.stepLock
           })
         }else if (todo === '取消踩') {
+          that.stepSrc = '/static/images/cai.png'
           that.reply.cnum = parseInt(that.reply.cnum) - 1
           for(let i=0; i<that.myDetail.interactList.length; i++){
             if(that.myDetail.interactList[i].id===stepId){
@@ -234,13 +252,21 @@
           })
         }
       },
-      test(){
+
+      praiseStatus (){
         let that = this
-        console.log('点击')
-        that.$get('api/queryTagDetail',{tag_id: that.reply.tag_id}).then(function(res){
-          console.log('交互列表',res.data.interactList)
-        })
+        for(let i=0; i<that.myDetail.interactList.length; i++){
+         if(that.myDetail.interactList[i].to_interact_id === that.reply.id && that.myDetail.interactList[i].interact_type === '点赞'){
+            that.praiseSrc = '/static/images/zan1.png'
+          } 
+         if(that.myDetail.interactList[i].to_interact_id === that.reply.id && that.myDetail.interactList[i].interact_type === '点踩'){
+           that.stepSrc = '/static/images/cai1.png'
+         } 
+        }
+       
+
       },
+     
       preview: function (index) {
         //图片预览
         wx.previewImage({
@@ -285,16 +311,16 @@
   .avatar img {
     width: 80rpx;
     height: 80rpx;
+    border-radius:50%;
   }
 
   .content {
     width: 490rpx;
-
     line-height: 18px;
   }
 
   .content .content-in {
-    width: 460rpx;
+    width: 480rpx;
   }
 
   .content-in .user {
@@ -311,6 +337,7 @@
     color: #000;
     margin: 20rpx 0;
     font-size: 17px;
+    line-height: 24px
   }
 
   .words .article{
@@ -322,11 +349,11 @@
     width: 105rpx;
     height: 105rpx;
     margin-right: 10rpx;
-    margin-bottom: 10rpx;
+    margin-bottom: 5rpx;
   }
 
   .content-in .time {
-    color: rgb(137, 145, 150);
+    color: #ccc;
     font-size: 13px;
   }
 
@@ -337,8 +364,8 @@
   .interact .interact-in {
     height: 180rpx;
     width: 100rpx;
-    border: 1px solid rgb(219, 219, 219);
-    box-sizing: border-box;
+    /* border: 1px solid rgb(219, 219, 219);
+    box-sizing: border-box; */
     margin-left: 15rpx;
     font-size: 14px;
     line-height: 60rpx;
@@ -351,41 +378,53 @@
   }
 
   .interact-in .step {
-    border-bottom: 1px solid rgb(219, 219, 219);
-    box-sizing: border-box;
+    /* border-bottom: 1px solid rgb(219, 219, 219);
+    box-sizing: border-box; */
     height: 60rpx;
   }
 
   .step .step-num {
-    color: #ccc;
+    color: rgb(137, 145, 150);
     text-align: right;
   }
 
   .step .step-str {
     text-align: left;
     margin-left: 4rpx;
+    width:40rpx;
+    height:40rpx;
+    vertical-align: middle; /*图片垂直居中*/
   }
 
   .interact-in .praise {
-    border-bottom: 1px solid rgb(219, 219, 219);
-    box-sizing: border-box;
+    /* border-bottom: 1px solid rgb(219, 219, 219);
+    box-sizing: border-box; */
     height: 60rpx;
   }
 
   .praise .praise-num {
-    color: #ccc;
+    color: rgb(137, 145, 150);
     text-align: right;
   }
 
   .praise .praise-str {
     text-align: left;
     margin-left: 4rpx;
+    width:40rpx;
+    height:40rpx;
+    vertical-align: middle; /*图片垂直居中*/
   }
 
   .interact-in .say {
-    box-sizing: border-box;
-    height: 60rpx;
+    /* box-sizing: border-box; */
     text-align: center;
+    height: 60rpx;
+  }
+
+  .say1 {
+    width:40rpx;
+    height:40rpx;
+    vertical-align: middle; /*图片垂直居中*/
   }
 
 </style>

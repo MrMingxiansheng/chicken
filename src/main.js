@@ -4,7 +4,7 @@ import App from './App'
 Vue.config.productionTip = false
 App.mpType = 'app'
 
-let serverPath = 'http://www.xaoji.com:3000/'
+let serverPath = 'https://www.xaoji.com/'
 let Methods = function get(url, data) {
   return new Promise((resolve, reject) => {
     wx.request({

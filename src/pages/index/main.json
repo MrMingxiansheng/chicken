@@ -4,6 +4,6 @@
     "i-collapse": "../../static/iview/collapse/index",
     "i-collapse-item": "../../static/iview/collapse-item/index"
   },
-  "navigationBarTitleText": "小鸡评房",
+  "navigationBarTitleText": "小鸡笼",
   "enablePullDownRefresh": true
 }

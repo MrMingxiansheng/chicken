@@ -6,12 +6,14 @@
     "pages/qwa/main",
     "pages/qwb/main",
     "pages/qwc/main",
-    "pages/qwd/main"
+    "pages/qwd/main",
+    "pages/article/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#ffe144",
-    "navigationBarTitleText": "小鸡窝",
+    "backgroundColor": "#ffe144",
+    "navigationBarTitleText": "小鸡笼",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {

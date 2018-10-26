@@ -1,6 +1,6 @@
 <template>
-  <div class="page">
-    <span class="p">{{city}}</span>
+  <div class="page" v-if="city">
+    <span class="city"><a href="/pages/qwd/main">{{city}}</a></span>
     <div class="search" @click="suo">
       <div class="search_arr">
         <icon class="searchcion" size="20" type="search"></icon>
@@ -36,7 +36,7 @@
     margin-top: 20rpx;
   }
 
-  .p {
+  .city {
     margin-left: 20rpx;
     font-size: 18px;
     position: relative;

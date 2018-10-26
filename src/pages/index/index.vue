@@ -1,14 +1,14 @@
 <template>
   <div id="app">
-    <i-notice-bar icon="systemprompt" loop>
+    <!-- <i-notice-bar icon="systemprompt" loop>
       小鸡评房正在准备评测未来悦，请大家持续关注！小鸡评房正在准备评测未来悦，请大家持续关注！
-    </i-notice-bar>
+    </i-notice-bar> -->
     <div>
       <page></page>
     </div>
     <topswiper :tops="tops"></topswiper>
     <div class="Hot">
-      <hot :item="site" v-for="site in sites" :key="site"></hot>
+      <hot :item="site" v-for="site in sites" :key="site.id"></hot>
     </div>
   </div>
 </template>
@@ -60,9 +60,6 @@
                   wx.setStorage({
                     key: 'key',
                     data: res.data.data[0],
-                    success: function (res) {
-                      console.log(res)
-                    }
                   })
                 } else {
                   console.log('open_id_test:', JSON.parse(res.data.data).openid)
@@ -83,23 +80,38 @@
         }
       });
       that.queryRealEstate()
-      that.setMyDetail()
     },
 
-    onShow(){
-      let that = this
-      
-    },
     // 下拉刷新回调接口
     onPullDownRefresh: function () {
-        let that = this
-        that.sites = []
-        that.getRealEstate()
+      let that = this
+    setTimeout(function()
+      {
+      that.sites = []
+      that.$get('api/queryRealEstateList').then(function(res){
+        that.sites = res.data
+        console.log('sites',res.data)
+        wx.setStorage({
+          key: 'queryRealEstateList',
+          data: res.data,
+          success: function (res) {
+            wx.stopPullDownRefresh({
+              success(){
+                console.log('刷新成功')
+              }
+            })
+          }
+        })
+      })
+      wx.hideNavigationBarLoading() //完成停止加载
+      wx.stopPullDownRefresh() //停止下拉刷新
+    },1500)
     },
     methods: {
       queryRealEstate(){
         let that = this
         that.$get('api/queryRealEstateList').then(function (res) {
+          console.log('查询楼盘列表',res.data)
           that.sites = res.data
           wx.setStorage({
             key: 'queryRealEstateList',
@@ -113,35 +125,6 @@
         })
       },
 
-      getRealEstate(){
-        console.log('获取楼盘列表缓存')
-        let that = this
-        wx.getStorage({
-          key:'queryRealEstateList',
-          success(res){
-            console.log('楼盘列表缓存',res.data)
-            that.sites = res.data
-          }
-        })
-      },
-
-      setMyDetail(){
-        let that = this
-        wx.getStorage({
-          key:'key',
-          success(res){
-            that.$get('api/queryUserDetail',{user_id:res.data.id}).then(function(obj){
-              wx.setStorage({
-                key:'myDetail',
-                data:obj.data,
-                success(){
-                  console.log('myDetail设置成功')
-                }
-              })
-            })
-          }
-        })
-      }
 
     }//methods下括号
   }
@@ -149,5 +132,7 @@
 </script>
 
 <style scoped>
- 
+ #app{
+   background-color: white;
+ }
 </style>

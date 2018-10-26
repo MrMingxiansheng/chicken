@@ -1,9 +1,9 @@
 <template>
   <div class="topic">
     <div class="header">
-      <div class="building">{{real_estate_name}}</div>
-      <div class="topicTitle">{{tag.tag_name}}</div>
-      <div class="topicViews">{{tag.views_num}}浏览</div>
+      <!-- <div class="building">{{real_estate_name}}</div> -->
+      <div class="topicTitle" decode="ensp">#&ensp;{{tag.tag_name}}</div>
+      <div class="topicViews">{{views_num}}浏览</div>
     </div>
     <scroll-view scroll-y="true" :style="{height:scrollHight+'rpx'}">
       <div class="content">
@@ -14,10 +14,10 @@
     <div class="footer">
       <div v-for="(img,index) in localImages" :key="index" v-if="index<6" class="box-img">
         <img :src="img" class="big" @click="preview">
-        <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
+        <img src="/static/images/chacha.png" class="min" @click="removeImage(index)">
       </div>
       <div class="send_arr">
-        <input id="enter" v-model="words" :focus="focusState" @input="keyInput" :cursor="cursor" @focus="focus" 
+        <input id="enter" v-model.lazy="words" :focus="focusState" @input="keyInput" :cursor="cursor" @focus="focus" 
           maxlength="200" />
         <div class="send" @click="clickSend">发送</div>
       </div>
@@ -57,22 +57,26 @@
         words: '',              //输入框的内容
         images:[],              //图片列表
         localImages:[],
-        uploadTasks:[],
         interactList: '',       //交互列表,给reply组件加载评论和回复
         tag_id: '',             //当前话题的id,用来刷新评论和回复
-        my_user_id:'',          //用于收藏
+        views_num:'',           //当前话题的浏览量
         myDetail:'',            //我的recordList,msgList,tagList,user
         user_type:'',           //传给reply,判断是不是匿名
         hideUser:'',            //传给reply,匿名的头像和昵称
         real_estate_name: '',   //楼盘名
-        to_interact_id: '',     //用来判断是评论还是回复,回复那条交互
+        to_interact_id: '',     //用来判断是评论还是回复,回复哪条交互
         cursor: -1,             //光标位置
         tag:'',                 //包含tag_name,views_num,user_id(传给reply,用来判断是不是题主),tag_id(单独提出来了)
-        user_status:'匿名'
+        user_status:'匿名',
+        collectLock:true
       }
     },
 
     onLoad(option) {
+      wx.showLoading({
+        title:'加载中',
+        mask:true
+      })
       this.size()
       this.loadTopicPage(option)
       this.collectStatus()
@@ -83,6 +87,7 @@
       this.focusState = false
       this.real_estate_name = ''
       this.interactList = ''
+      this.views_num = ''
       this.user_type = ''
       this.hideUser = ''
       this.collect_status = ''
@@ -92,24 +97,20 @@
     },
     methods: {
       loadTopicPage(option) {
-        console.log('开始加载话题页面')
         let that = this
         let tag = JSON.parse(option.tag)
         that.tag = tag
         that.tag_id = tag.id
-        let uploadEstateId = {
-          real_estate_id: tag.real_estate_id
-        }
-        that.$get("api/queryRealEstateDetail", uploadEstateId).then(function (d) {
-          that.real_estate_name = d.data.realEstate.real_estate_name //通过楼盘id拿到楼盘名
-        })
+        that.real_estate_name = tag.real_estate_name
         let uploadTagId = {
           tag_id: tag.id
         }
         that.$get("api/queryTagDetail", uploadTagId).then(function (tagDetail) {
           that.interactList = tagDetail.data.interactList //通过话题id拿到该话题的交互列表
+          that.views_num = tagDetail.data.tag.views_num
           that.user_type = that.interactList[0].user_type || ''
           that.hideUser = that.interactList[0].user
+          wx.hideLoading()
         })
       },
       reloadTopicPage(){
@@ -127,6 +128,7 @@
       },
       clickSend() {
         let that = this
+        that.focusState = false
         if (that.words) {
           wx.getStorage({
             key: 'key',
@@ -221,19 +223,17 @@
                 'item': JSON.stringify(interact),
                 'items': JSON.stringify(interact)
               }
-              wx.showToast({
-                title: '发送中',
-                icon: 'loading',
-                mask: true,
-                duration: 2500
+              wx.showLoading({
+                title:'发送中',
+                mask:true
               })
               that.$get('api/update', updateInteract).then(function (obj) {
+                wx.hideLoading()
                 that.words = ''
                 that.images = []
                 that.localImages = []
                 that.user_status = '匿名'
                 that.reloadTopicPage()
-                console.log('到底了')
               })
               that.$nextTick(function(){
                 that.focusState = false
@@ -251,13 +251,16 @@
         }
       },
       clickCollect(){
-        console.log('点击收藏按钮')
         let that = this
+        if(!that.collectLock){
+          return;
+        }
+        that.collectLock = !that.collectLock
         let record = {}
         if(that.collect_status === '收藏'){
-          console.log('开始收藏')
+          that.collect_status = '已收藏'
           record.record_type = '收藏记录'
-          record.user_id = that.my_user_id
+          record.user_id = that.myDetail.user.id
           record.tag_id = that.tag_id
           let uploadRecord = {
             'db': 'WpRecordModel',
@@ -266,16 +269,17 @@
             'items': JSON.stringify(record)
           }
           that.$get('api/update',uploadRecord).then(function(res){
-            that.collect_status = '已收藏'
+            res.data.tag = that.tag
+            res.data.realEstate = {real_estate_name:that.real_estate_name}
             that.collectId = res.data.id
             that.myDetail.recordList.reverse()
             that.myDetail.recordList.push(res.data)
             that.myDetail.recordList.reverse()
             that.reSetMyDetail(that.myDetail)
-            console.log('收藏成功')
+            that.collectLock = !that.collectLock
           })
         }else if(that.collect_status === '已收藏'){
-          console.log('开始取消收藏')
+          that.collect_status = '收藏'
           record.record_type = '取消收藏'
           record.id = that.collectId
           let uploadRecord = {
@@ -285,7 +289,6 @@
             'items': JSON.stringify(record)
           }
           that.$get('api/update',uploadRecord).then(function(res){
-            that.collect_status = '收藏'
             for(let i=0; i<that.myDetail.recordList.length; i++){
               if(that.myDetail.recordList[i].tag_id===that.tag_id){
                 that.myDetail.recordList.splice(i, 1)
@@ -293,7 +296,7 @@
               }
             }
             that.reSetMyDetail(that.myDetail)
-            console.log('取消收藏成功')
+            that.collectLock = !that.collectLock
           })
         }
         that.$nextTick(function(){
@@ -325,16 +328,14 @@
         let px_to_rpx = rWindowWidth / windowWidth
         let rWindowHeight = windowHeight * px_to_rpx
         let rStatusBarHeight = statusBarHeight * px_to_rpx
-        this.scrollHight = rWindowHeight - rStatusBarHeight - 240
+        this.scrollHight = rWindowHeight - rStatusBarHeight - 230
       },
       collectStatus(){
         let that = this
         wx.getStorage({
           key: 'myDetail',
           success: function (res) {
-            console.log('获取myDetail成功')
             that.myDetail = res.data
-            that.my_user_id = res.data.user.id
             let recordList = res.data.recordList
             if(recordList.length === 0){
               that.collect_status = '收藏'
@@ -355,7 +356,7 @@
       },
 
       //上传图片
-      upLoadImage() {
+       upLoadImage() {
         let that = this
         let num = 6 - that.localImages.length
         if(num>0){
@@ -364,30 +365,19 @@
             sizeType: ['compressed'],
             sourceType: ['album'],
             success: function (res) {
-              that.getCanvasImg(0, 0, res.tempFilePaths) //进行压缩
               wx.showLoading({
                 title:'正在上传图片',
                 mask:true
               })
-              let timer = setTimeout(function(){
-                wx.hideLoading({
-                  success(){
-                    clearTimeout(timer)
-                    for(let i in res.tempFilePaths){
-                      that.localImages.push(res.tempFilePaths[i])
-                    }
-                  }
-                })
-              },3000)
+              that.getCanvasImg(0, 0, res.tempFilePaths) //进行压缩
+              for(let i in res.tempFilePaths){
+                that.localImages.push(res.tempFilePaths[i])
+              }
             }
           })
         }
-        that.$nextTick(function(){
-          that.focusState = false
-        })
       },
       getCanvasImg: function (index,failNum, tempFilePaths){
-        console.log('2')
         let that = this;
         if (index < tempFilePaths.length){
           const ctx = wx.createCanvasContext('attendCanvasId');
@@ -396,12 +386,18 @@
             success(res){
               let picH = res.height
               let picW = res.width
-              ctx.drawImage(tempFilePaths[index], 0, 0, 150, 150*picH/picW);
+              let d = picH/picW
+              if(picW>250){
+                picW = 250+parseInt((picW-250)/10)
+                picH = parseInt(picW*d)
+              }
+              ctx.drawImage(tempFilePaths[index], 0, 0, picW, picH);
               ctx.draw(true, function () {
                 index = index + 1;//上传成功的数量，上传成功则加1
                 wx.canvasToTempFilePath({
-                  width:150,
-                  height:150*picH/picW,
+                  width:picW,
+                  height:picH,
+                  fileType:'jpg',
                   canvasId: 'attendCanvasId',
                   success: function (res) {
                     that.uploadCanvasImg(res.tempFilePath);
@@ -415,70 +411,43 @@
               });
             }
           })
-          
         }
-        that.$nextTick(function(){
-          that.focusState = false
-        })
       },
       uploadCanvasImg: function (canvasImg){
-        console.log('uploadtask')
         let that = this;
-        let uploadTask = wx.uploadFile({
-          url: 'http://www.xaoji.com:3000/api/uploadImage',
+        wx.uploadFile({
+          url: 'https://www.xaoji.com/api/uploadImage',
           filePath: canvasImg,
           name: 'pic',
           header:{
             'content-type':'multipart/form-data'
           },
           success: function (res) {
-            console.log('res',res)
-            console.log('JSON.parse(res.data)',JSON.parse(res.data))
-            let url = 'http://www.xaoji.com:3000'+JSON.parse(res.data).url
+            let url = 'https://www.xaoji.com'+JSON.parse(res.data).url
             that.images.push(url)
-            // console.log(that.images)
+            if(that.images.length === that.localImages.length){
+              wx.hideLoading()
+            }
           }
-        })
-        that.uploadTasks.push(uploadTask)
-        that.$nextTick(function(){
-          that.focusState = false
         })
       },
       //-上传图片
 
+
+      //删除图片
       removeImage(index) {
-        let that = this
-        if(that.images[index]){
-          that.images.splice(index, 1)
-          that.localImages.splice(index, 1)
-          that.uploadTasks.splice(index, 1)
-        }else{
-          console.log('else')
-          that.uploadTasks[index].abort()
-          that.localImages.splice(index, 1)
-          that.uploadTasks.splice(index, 1)
-        }
+        this.images.splice(index, 1)
+        this.localImages.splice(index, 1)
       },
+      
       reSetMyDetail(data){
         wx.setStorage({
           key:'myDetail',
           data:data,
-          success(){
-            console.log('myDetail缓存设置成功')
-          }
-        })
-      },
-      getMyDetail(){
-        let that = this
-        wx.getStorage({
-          key: 'myDetail',
-          success: function (res) {
-            console.log('获取myDetail成功',res.data)
-            that.myDetail = res.data
-          }
         })
       },
 
+      //改变匿名状态
       changeUserStatus(){
         let that = this
         if(this.user_status === '匿名'){

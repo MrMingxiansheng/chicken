@@ -29,9 +29,8 @@
       test(){
         let obj = {
           tag_name:this.record.tag.tag_name,
-          views_num:this.record.tag.views_num,
           user_id:this.record.tag.user_id,
-          real_estate_id:this.record.realEstate.real_estate_id,
+          real_estate_name:this.record.realEstate.real_estate_name,
           id:this.record.tag.id
         }
         wx.navigateTo({

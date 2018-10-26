@@ -94,6 +94,7 @@
       this.showImages = []
       this.user_status = '匿名'
     },
+
     methods: {
       loadTopicPage(option) {
         let that = this
@@ -283,11 +284,13 @@
         //   that.focusState = false
         // })
       },
+
       toReplyName(name, id) {
         this.to_interact_id = id
         this.words = '回复' + name + ':'
         this.focusState = true
       },
+
       focus() {
         this.focusState = true
       },
@@ -300,6 +303,7 @@
           this.words = value.slice(pos)
         }
       },
+
       size() {
         let that = this
         wx.getSystemInfo({

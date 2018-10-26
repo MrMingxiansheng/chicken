@@ -62,6 +62,7 @@
         real:''                 //楼盘列表中的一项
       }
     },
+
     onShareAppMessage: function (res) {
       if (res.from === 'button') {
         // 来自页面内转发按钮

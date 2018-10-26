@@ -298,7 +298,6 @@
 
   .content {
     width: 490rpx;
-
     line-height: 18px;
   }
 
@@ -321,6 +320,13 @@
     margin: 20rpx 0;
     font-size: 17px;
     line-height: 24px
+  }
+  
+  .content-in .images img {
+    width: 105rpx;
+    height: 105rpx;
+    margin-right: 10rpx;
+    margin-bottom: 10rpx;
   }
 
   .words .article{

@@ -1,28 +1,28 @@
 <template>
   <div class="itemx" >
     <div class="tagList">
-      <div class="tag"  v-for="(site,index) in tagList" :key="site.id"  v-if="index<6"  @click="toTopicPage(site)">{{ site.tag_name }}</div>
+      <div class="tag"  v-for="(site,index) in tagList" :key="site.id"  v-if="index<9" @click="toTopicPage(site)">{{ site.tag_name }}</div>
     </div>
   </div>
 </template>
 
 <script>
   export default {
-    props: ['tagList','real_estate_name'],
+    props: ['tagList'],
     methods: {
       toTopicPage(site) {
-        console.log(this.real_estate_name)
+        console.log('taglist',this.tagList)
         let obj = {
           tag_name:site.tag_name,
           views_num:site.views_num,
           user_id:site.user_id,
-          real_estate_name:this.real_estate_name,
+          real_estate_id:site.real_estate_id,
           id:site.id
         }
         wx.navigateTo({
           url:'/pages/qwb/main?tag='+JSON.stringify(obj)
         })
-      },
+      }
     }
   };
 

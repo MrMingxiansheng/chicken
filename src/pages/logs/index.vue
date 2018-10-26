@@ -283,6 +283,7 @@
 
   .box {
     margin-top: 20rpx;
+    margin-left: 20rpx;
   }
   .box button {
     display: inline-block;

@@ -2,13 +2,14 @@
   <div>
     <div class="box">
       <div class="head">
-        <img :src="myDetail.user.head_url" class="avatarUrl" v-if="myDetail"/>
+        <img :src="user.head_url" class="avatarUrl" v-if="user.head_url"/>
+        <img src="/static/images/nobody.png" class="avatarUrl" v-else/>
       </div>
-      <div class="box1" v-if="myDetail">
-        <div class="p1">{{myDetail.user.user_name}}</div>
+      <div class="box1" v-if="user.user_name">
+        <div class="p1">{{user.user_name}}</div>
         <div class="p3" decode="emsp"><span>{{praise}}</span>赞 &emsp; <span>{{step}}</span>踩</div>
       </div>
-      <button v-if="!myDetail" plain="true" open-type="getUserInfo" @getuserinfo="handleUserInfo">点击获取昵称</button>
+      <button v-else plain="true" open-type="getUserInfo" @getuserinfo="handleUserInfo">点击获取昵称</button>
     </div>
     <div>
       <div class="tab">
@@ -23,16 +24,16 @@
         <line />
         <div class="bd">
           <div class="mes" v-if="lanmu=='mes'">
-            <div class="notice" v-if="msgList.length===0">消息为空</div>
-            <message v-for="msg in msgList" :key="msg.id" :msg="msg" :userList="myDetail.userList"></message>
+            <div class="notice" v-if="revMsgList.length===0">消息为空</div>
+            <message v-for="msg in revMsgList" :key="msg.id" :msg="msg" :userList="userList"></message>
           </div>
           <div class="col" v-if="lanmu=='col'">
-            <div v-if="myDetail"><div class="notice" v-if="myDetail.recordList.length===0">收藏为空</div></div>
-            <collect v-for="record in myDetail.recordList" :key="record.id" :record="record"></collect>
+            <div class="notice" v-if="recordList.length===0">收藏为空</div>
+            <collect v-for="record in recordList" :key="record.id" :record="record"></collect>
           </div>
           <div class="mytopic" v-if="lanmu=='mytopic'">
-            <div v-if="myDetail"><div class="notice" v-if="myDetail.tagList.length===0">话题为空</div></div>
-            <mytopic v-for="tag in myDetail.tagList" :key="tag.id" :tag="tag" :myDetail="myDetail"></mytopic>
+            <div class="notice" v-if="tagList.length===0">话题为空</div>
+            <mytopic v-for="tag in tagList" :key="tag.id" :tag="tag" :tagList="tagList" :recordList="recordList"></mytopic>
           </div>
           <div class="sug" v-if="lanmu=='sug'">
             <suggest></suggest>
@@ -64,8 +65,12 @@
         praise: "25",
         step: "3",
         lanmu: "col",
-        myDetail: '',
-        red: false
+        red: false,
+        user:'',
+        msgList:'',
+        recordList:'',
+        tagList:'',
+        userList:''
       }
     },
 
@@ -74,28 +79,38 @@
     },
 
     onLoad(){
-      if(!this.myDetail){
+      console.log('我的页面onload')
+      if(!this.user){
+        console.log('没有用户信息')
         this.init()
       }
     },
     
     onShow: function () {
-      this.getMyDetail()
+      let that = this
+      wx.getStorage({
+        key:'recordList',
+        success(res){
+          that.recordList = res.data
+        }
+      })
+      wx.getStorage({
+        key:'tagList',
+        success(res){
+          that.tagList = res.data
+        }
+      })
     },
 
     computed: {
-      msgList() {
+      revMsgList() {
         let arr;
-        if(this.myDetail.msgList){
-          if(this.myDetail.msgList.length>0){
-            arr = JSON.parse(JSON.stringify(this.myDetail.msgList)).reverse()
-          }else{
-            arr = []
-          }
+        if(this.msgList.length>0){
+          arr = JSON.parse(JSON.stringify(this.msgList)).reverse()
         }else{
           arr = []
         }
-        return arr
+        return arr;
       }
     },
     methods: {
@@ -124,15 +139,12 @@
               }
               that.$get('api/update', param).then(function (res) {
                 console.log('登录后的返回', res)
-                that.$get('api/queryUserDetail',{user_id:res.data.id}).then(function(res){
-                  wx.setStorage({
-                    key: 'myDetail',
-                    data: res.data,
-                    success(){
-                      console.log('<myDetail>缓存设置成功')
-                      that.init()
-                    }
-                  })
+                wx.setStorage({
+                  key:'user',
+                  data:res.data,
+                  success(){
+                    that.init()
+                  }
                 })
               })
             }
@@ -140,39 +152,35 @@
         }
       },
 
-      //获取myDetail缓存
-      getMyDetail() {
-        let that = this
-        wx.getStorage({
-          key: 'myDetail',
-          success: function (res) {
-            console.log('获取myDetail成功', res.data)
-            that.myDetail = res.data
-          }
-        })
-      },
 
       init() {
         console.log('我的页面init开始')
         let that = this
         wx.getStorage({
-          key: 'myDetail',
+          key: 'user',
           success(res) {
-            console.log('<myDetail>缓存获取成功')
+            console.log('user缓存获取成功')
+            that.user = res.data
             that.$get('api/queryUserDetail', {
-              user_id: res.data.user.id
+              user_id: res.data.id
             }).then(function (obj) {
-              if (obj.data.msgList.length > res.data.msgList.length) {
-                that.red = true
-              }
-              that.myDetail = obj.data
-              wx.setStorage({
-                key: 'myDetail',
-                data: obj.data,
-                success() {
-                  console.log('<myDetail>缓存更新成功')
+              wx.getStorage({
+                key:'msgList',
+                success(res){
+                  if (obj.data.msgList.length > res.data.length) {
+                    that.red = true
+                  }
                 }
               })
+              that.userList = obj.data.userList
+              that.msgList = obj.data.msgList
+              that.recordList = obj.data.recordList
+              that.tagList = obj.data.tagList
+              that.$setStorage('interactList',obj.data.interactList)
+              //that.$setStorage('msgList',obj.data.msgList)
+              that.$setStorage('recordList',obj.data.recordList)
+              that.$setStorage('tagList',obj.data.tagList)
+              that.$setStorage('userList',obj.data.userList)
               wx.connectSocket({
                 url: 'ws://www.xaoji.com:3001',
                 data: {
@@ -197,7 +205,7 @@
               wx.onSocketOpen(function () {
                 console.log('发送初始化消息')
                 that.$sendMessage(JSON.stringify({
-                  user_id: res.data.user.id,
+                  user_id: obj.data.user.id,
                   status: 'connect'
                 }))
               })
@@ -206,19 +214,13 @@
                 that.red = true
                 let chat = JSON.parse(message.data)
                 console.log('chat', chat)
-                that.myDetail.msgList.push(chat)
-                wx.setStorage({
-                  key: 'myDetail',
-                  data: that.myDetail,
-                  success() {
-                    console.log('<myDetail>缓存更新成功')
-                  }
-                })
+                that.msgList.push(chat)
+                //要不要存缓存?
               })
             })
           },
           fail() {
-            console.log('<myDetail>缓存获取失败')
+            console.log('user缓存获取失败')
             wx.login({
               success: function (res) {
                 console.log('获取code成功')
@@ -232,24 +234,18 @@
                     success(res) {
                       console.log('发送code成功')
                       if (res.data.msg == 'have data') {
-                        that.$get('api/queryUserDetail',{user_id:res.data.data[0].id}).then(function(res){
-                          wx.setStorage({
-                            key: 'myDetail',
-                            data: res.data,
-                            success(){
-                              console.log('<myDetail>缓存设置成功')
-                              that.init()
-                            }
-                          })
-                        })
-                      } else {
+                        console.log('后台有这个用户')
                         wx.setStorage({
-                          key: 'open_id',
-                          data: JSON.parse(res.data.data).openid,
+                          key:'user',
+                          data:res.data.data[0],
                           success(){
-                            console.log('<open_id>缓存设置成功')
+                            console.log('user缓存设置成功')
+                            that.init()
                           }
                         })
+                      } else {
+                        console.log('后台没有这个用户')
+                        that.$setStorage('open_id',JSON.parse(res.data.data).openid)
                       }
                     }
                   })
@@ -270,7 +266,6 @@
 </script>
 <style scoped>
   .head {
-    margin-left: 30rpx;
     height: 100rpx;
     width: 100rpx;
     display: inline-block;

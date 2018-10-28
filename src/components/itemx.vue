@@ -13,11 +13,8 @@
       toTopicPage(site) {
         console.log(this.real_estate_name)
         let obj = {
-          tag_name:site.tag_name,
-          views_num:site.views_num,
-          user_id:site.user_id,
           real_estate_name:this.real_estate_name,
-          id:site.id
+          tag_id:site.id
         }
         wx.navigateTo({
           url:'/pages/qwb/main?tag='+JSON.stringify(obj)

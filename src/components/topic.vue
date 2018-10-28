@@ -10,7 +10,7 @@
             <span decode="ensp">&ensp;{{item.interact.user.user_name}}&ensp;发布</span>
           </div>
         <div class="talk">
-          <span class="views_num" @click="ClickTag(item)">{{interactList.length}}讨论</span>
+          <span class="views_num" @click="ClickTag(item)">{{item.comment_num}}讨论</span>
           <div class="step" @click="clickStep">
           <span class="step-num">{{item.interact.cnum}}</span>
           <span class="step-str">踩</span>
@@ -35,14 +35,13 @@
     components: {
       line
     },
-    props: ['item','myDetail','real_estate_name'],
+    props: ['item','real_estate_name','user','interactList'],
     data() {
       return {
         content:'',
         images:'',
         articleSrc:'',
         stepLock:true,
-        interactList:''
       };
     },
     onLoad (){
@@ -66,22 +65,15 @@
         this.content = articleArr[0]
         this.articleSrc = 'https://' + articleArr[1]
       }
-      that.$get('api/queryTagDetail',{tag_id:that.item.id}).then(function(res){
-        that.interactList = res.data.interactList
-      })
     },
     methods: {
       ClickTag: function (item) {
         let that = this
         let obj = {
-          tag_name:item.tag_name,
-          views_num:item.views_num,
-          user_id:item.user_id,
           real_estate_name:this.real_estate_name,
-          id:item.id
+          tag_id:item.id
         }
         console.log('obj',obj)
-        //+'interactList='+JSON.stringify(that.interactList)
         wx.navigateTo({
           url:'/pages/qwb/main?tag='+JSON.stringify(obj)
         })
@@ -99,11 +91,20 @@
         if(!that.stepLock){
           return
         }
+        if (!that.user.id) {
+          wx.showToast({
+            title: '请先登录！',
+            icon: 'none',
+            mask: true,
+            duration: 1000
+          })
+          return;
+        }
         that.stepLock = !that.stepLock
         let interact = {} 
         let todo = ''
         let stepId = ''
-        let interactList = that.myDetail.interactList
+        let interactList = that.interactList
         if(interactList.length > 0){
           //有交互
           for(let i=0; i<interactList.length; i++){
@@ -126,7 +127,7 @@
         if (todo === '点踩') {
           that.item.cnum = parseInt(that.item.cnum) + 1
           interact.tag_id = that.item.interact.tag_id
-          interact.user_id = that.myDetail.user.id
+          interact.user_id = that.user.id
           interact.interact_type = '点踩'
           interact.to_interact_id = that.item.interact.id
           interact.interact_status = '0'
@@ -137,24 +138,24 @@
             'items': JSON.stringify(interact)
           }
           that.$get('api/update', updateInteract).then(function (res) {
-            that.myDetail.interactList.push(res.data)
-            that.reSetMyDetail(that.myDetail)
+            that.interactList.push(res.data)
+            that.$reSetStorage('interactList',that.interactList)
             console.log('点踩返回',res.data)
             that.stepLock = !that.stepLock
           })
         }else if (todo === '取消踩') {
           that.item.cnum = parseInt(that.item.cnum) - 1
-          for(let i=0; i<that.myDetail.interactList.length; i++){
-            if(that.myDetail.interactList[i].id===stepId){
-              that.myDetail.interactList.splice(i,1)
+          for(let i=0; i<that.interactList.length; i++){
+            if(that.interactList[i].id===stepId){
+              that.interactList.splice(i,1)
               break
             }
           }
-          that.reSetMyDetail(that.myDetail)
+          that.$reSetStorage('interactList',that.interactList)
           interact.id = stepId
           interact.interact_type = '取消踩'
           interact.tag_id = that.item.interact.tag_id
-          interact.user_id = that.myDetail.user.id
+          interact.user_id = that.user.id
           interact.to_interact_id = that.item.interact.id
           interact.interact_status = '0'
           let updateInteract = {
@@ -175,16 +176,8 @@
         wx.navigateTo({
           url: '/pages/article/main?src='+that.articleSrc
         })
-      },
-      reSetMyDetail(data){
-        wx.setStorage({
-          key:'myDetail',
-          data:data,
-          success(){
-            console.log('myDetail缓存设置成功')
-          }
-        })
       }
+      
 
     }
   };

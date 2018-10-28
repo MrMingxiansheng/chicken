@@ -50,7 +50,7 @@
 
 <script>
   export default {
-    props: ["reply","owner","hideUser","user_type","myDetail"],
+    props: ["reply","owner","hideUser","user_type","tag","user","interactList"],
     data() {
       return {
         content:'',
@@ -84,10 +84,28 @@
     },
     methods: {
       clickReply() {
+        if (!this.user.id) {
+          wx.showToast({
+            title: '请先登录！',
+            icon: 'none',
+            mask: true,
+            duration: 1000
+          })
+          return;
+        }
         this.$emit('toReplyName', this.reply.user.user_name, this.reply.id)
       },
       clickPraise() {
         console.log('点了一下赞')
+        if (!this.user.id) {
+          wx.showToast({
+            title: '请先登录！',
+            icon: 'none',
+            mask: true,
+            duration: 1000
+          })
+          return;
+        }
         let that = this
         if(!that.praiseLock){
           return
@@ -96,7 +114,7 @@
         let interact = {} 
         let todo = ''
         let praiseId = ''
-        let interactList = that.myDetail.interactList
+        let interactList = that.interactList
         if(interactList.length > 0){
           //有交互
           for(let i=0; i<interactList.length; i++){
@@ -118,7 +136,7 @@
         if (todo === '点赞') {
           that.reply.interact_status = parseInt(that.reply.interact_status) + 1
           interact.tag_id = that.reply.tag_id
-          interact.user_id = that.myDetail.user.id
+          interact.user_id = that.user.id
           interact.interact_type = '点赞'
           interact.to_interact_id = that.reply.id
           interact.interact_status = '0'
@@ -129,25 +147,26 @@
             'items': JSON.stringify(interact)
           }
           that.$get('api/update', updateInteract).then(function (res) {
+            res.data.tag = that.tag
             that.$sendMessage(JSON.stringify(res.data))
-            that.myDetail.interactList.push(res.data)
-            that.reSetMyDetail(that.myDetail)
+            that.interactList.push(res.data)
+            that.$reSetStorage('interactList',that.interactList)
             console.log('点赞返回',res.data)
             that.praiseLock = !that.praiseLock
           })
         }else if (todo === '取消赞') {
           that.reply.interact_status = parseInt(that.reply.interact_status) - 1
-          for(let i=0; i<that.myDetail.interactList.length; i++){
-            if(that.myDetail.interactList[i].id===praiseId){
-              that.myDetail.interactList.splice(i,1)
+          for(let i=0; i<that.interactList.length; i++){
+            if(that.interactList[i].id===praiseId){
+              that.interactList.splice(i,1)
               break
             }
           }
-          that.reSetMyDetail(that.myDetail)
+          that.$reSetStorage('interactList',that.interactList)
           interact.id = praiseId
           interact.interact_type = '取消赞'
           interact.tag_id = that.reply.tag_id
-          interact.user_id = that.myDetail.user.id
+          interact.user_id = that.user.id
           interact.to_interact_id = that.reply.id
           interact.interact_status = '0'
           let updateInteract = {
@@ -164,6 +183,15 @@
       },
       clickStep() {
         console.log('点了一下踩')
+        if (!this.user.id) {
+          wx.showToast({
+            title: '请先登录！',
+            icon: 'none',
+            mask: true,
+            duration: 1000
+          })
+          return;
+        }
         let that = this
         if(!that.stepLock){
           return
@@ -172,7 +200,7 @@
         let interact = {} 
         let todo = ''
         let stepId = ''
-        let interactList = that.myDetail.interactList
+        let interactList = that.interactList
         if(interactList.length > 0){
           //有交互
           for(let i=0; i<interactList.length; i++){
@@ -195,7 +223,7 @@
         if (todo === '点踩') {
           that.reply.cnum = parseInt(that.reply.cnum) + 1
           interact.tag_id = that.reply.tag_id
-          interact.user_id = that.myDetail.user.id
+          interact.user_id = that.user.id
           interact.interact_type = '点踩'
           interact.to_interact_id = that.reply.id
           interact.interact_status = '0'
@@ -206,24 +234,26 @@
             'items': JSON.stringify(interact)
           }
           that.$get('api/update', updateInteract).then(function (res) {
-            that.myDetail.interactList.push(res.data)
-            that.reSetMyDetail(that.myDetail)
+            res.data.tag = that.tag
+            that.$sendMessage(JSON.stringify(res.data))
+            that.interactList.push(res.data)
+            that.$reSetStorage('interactList',that.interactList)
             console.log('点踩返回',res.data)
             that.stepLock = !that.stepLock
           })
         }else if (todo === '取消踩') {
           that.reply.cnum = parseInt(that.reply.cnum) - 1
-          for(let i=0; i<that.myDetail.interactList.length; i++){
-            if(that.myDetail.interactList[i].id===stepId){
-              that.myDetail.interactList.splice(i,1)
+          for(let i=0; i<that.interactList.length; i++){
+            if(that.interactList[i].id===stepId){
+              that.interactList.splice(i,1)
               break
             }
           }
-          that.reSetMyDetail(that.myDetail)
+          that.$reSetStorage('interactList',that.interactList)
           interact.id = stepId
           interact.interact_type = '取消踩'
           interact.tag_id = that.reply.tag_id
-          interact.user_id = that.myDetail.user.id
+          interact.user_id = that.user.id
           interact.to_interact_id = that.reply.id
           interact.interact_status = '0'
           let updateInteract = {
@@ -238,18 +268,7 @@
           })
         }
       },
-      test(){
-        let that = this
-        wx.showLoading({
-          title:'加载中',
-          mask:true
-        })
-        console.log('外面')
-        that.$get('api/testSpeed').then(function(res){
-          console.log('里面')
-          wx.hideLoading()
-        })
-      },
+      
       preview: function (index) {
         //图片预览
         wx.previewImage({
@@ -265,15 +284,6 @@
         })
       },
 
-      reSetMyDetail(data){
-        wx.setStorage({
-          key:'myDetail',
-          data:data,
-          success(){
-            console.log('myDetail缓存设置成功')
-          }
-        })
-      }
 
     }//methods下括号
   }

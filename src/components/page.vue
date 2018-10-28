@@ -24,7 +24,10 @@
         wx.navigateTo({
           url: '/pages/qwc/main',
         })
-      }
+      },
+      // test(){
+      //   this.$get('slsls',{id:'234642'})
+      // }
     }
   }
 

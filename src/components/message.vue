@@ -1,15 +1,16 @@
 <template>
   <div class="message">
-    <div class="mes">
-      <div class="box">
+    <div class="mes" @click="toTopicPage()">
+      <div class="box" v-if="msg.interact_type!=='点踩'">
         <img :src="head_url" alt="" class="headImage">
         <span class="nick">{{user_name}}</span>
         给你
         <span class="type">&nbsp;{{msg.interact_type}}</span>
       </div>
+      <div v-if="msg.interact_type==='点踩'" class="step">有人给你点踩</div>
       <div class="content" v-if="msg.interact_content">&nbsp;{{content}}</div>
       <div class="images">
-        <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)">
+        <img v-for="(url,index) in images" :key="index" :src="url">
       </div>
       <div class="time">{{msg.update_time}}</div>
     </div>
@@ -64,21 +65,18 @@
         }
       }
       if (that.head_url === '') {
-        that.$get('api/queryUserDetail', {
-          user_id: that.msg.user_id
-        }).then(function (res) {
-          let user = res.data.user
-          that.user_name = user.user_name
-          that.head_url = user.head_url
-        })
+        that.head_url = that.user.head_url
+        that.user_name = that.user.user_name
       }
     },
     methods: {
-      preview: function (index) {
-        //图片预览
-        wx.previewImage({
-          current: this.images[index], // 当前显示图片的http链接
-          urls: this.images // 需要预览的图片http链接列表
+      toTopicPage() {
+        let obj = {
+          real_estate_name:this.msg.real_estate_name,
+          tag_id:this.msg.tag_id
+        }
+        wx.navigateTo({
+          url:'/pages/qwb/main?tag='+JSON.stringify(obj)
         })
       },
     }
@@ -106,6 +104,11 @@
     color: rgb(137, 145, 150);
     font-size: 15px;
   }
+  .step{
+    color: rgb(137, 145, 150);
+    font-size: 15px;
+    margin-left: 40rpx;
+  }
 
   .content {
     margin-left: 40rpx;
@@ -118,7 +121,7 @@
   }
   .images{
     width: 600rpx;
-    margin-left: 40rpx;
+    margin-left: 50rpx;
   }
   .images img{
     width: 50rpx;

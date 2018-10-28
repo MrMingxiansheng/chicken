@@ -6,9 +6,9 @@
     </div>
     <line />
     <scroll-view scroll-y="true" :style="{height:scrollHight+'rpx'}" class="item">
-        <div class="box">
-          <topic v-for="site in dataList" :item="site" :key="site.id" :myDetail="myDetail" :real_estate_name="real.real_estate_name"></topic>
-        </div>
+      <div class="box">
+        <topic v-for="site in dataList" :item="site" :key="site.id" :real_estate_name="real.real_estate_name" :user="user" :interactList="interactList"></topic>
+      </div>
     </scroll-view>
     <canvas canvas-id='attendCanvasId' class='myCanvas'></canvas>
     <div class="footer">
@@ -17,12 +17,7 @@
         <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
       </div>
       <div class="send_arr">
-        <input id="enter"
-        v-model.lazy="words"
-        maxlength="200" 
-        placeholder="  在此发话题,前8个字重点显示"
-        placeholder-style="font-size: 14px"
-        />
+        <input id="enter" v-model.lazy="words" maxlength="200" placeholder="  在此发话题,前8个字重点显示" placeholder-style="font-size: 14px" />
         <div class="send" @click="sendTopic()">发送</div>
       </div>
       <line />
@@ -53,13 +48,14 @@
       return {
         scrollHight: "",
         dataList: [],
-        words:'',
-        images:[],
-        showImages:[],
-        localImage:'',
-        user_status:'匿名',
-        myDetail:'',
-        real:''                 //楼盘列表中的一项
+        words: '',
+        images: [],
+        showImages: [],
+        localImage: '',
+        user_status: '匿名',
+        user:'',
+        tagList:'',
+        real: '' //楼盘列表中的一项
       }
     },
 
@@ -76,20 +72,36 @@
     },
     onLoad(option) {
       wx.showLoading({
-        title:'加载中',
-        mask:true
+        title: '加载中',
+        mask: true
       })
       let that = this
       that.ScrollViewHeight()
       that.real = JSON.parse(option.real)
-      that.$get('api/queryRealEstateDetail',{real_estate_id:that.real.id}).then(function(res){
+      that.$get('api/queryRealEstateDetail', {
+        real_estate_id: that.real.id
+      }).then(function (res) {
         that.dataList = res.data.tagList
-        wx.hideLoading()
+        that.$nextTick(function () {
+          wx.hideLoading()
+        })
       })
       wx.getStorage({
-        key:'myDetail',
+        key: 'user',
+        success(res) {
+          that.user = res.data
+        }
+      })
+      wx.getStorage({
+        key: 'tagList',
+        success(res) {
+          that.tagList = res.data
+        }
+      })
+      wx.getStorage({
+        key:'interactList',
         success(res){
-          that.myDetail = res.data
+          that.interactList = res.data
         }
       })
     },
@@ -102,29 +114,26 @@
       this.images = []
       this.showImages = []
     },
-   
+
     methods: {
       //计算滚动高度
       ScrollViewHeight() {
         let that = this
         wx.getSystemInfo({
-          success(res){
+          success(res) {
             let px_to_rpx = 750 / res.windowWidth
-            let height = res.windowHeight*px_to_rpx
-            let statusBarHeight = res.statusBarHeight*px_to_rpx
+            let height = res.windowHeight * px_to_rpx
+            let statusBarHeight = res.statusBarHeight * px_to_rpx
             that.scrollHight = height - statusBarHeight - 230
           }
         })
         //读取机型全屏高度，减去固定高度获得scroll高度
       },
-      
+
       //发送话题
-      sendTopic () {
+      sendTopic() {
         let that = this
-        let topicTitle = {} //话题标题
-        let interact = {}
-        if(!that.myDetail.user.id){
-          //没有读取到我的id
+        if (!that.user.id) {
           wx.showToast({
             title: '请先登录！',
             icon: 'none',
@@ -133,139 +142,157 @@
           })
           return;
         }
-        if (that.words.length === 0) {
-          //输入框为空
-          wx.showToast({
-            title: '输入为空！',
-            icon: 'none',
-            mask: true,
-            duration: 1000
-          })
-          return;
-        }
-        if(that.images.length!==0){
-          //有图片
-          interact.interact_content = that.words.trim()+'images='+JSON.stringify(that.images)
-        }else{
-          //没有图片
-          interact.interact_content = that.words.trim()
-        }
-        if(that.words.indexOf('https://')!==-1){
-          //有网址
-          let wordsArr = that.words.split('https://')
-          let words = wordsArr[0]
-          let trimWords = words.trim()
-          if(trimWords.length===0){
+        let timer = setTimeout(function () {
+          let topicTitle = {} //话题标题
+          let interact = {}
+          if (that.words.length === 0) {
+            //输入框为空
             wx.showToast({
-              title: '内容为空！',
+              title: '输入为空！',
               icon: 'none',
               mask: true,
               duration: 1000
             })
             return;
-          }else if(trimWords.length<=8){
-            //8个字内
-            topicTitle.tag_name = trimWords.replace(/\s*/g,"")
-          }else{
-            //超过8个字
-            topicTitle.tag_name = trimWords.slice(0,7).replace(/\s*/g,"")
           }
-        }else{
-          //没有网址
-          let trimWords = that.words.trim()
-          if(trimWords.length===0){
-            wx.showToast({
-              title: '内容为空！',
-              icon: 'none',
-              mask: true,
-              duration: 1000
-            })
-            return;
-          }else if(trimWords.length<=8){
-            //8个字内
-            topicTitle.tag_name = trimWords.replace(/\s*/g,"")
-          }else{
-            //超过8个字
-            topicTitle.tag_name = trimWords.slice(0,7).replace(/\s*/g,"")
+          if (that.images.length !== 0) {
+            //有图片
+            interact.interact_content = that.words.trim() + 'images=' + JSON.stringify(that.images)
+          } else {
+            //没有图片
+            interact.interact_content = that.words.trim()
           }
-        }
-        topicTitle.real_estate_id = that.real.id
-        topicTitle.user_id = that.myDetail.user.id
-        topicTitle.views_num = '0'
-        let param = {
-          'db': 'WpTagModel',
-          'model': 'edit',
-          'item': JSON.stringify(topicTitle),
-          'items': JSON.stringify(topicTitle)
-        }
-        wx.showLoading({
-          title:'发送中',
-          mask:true
-        })
-        that.$get('api/update', param).then(function (res) {
-          console.log('发送标题成功')
-          res.data.realEstate = {real_estate_name:that.real.real_estate_name}
-          res.data.real_estate_name = that.real.real_estate_name
-          that.tag = res.data //跳转页面用
-          that.myDetail.tagList.reverse()
-          that.myDetail.tagList.push(res.data)
-          that.myDetail.tagList.reverse()
-          that.reSetMyDetail(that.myDetail)
-          if(that.user_status === '已匿名'){
-            interact.user_type = '匿名'
+          if (that.words.indexOf('https://') !== -1) {
+            //有网址
+            let wordsArr = that.words.split('https://')
+            let words = wordsArr[0]
+            let trimWords = words.trim()
+            if (trimWords.length === 0) {
+              wx.showToast({
+                title: '内容为空！',
+                icon: 'none',
+                mask: true,
+                duration: 1000
+              })
+              return;
+            } else if (trimWords.length <= 8) {
+              //8个字内
+              topicTitle.tag_name = trimWords.replace(/\s*/g, "")
+            } else {
+              //超过8个字
+              topicTitle.tag_name = trimWords.slice(0, 7).replace(/\s*/g, "")
+            }
+          } else {
+            //没有网址
+            let trimWords = that.words.trim()
+            if (trimWords.length === 0) {
+              wx.showToast({
+                title: '内容为空！',
+                icon: 'none',
+                mask: true,
+                duration: 1000
+              })
+              return;
+            } else if (trimWords.length <= 8) {
+              //8个字内
+              topicTitle.tag_name = trimWords.replace(/\s*/g, "")
+            } else {
+              //超过8个字
+              topicTitle.tag_name = trimWords.slice(0, 7).replace(/\s*/g, "")
+            }
           }
-          interact.tag_id = res.data.id
-          interact.user_id = res.data.user_id
-          interact.interact_type = '评论'
-          interact.interact_status = '0'
-          let updateInteract = {
-            'db': 'WpInteractModel',
+          topicTitle.real_estate_id = that.real.id
+          topicTitle.user_id = that.user.id
+          topicTitle.views_num = '0'
+          let param = {
+            'db': 'WpTagModel',
             'model': 'edit',
-            'item': JSON.stringify(interact),
-            'items': JSON.stringify(interact)
+            'item': JSON.stringify(topicTitle),
+            'items': JSON.stringify(topicTitle)
           }
-          that.$get('api/update', updateInteract).then(function (res) {
-            console.log('发送描述成功',res.data)
-            let interactId = {
-              id: res.data.tag_id,
-              tag_content_id: res.data.id
+          wx.showLoading({
+            title: '发送中',
+            mask: true
+          })
+          that.$get('api/update', param).then(function (res) {
+            console.log('发送标题成功')
+            res.data.realEstate = {
+              real_estate_name: that.real.real_estate_name
             }
-            let updateInteractId = {
-              'db': 'WpTagModel',
+            that.tagList.reverse()
+            that.tagList.push(res.data)
+            that.tagList.reverse()
+            that.$reSetStorage('tagList', that.tagList)
+            if (that.user_status === '已匿名') {
+              interact.user_type = '匿名'
+            }
+            interact.tag_id = res.data.id
+            interact.user_id = res.data.user_id
+            interact.interact_type = '评论'
+            interact.interact_status = '0'
+            let updateInteract = {
+              'db': 'WpInteractModel',
               'model': 'edit',
-              'item': JSON.stringify(interactId),
-              'items': JSON.stringify(interactId)
+              'item': JSON.stringify(interact),
+              'items': JSON.stringify(interact)
             }
-            that.$get('api/update', updateInteractId).then(function () {
-              console.log('绑定交互成功',res.data)
-              wx.hideLoading()
-              wx.redirectTo({
-                url:'/pages/qwb/main?tag='+JSON.stringify(that.tag)
+            that.$get('api/update', updateInteract).then(function (res) {
+              console.log('发送描述成功', res.data)
+              let interactId = {
+                id: res.data.tag_id,
+                tag_content_id: res.data.id
+              }
+              let updateInteractId = {
+                'db': 'WpTagModel',
+                'model': 'edit',
+                'item': JSON.stringify(interactId),
+                'items': JSON.stringify(interactId)
+              }
+              that.$get('api/update', updateInteractId).then(function () {
+                console.log('绑定交互成功', res.data)
+                let obj = {
+                  tag_id: res.data.tag_id,
+                  real_estate_name: that.real.real_estate_name
+                }
+                clearTimeout(timer)
+                wx.hideLoading()
+                wx.redirectTo({
+                  url: '/pages/qwb/main?tag=' + JSON.stringify(obj)
+                })
               })
             })
           })
-        })
+        }, 100)
       },
       //-发送话题
 
       //上传图片
       upLoadImage() {
         let that = this
+        if (!that.user.id) {
+          wx.showToast({
+            title: '请先登录！',
+            icon: 'none',
+            mask: true,
+            duration: 1000
+          })
+          return;
+        }
         let num = 6 - that.showImages.length
-        if(num>0){
+        if (num > 0) {
           wx.chooseImage({
             count: 1,
             sizeType: ['compressed'],
             sourceType: ['album'],
             success: function (res) {
               wx.showLoading({
-                title:'正在上传图片',
-                mask:true
+                title: '正在上传图片',
+                mask: true
               })
               that.getCanvasImg(res.tempFilePaths[0]) //进行压缩
             }
           })
-        }else{
+        } else {
           wx.showToast({
             title: '最多6张图片！',
             icon: 'none',
@@ -275,55 +302,56 @@
           return;
         }
       },
-      getCanvasImg: function (tempFilePath){
+      getCanvasImg: function (tempFilePath) {
         let that = this;
-        
-          const ctx = wx.createCanvasContext('attendCanvasId');
-          wx.getImageInfo({
-            src:tempFilePath,
-            success(res){
-              let picH = res.height
-              let picW = res.width
-              let d = picH/picW
-              if(picW>300){
-                picW = 300
-                picH = parseInt(300*d)
-              }
-              ctx.drawImage(tempFilePath, 0, 0, picW, picH);
-              ctx.draw(true, function () {
-                wx.canvasToTempFilePath({
-                  width:picW,
-                  height:picH,
-                  fileType:'jpg',
-                  canvasId: 'attendCanvasId',
-                  success: function (res) {
-                    that.localImage = res.tempFilePath
-                    that.uploadCanvasImg(res.tempFilePath);
-                    let url = res.tempFilePath.replace('http://tmp/','https://www.xaoji.com/upload/image/')
-                    that.images.push(url)
-                  }
-                });
-              });
+
+        const ctx = wx.createCanvasContext('attendCanvasId');
+        wx.getImageInfo({
+          src: tempFilePath,
+          success(res) {
+            let picH = res.height
+            let picW = res.width
+            let d = picH / picW
+            if (picW > 300) {
+              picW = 300
+              picH = parseInt(300 * d)
             }
-          })
-        
+            ctx.drawImage(tempFilePath, 0, 0, picW, picH);
+            ctx.draw(true, function () {
+              wx.canvasToTempFilePath({
+                width: picW,
+                height: picH,
+                fileType: 'jpg',
+                canvasId: 'attendCanvasId',
+                success: function (res) {
+                  that.localImage = res.tempFilePath
+                  that.uploadCanvasImg(res.tempFilePath);
+                  let url = res.tempFilePath.replace('http://tmp/',
+                    'https://www.xaoji.com/upload/image/')
+                  that.images.push(url)
+                }
+              });
+            });
+          }
+        })
+
       },
-      uploadCanvasImg: function (canvasImg){
+      uploadCanvasImg: function (canvasImg) {
         let that = this;
         wx.uploadFile({
           url: 'https://www.xaoji.com/api/uploadImage',
           filePath: canvasImg,
           name: 'pic',
-          header:{
-            'content-type':'multipart/form-data'
+          header: {
+            'content-type': 'multipart/form-data'
           },
           success: function (res) {
             wx.hideLoading({
-              success(){
+              success() {
                 that.showImages.push(that.localImage)
               }
             })
-            
+
             // }
           }
         })
@@ -344,33 +372,29 @@
         this.showImages.splice(index, 1)
       },
 
-      changeUserStatus(){
+      changeUserStatus() {
         let that = this
-        if(this.user_status === '匿名'){
+        if (this.user_status === '匿名') {
           this.user_status = '已匿名'
-        }else if(this.user_status === '已匿名'){
+        } else if (this.user_status === '已匿名') {
           this.user_status = '匿名'
         }
       },
 
-      reSetMyDetail(data){
-        wx.setStorage({
-          key:'myDetail',
-          data:data,
-        })
-      },
-
-      reLoadRealEstatePage(){
+     
+      reLoadRealEstatePage() {
         let that = this
-        that.$get('api/queryRealEstateDetail',{real_estate_id:that.real.id}).then(function(res){
+        that.$get('api/queryRealEstateDetail', {
+          real_estate_id: that.real.id
+        }).then(function (res) {
           that.dataList = res.data.tagList
         })
       }
 
-     
 
 
-    }//methods的下括号
+
+    } //methods的下括号
   }
 
 </script>
@@ -400,7 +424,7 @@
     right: 20rpx;
   }
 
- .footer {
+  .footer {
     width: 100%;
     position: fixed;
     bottom: 0;
@@ -441,7 +465,9 @@
     left: 20rpx;
   }
 
-  .userstatus,.share,.image{
+  .userstatus,
+  .share,
+  .image {
     width: 120rpx;
     height: 70rpx;
     color: #f3cc01;
@@ -473,7 +499,7 @@
     height: 125rpx;
   }
 
-  .myCanvas{
+  .myCanvas {
     width: 2000px;
     height: 2000px;
     position: absolute;

@@ -8,7 +8,7 @@
     <scroll-view scroll-y="true" :style="{height:scrollHight+'rpx'}">
       <div class="content">
         <speak v-for="obj in interactList" :key="obj.id" :reply="obj" :owner="tag.user_id" :user_type="user_type"
-          :hideUser="hideUser" :myDetail="myDetail" @toReplyName="toReplyName"></speak>
+          :hideUser="hideUser" :tag="tag" :user="user" :interactList="myInteractList" @toReplyName="toReplyName"></speak>
       </div>
     </scroll-view>
     <canvas canvas-id='attendCanvasId' class='myCanvas'></canvas>
@@ -18,8 +18,8 @@
         <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
       </div>
       <div class="send_arr">
-        <input id="enter" v-model.lazy="words" :focus="focusState" @focus="focus" @input="keyInput" @blur="leave()" maxlength="200" />
-        <div class="send" @click="timeOut()">发送</div>
+        <input id="enter" v-model.lazy="words" :focus="focusState" @focus="focus" @input="keyInput" maxlength="200" />
+        <div class="send" @click="sendTopic()">发送</div>
       </div>
       <line />
       <ul>
@@ -52,22 +52,24 @@
       return {
         scrollHight: '', //滚动高度
         focusState: false, //输入框是否聚焦
-        collect_status: '', //收藏状态,是<收藏>还是<已收藏>
+        collect_status: '收藏', //收藏状态,是<收藏>还是<已收藏>
         collectId: '', //一条收藏的id,用来取消收藏的时候覆盖
         words: '', //输入框的内容
         images: [], //图片列表
-        localImage: '',
+        localImage: [],
         showImages: [],
         interactList: '', //交互列表,给reply组件加载评论和回复
         tag_id: '', //当前话题的id,用来刷新评论和回复
-        myDetail: '', //我的recordList,msgList,tagList,user
+        recordList: '',
         user_type: '', //传给reply,判断是不是匿名
         hideUser: '', //传给reply,匿名的头像和昵称
         real_estate_name: '', //楼盘名
         to_interact_id: '', //用来判断是评论还是回复,回复哪条交互
         tag: '', //包含tag_name,views_num,user_id(传给reply,用来判断是不是题主),tag_id(单独提出来了)
         user_status: '匿名',
-        collectLock: true
+        collectLock: true,
+        user:'',
+        myInteractList:''
       }
     },
 
@@ -79,6 +81,19 @@
       this.size()
       this.loadTopicPage(option)
       this.collectStatus()
+      let that = this
+      wx.getStorage({
+        key:'user',
+        success(res){
+          that.user = res.data
+        }
+      })
+      wx.getStorage({
+        key:'interactList',
+        success(res){
+          that.myInteractList = res.data
+        }
+      })
     },
 
     onUnload() {
@@ -88,9 +103,9 @@
       this.interactList = ''
       this.user_type = ''
       this.hideUser = ''
-      this.collect_status = ''
+      this.collect_status = '收藏'
       this.images = []
-      this.localImage = ''
+      this.localImage = []
       this.showImages = []
       this.user_status = '匿名'
     },
@@ -99,19 +114,13 @@
       loadTopicPage(option) {
         let that = this
         let tag = JSON.parse(option.tag)
-        that.tag = tag
-        that.tag_id = tag.id
+        that.tag_id = tag.tag_id
         that.real_estate_name = tag.real_estate_name
-        if(option.interactList){
-          console.log('有交互列表')
-          return;
-        }
         let uploadTagId = {
-          tag_id: tag.id
+          tag_id: tag.tag_id
         }
-        console.log('外面')
         that.$get("api/queryTagDetail", uploadTagId).then(function (tagDetail) {
-          console.log('里面')
+          that.tag = tagDetail.data.tag
           that.interactList = tagDetail.data.interactList //通过话题id拿到该话题的交互列表
           that.user_type = that.interactList[0].user_type || ''
           that.hideUser = that.interactList[0].user
@@ -129,13 +138,25 @@
           that.interactList = tagDetail.data.interactList //通过话题id拿到该话题的交互列表
           that.user_type = that.interactList[0].user_type || ''
           that.hideUser = that.interactList[0].user
+           that.$nextTick(function(){
+            wx.hideLoading()
+          })
         }).catch(function (err) {
           console.log(err)
         })
       },
-      timeOut(){
+      sendTopic(){
         this.focusState = false
         let that = this
+        if (!that.user.id) {
+          wx.showToast({
+            title: '请先登录！',
+            icon: 'none',
+            mask: true,
+            duration: 1000
+          })
+          return;
+        }
         let timer = setTimeout(function(){
         if (that.words) {
           let interact = {}
@@ -190,7 +211,7 @@
             interact.user_type = '匿名'
           }
           interact.tag_id = that.tag_id
-          interact.user_id = that.myDetail.user.id
+          interact.user_id = that.user.id
           interact.interact_status = '0'
           let updateInteract = {
             'db': 'WpInteractModel',
@@ -203,6 +224,7 @@
             mask: true
           })
           that.$get('api/update', updateInteract).then(function (obj) {
+            obj.data.tag = that.tag
             that.$sendMessage(JSON.stringify(obj.data))
             that.words = ''
             that.showImages = []
@@ -211,7 +233,6 @@
             that.user_status = '匿名'
             clearTimeout(timer)
             that.reloadTopicPage()
-            wx.hideLoading()
           })
           // that.$nextTick(function(){
           //   that.focusState = false
@@ -231,6 +252,15 @@
       clickCollect() {
         this.focusState = false
         let that = this
+        if (!that.user.id) {
+          wx.showToast({
+            title: '请先登录！',
+            icon: 'none',
+            mask: true,
+            duration: 1000
+          })
+          return;
+        }
         if (!that.collectLock) {
           return;
         }
@@ -239,7 +269,7 @@
         if (that.collect_status === '收藏') {
           that.collect_status = '已收藏'
           record.record_type = '收藏记录'
-          record.user_id = that.myDetail.user.id
+          record.user_id = that.user.id
           record.tag_id = that.tag_id
           let uploadRecord = {
             'db': 'WpRecordModel',
@@ -253,10 +283,10 @@
               real_estate_name: that.real_estate_name
             }
             that.collectId = res.data.id
-            that.myDetail.recordList.reverse()
-            that.myDetail.recordList.push(res.data)
-            that.myDetail.recordList.reverse()
-            that.reSetMyDetail(that.myDetail)
+            that.recordList.reverse()
+            that.recordList.push(res.data)
+            that.recordList.reverse()
+            that.$reSetStorage('recordList',that.recordList)
             that.collectLock = !that.collectLock
           })
         } else if (that.collect_status === '已收藏') {
@@ -270,13 +300,13 @@
             'items': JSON.stringify(record)
           }
           that.$get('api/update', uploadRecord).then(function (res) {
-            for (let i = 0; i < that.myDetail.recordList.length; i++) {
-              if (that.myDetail.recordList[i].tag_id === that.tag_id) {
-                that.myDetail.recordList.splice(i, 1)
+            for (let i = 0; i < that.recordList.length; i++) {
+              if (that.recordList[i].tag_id === that.tag_id) {
+                that.recordList.splice(i, 1)
                 break
               }
             }
-            that.reSetMyDetail(that.myDetail)
+            that.$reSetStorage('recordList',that.recordList)
             that.collectLock = !that.collectLock
           })
         }
@@ -318,22 +348,17 @@
       collectStatus() {
         let that = this
         wx.getStorage({
-          key: 'myDetail',
+          key: 'recordList',
           success: function (res) {
-            that.myDetail = res.data
-            let recordList = res.data.recordList
-            if (recordList.length === 0) {
-              that.collect_status = '收藏'
-            } else {
+            that.recordList = res.data
+            let recordList = res.data
+            if (recordList.length > 0) {
               for (let i = 0; i < recordList.length; i++) {
                 if (recordList[i].tag_id === that.tag_id) {
                   that.collectId = recordList[i].id
                   that.collect_status = '已收藏'
                   break
                 }
-              }
-              if (that.collect_status === '') {
-                that.collect_status = '收藏'
               }
             }
           }
@@ -344,6 +369,15 @@
       upLoadImage() {
         this.focusState = false
         let that = this
+        if (!that.user.id) {
+          wx.showToast({
+            title: '请先登录！',
+            icon: 'none',
+            mask: true,
+            duration: 1000
+          })
+          return;
+        }
         let num = 6 - that.showImages.length
         if (num > 0) {
           wx.chooseImage({
@@ -439,12 +473,6 @@
         })
       },
 
-      reSetMyDetail(data) {
-        wx.setStorage({
-          key: 'myDetail',
-          data: data,
-        })
-      },
 
       //改变匿名状态
       changeUserStatus() {

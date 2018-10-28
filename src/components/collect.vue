@@ -1,7 +1,7 @@
 <template>
   <div class="collect">
     <div class="item">
-      <div class="border" @click="test">{{ record.tag.tag_name }}</div>
+      <div class="border" @click="toTopicPage()">{{ record.tag.tag_name }}</div>
       <div class="collect-build">{{record.realEstate.real_estate_name}}</div>
     </div>
     <line />
@@ -26,13 +26,10 @@
       }
     },
     methods: {
-      test(){
+      toTopicPage(){
         let obj = {
-          tag_name:this.record.tag.tag_name,
-          views_num:this.record.tag.views_num,
-          user_id:this.record.tag.user_id,
           real_estate_name:this.record.realEstate.real_estate_name,
-          id:this.record.tag.id
+          tag_id:this.record.tag.id
         }
         wx.navigateTo({
           url: '/pages/qwb/main?tag=' + JSON.stringify(obj)

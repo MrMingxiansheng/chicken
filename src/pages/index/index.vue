@@ -51,13 +51,13 @@
             imgSrc: '/static/images/ad3.png'
           }
         ],
-        show:true
+        show:''
       }
     },
     created(){
       let that = this
       wx.getStorage({
-        key:'myDetail',
+        key:'user',
         success(){
           that.show = false
         },
@@ -109,12 +109,7 @@
           // failure
         })
       },
-      reSetMyDetail(data) {
-        wx.setStorage({
-          key: 'myDetail',
-          data: data,
-        })
-      },
+      
       closeMask(){
         this.show = false
       },
@@ -139,15 +134,7 @@
               }
               that.$get('api/update', param).then(function (res) {
                 console.log('登录后的返回', res)
-                that.$get('api/queryUserDetail',{user_id:res.data.id}).then(function(res){
-                  wx.setStorage({
-                    key: 'myDetail',
-                    data: res.data,
-                    success(){
-                      console.log('<myDetail>缓存设置成功')
-                    }
-                  })
-                })
+                that.$setStorage('user',res.data)
               })
             }
           })

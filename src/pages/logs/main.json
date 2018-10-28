@@ -1,6 +1,6 @@
 {
-  "navigationBarTitleText": "小鸡窝",
+  "navigationBarTitleText": "小鸡笼",
   "usingComponents": {
     "i-badge": "../../static/iview/badge/index"
-  }  
+  } 
 }

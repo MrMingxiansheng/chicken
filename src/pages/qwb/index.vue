@@ -1,21 +1,20 @@
 <template>
   <div class="topic">
     <div class="header">
-      <!-- <div class="building">{{real_estate_name}}</div> -->
-      <div class="topicTitle"># {{tag.tag_name}}</div>
-      <div class="topicViews">{{tag.views_num}}浏览</div>
+      <div class="topicTitle" decode="ensp">#&ensp;{{tag.tag_name}}</div>
+      <div class="topicViews">{{views_num}}浏览</div>
     </div>
     <scroll-view scroll-y="true" :style="{height:scrollHight+'rpx'}">
       <div class="content">
-        <speak v-for="obj in interactList" :key="obj.id" :reply="obj" :owner="tag.user_id" :user_type="user_type"
-          :hideUser="hideUser" :tag="tag" :user="user" :interactList="myInteractList" @toReplyName="toReplyName"></speak>
+        <speak v-for="(obj,index) in interactList" :key="obj.id" :reply="obj" :owner="tag.user_id" :user_type="user_type"
+          :hideUser="hideUser" :tag="tag" :user="user" :interactList="myInteractList" :index="index" @toReplyName="toReplyName"></speak>
       </div>
     </scroll-view>
     <canvas canvas-id='attendCanvasId' class='myCanvas'></canvas>
     <div class="footer">
       <div v-for="(img,index) in showImages" :key="index" v-if="index<6" class="box-img">
         <img :src="img" class="big" @click="preview">
-        <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
+        <img src="/static/images/chacha.png" class="min" @click="removeImage(index)">
       </div>
       <div class="send_arr">
         <input id="enter" v-model.lazy="words" :focus="focusState" @focus="focus" @input="keyInput" maxlength="200" />
@@ -66,6 +65,7 @@
         real_estate_name: '', //楼盘名
         to_interact_id: '', //用来判断是评论还是回复,回复哪条交互
         tag: '', //包含tag_name,views_num,user_id(传给reply,用来判断是不是题主),tag_id(单独提出来了)
+        views_num:'',
         user_status: '匿名',
         collectLock: true,
         user:'',
@@ -74,10 +74,6 @@
     },
 
     onLoad(option) {
-      wx.showLoading({
-        title: '加载中',
-        mask: true
-      })
       this.size()
       this.loadTopicPage(option)
       this.collectStatus()
@@ -101,6 +97,7 @@
       this.focusState = false
       this.real_estate_name = ''
       this.interactList = ''
+      this.views_num = ''
       this.user_type = ''
       this.hideUser = ''
       this.collect_status = '收藏'
@@ -122,11 +119,15 @@
         that.$get("api/queryTagDetail", uploadTagId).then(function (tagDetail) {
           that.tag = tagDetail.data.tag
           that.interactList = tagDetail.data.interactList //通过话题id拿到该话题的交互列表
+          that.views_num = tagDetail.data.tag.views_num
           that.user_type = that.interactList[0].user_type || ''
           that.hideUser = that.interactList[0].user
           that.$nextTick(function(){
             wx.hideLoading()
           })
+          // wx.setNavigationBarTitle({
+          //   title: '#'+tag.tag_name+'# ('+that.views_num+'浏览)',
+          // })
         })
       },
       reloadTopicPage() {
@@ -485,7 +486,7 @@
         }
       },
       leave(){
-        
+        this.focusState = false
       }
 
 
@@ -500,7 +501,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    /*纵向居中*/
+    background-color: #ffe144;
     height: 80rpx;
     border-bottom: 1px solid #ddd;
   }
@@ -509,7 +510,7 @@
     position: fixed;
     width: 100%;
     text-align: center;
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .building {
@@ -525,7 +526,7 @@
     width: 100%;
     text-align: right;
     color: #888888;
-    font-size: 15px;
+    font-size: 13px;
     right: 20rpx;
   }
 
@@ -543,6 +544,7 @@
 
   .footer li {
     width: 20rpx;
+    font-weight:700;/*字体加粗*/
     text-align: center;
     margin-top: 20rpx;
     flex: auto;
@@ -556,6 +558,7 @@
   .send_arr {
     display: flex;
     flex-direction: row;
+    border-radius: 7px;
     border: 1px solid #d0d0d0;
     width: 710rpx;
     height: 70rpx;
@@ -566,6 +569,7 @@
   .send {
     color: #f3cc01;
     position: relative;
+    font-weight:700;/*字体加粗*/
     top: 14rpx;
     left: 20rpx;
   }

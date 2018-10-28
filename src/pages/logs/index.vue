@@ -73,7 +73,6 @@
         userList:''
       }
     },
-
     created() {
       this.init()
     },
@@ -83,9 +82,21 @@
       if(!this.user){
         console.log('没有用户信息')
         this.init()
-      }
+       }
+        wx.getStorage({
+          key: 'myDetail',
+          success: function (res) {
+            for (let i=0; i<res.data.msgList.length; i++){
+              if (res.data.msgList[i].interact_type === "点赞"){
+                that.num += 1
+              }
+              if (res.data.msgList[i].interact_type === "点踩"){
+                that.cnum += 1
+              }
+            }
+          }
+        })
     },
-    
     onShow: function () {
       let that = this
       wx.getStorage({
@@ -264,6 +275,7 @@
   }
 
 </script>
+
 <style scoped>
   .head {
     height: 100rpx;
@@ -274,14 +286,18 @@
   .avatarUrl {
     height: 100rpx;
     width: 100rpx;
+    border-radius:50%;
   }
 
   .box {
     margin-top: 20rpx;
-    margin-left: 20rpx;
+    margin-left: 50rpx;
+    display: flex;
+    flex-direction: row;
+    color: rgb(141, 148, 141);
   }
+  
   .box button {
-    display: inline-block;
     width: 400rpx;
     height: 100rpx;
     font-size: 35rpx;
@@ -292,15 +308,13 @@
 
   .box1 {
     margin-left: 20rpx;
-    display: inline-block;
     height: 100rpx;
     width: 600rpx;
   }
 
 
-  .p1 {
+  .user {
     height: 35rpx;
-    float: left;
     width: 600rpx;
     font-size: 35rpx;
     line-height: 35rpx;
@@ -308,24 +322,21 @@
   }
 
 
-  .p3 {
-    color: #888888;
+  .Num {
     height: 35rpx;
-    float: left;
     width: 600rpx;
-    font-size: 35rpx;
+    font-size: 13px;
     line-height: 35rpx;
-  }
-
-  .p3 span {
-    font-size: 30rpx;
   }
 
   .hd {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    color: rgb(141, 148, 141);
     margin-top: 40rpx;
+    font-weight: 700;/*字体加粗*/
+    margin-bottom: 20rpx;
   }
 
   .cur {

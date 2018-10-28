@@ -1,5 +1,5 @@
 <template>
-  <div class="collect">
+  <div class="collect" v-if="record.tag.tag_name">
     <div class="item">
       <div class="border" @click="toTopicPage()">{{ record.tag.tag_name }}</div>
       <div class="collect-build">{{record.realEstate.real_estate_name}}</div>
@@ -45,19 +45,21 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    font-size: 13px;
     align-items: baseline;
+    font-weight:700;/*字体加粗*/
   }
 
   .collect-build {
     margin-right: 20rpx;
+    font-size: 13px;
   }
 
-  .border {
-    width: 230rpx;
-    /* background-color: #f8f8f8; */
+  .collect-tag_name {
+    padding: 0 20rpx;
+    font-size: 12px;
+    color:rgba(10, 10, 10, 0.774);
+    background: #f5f5f5;
     line-height: 60rpx;
-    border: 1px solid rgb(229, 229, 229);
     text-align: center;
     box-sizing: border-box;
     margin: 20rpx 20rpx;

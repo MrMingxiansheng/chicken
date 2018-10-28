@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div v-if="tag.tag_name">
     <div class="item">
-      <div class="border" @click="ClickTag_name">{{ tag.tag_name }}</div>
+      <div class="my-tag_name" @click="ClickTag_name">{{ tag.tag_name }}</div>
       <span class="my-topic">{{tag.realEstate.real_estate_name}}</span>
       <img src="/static/images/chacha.png" class="min" @click="removeImage">
     </div>
@@ -34,8 +34,8 @@
           success: function (res) {
             if (res.confirm) {
               wx.showLoading({
-                title:'删除中',
-                mask:true
+                title: '删除中',
+                mask: true
               })
               console.log('用户点击确定')
               that.$get('api/update', updateTemp).then(function (res) {
@@ -83,28 +83,30 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    font-size: 13px;
     align-items: baseline;
     position: relative;
+    font-weight:700;/*字体加粗*/
   }
 
   .my-topic {
     margin-right: 120rpx;
+    font-size: 13px;
   }
 
-  .border {
-    width: 230rpx;
-    /* background-color: #f8f8f8; */
+  .my-tag_name {
+    padding: 0 20rpx;
+    font-size: 12px;
+    color:rgba(10, 10, 10, 0.774);
+    background: #f5f5f5;
     line-height: 60rpx;
-    border: 1px solid rgb(229, 229, 229);
     text-align: center;
     box-sizing: border-box;
     margin: 20rpx 20rpx;
   }
 
   .min {
-    width: 50rpx;
-    height: 50rpx;
+    width: 40rpx;
+    height: 40rpx;
     position: absolute;
     right: 20rpx;
     top: 30rpx;

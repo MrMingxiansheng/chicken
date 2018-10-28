@@ -27,16 +27,14 @@
   //导入组件
   import line from "@/components/line"
   import hot from "@/components/hot"
-  import cityHot from "@/components/cityHot"
   import page from "@/components/page"
   import topswiper from "@/components/topSwiper"
   export default {
     components: {
       line,
-      hot,
       page,
+      hot,
       topswiper,
-      cityHot
     }, //声明在当前组件下使用组件
     data() {
       return {
@@ -75,6 +73,8 @@
     // 下拉刷新回调接口
     onPullDownRefresh: function () {
       let that = this
+    setTimeout(function()
+      {
       that.sites = []
       that.$get('api/queryRealEstateList').then(function(res){
         that.sites = res.data
@@ -85,12 +85,15 @@
           success: function (res) {
             wx.stopPullDownRefresh({
               success(){
-                console.log('首页下拉刷新成功')
+                console.log('刷新成功')
               }
             })
           }
         })
       })
+      wx.hideNavigationBarLoading() //完成停止加载
+      wx.stopPullDownRefresh() //停止下拉刷新
+    },1500)
     },
     methods: {
       queryRealEstate(){

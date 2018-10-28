@@ -1,5 +1,6 @@
 <template>
-  <div class="reply">
+<div :class="{ reply: index==0} " :style="{'background-color': index>0 ? 'white' : '#ffe144'}">
+  <div class="topic">
     <div class="avatar">
       <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner">
       <img :src="reply.user.head_url"  v-else>
@@ -22,7 +23,7 @@
           <span>{{content}}</span>
           <div class="article" @click="toArticlePage" v-if="articleSrc">文章链接</div>
         </div>
-        <div class="images">
+        <div class="images" v-if="images">
           <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)">
         </div>
         <div class="time">
@@ -31,21 +32,24 @@
       </div>
     </div>
     <div class="interact">
-      <div class="interact-in">
-        <div class="step" @click="clickStep">
-          <span class="step-num">{{reply.cnum}}</span>
-          <span class="step-str">踩</span>
+      <div class="interact-in" :style="{'margin-left': index>0 ? '40rpx' : '20rpx'}">
+        <div class="praise">
+          <div class="praise-num">{{reply.interact_status}}</div>
+          <img :src="praiseSrc" class="praise-str" @click.stop="clickPraise"/>
+          <!-- <span class="praise-str">赞</span> -->
         </div>
-        <div class="praise" @click="clickPraise">
-          <span class="praise-num">{{reply.interact_status}}</span>
-          <span class="praise-str">赞</span>
+        <div class="step">
+          <div class="step-num">{{reply.cnum}}</div>
+          <img :src="stepSrc" class="step-str" @click.stop="clickStep"/>
+          <!-- <span class="step-str">踩</span> -->
         </div>
-        <div class="say" @click="clickReply">
-          回复
+        <div class="say">
+          <img src="/static/images/reply.png" class="say1" @click.stop="clickReply"/>
         </div>
       </div>
     </div>
-  </div>
+   </div>
+</div>
 </template>
 
 <script>
@@ -58,10 +62,13 @@
         articleSrc:'',
         stepLock:true,
         praiseLock:true,
+        praiseSrc: '/static/images/zan.png',
+        stepSrc:'/static/images/cai.png'
       }
     },
     onLoad(){
       let that = this
+      that.praiseStatus()
       let allContent,articleArr
       if(this.reply.interact_content.indexOf('images=')===-1){
         //没有图片
@@ -120,6 +127,7 @@
           for(let i=0; i<interactList.length; i++){
             if(interactList[i].to_interact_id === that.reply.id && interactList[i].interact_type === '点赞'){
               //已经有点赞,要取消赞
+              that.praiseSrc = '/static/images/zan.png'
               todo = '取消赞'
               praiseId = interactList[i].id
               console.log('点赞交互',interactList[i])
@@ -128,12 +136,15 @@
           }
           if(todo !== '取消赞'){
             todo = '点赞'
+            that.praiseSrc = '/static/images/zan1.png'
           }
         }else{
           //没交互
           todo = '点赞'
+          that.praiseSrc = '/static/images/zan1.png'
         }
         if (todo === '点赞') {
+          that.praiseSrc = '/static/images/zan1.png'
           that.reply.interact_status = parseInt(that.reply.interact_status) + 1
           interact.tag_id = that.reply.tag_id
           interact.user_id = that.user.id
@@ -155,6 +166,7 @@
             that.praiseLock = !that.praiseLock
           })
         }else if (todo === '取消赞') {
+          that.praiseSrc = '/static/images/zan.png'
           that.reply.interact_status = parseInt(that.reply.interact_status) - 1
           for(let i=0; i<that.interactList.length; i++){
             if(that.interactList[i].id===praiseId){
@@ -206,6 +218,7 @@
           for(let i=0; i<interactList.length; i++){
             if(interactList[i].to_interact_id === that.reply.id && interactList[i].interact_type === '点踩'){
               //已经有点踩,要取消踩
+              that.stepSrc = '/static/images/cai.png'
               todo = '取消踩'
               console.log('interactList[i]',interactList[i])
               stepId = interactList[i].id
@@ -215,12 +228,15 @@
           }
           if(todo !== '取消踩'){
             todo = '点踩'
+            that.stepSrc = '/static/images/cai1.png'
           }
         }else{
           //没交互
           todo = '点踩'
+          that.stepSrc = '/static/images/cai1.png'
         }
         if (todo === '点踩') {
+          that.stepSrc = '/static/images/cai1.png'
           that.reply.cnum = parseInt(that.reply.cnum) + 1
           interact.tag_id = that.reply.tag_id
           interact.user_id = that.user.id
@@ -242,6 +258,7 @@
             that.stepLock = !that.stepLock
           })
         }else if (todo === '取消踩') {
+          that.stepSrc = '/static/images/cai.png'
           that.reply.cnum = parseInt(that.reply.cnum) - 1
           for(let i=0; i<that.interactList.length; i++){
             if(that.interactList[i].id===stepId){
@@ -268,7 +285,19 @@
           })
         }
       },
-      
+
+      praiseStatus (){
+        let that = this
+        for(let i=0; i<that.myDetail.interactList.length; i++){
+         if(that.myDetail.interactList[i].to_interact_id === that.reply.id && that.myDetail.interactList[i].interact_type === '点赞'){
+            that.praiseSrc = '/static/images/zan1.png'
+          } 
+         if(that.myDetail.interactList[i].to_interact_id === that.reply.id && that.myDetail.interactList[i].interact_type === '点踩'){
+           that.stepSrc = '/static/images/cai1.png'
+         } 
+        }
+      },
+     
       preview: function (index) {
         //图片预览
         wx.previewImage({
@@ -292,23 +321,27 @@
 
 <style scoped>
   .reply {
-    display: flex;
-    margin: 20rpx 0;
+    background-color: #ffe144;
+    padding: 20rpx;
   }
 
-  .avatar {
-    width: 125rpx;
-    text-align: center;
+  .topic{
+    display: flex;
+    background-color: white;
+    padding: 20rpx 20rpx 10rpx 20rpx;
+    border-radius: 7px;
   }
 
   .avatar img {
     width: 80rpx;
     height: 80rpx;
+    border-radius:50%;
   }
 
   .content {
     width: 490rpx;
     line-height: 18px;
+    margin-left: 10rpx;
   }
 
   .content .content-in {
@@ -336,19 +369,12 @@
     width: 105rpx;
     height: 105rpx;
     margin-right: 10rpx;
-    margin-bottom: 10rpx;
+    margin-bottom: 5rpx;
   }
 
   .words .article{
     color:#f3cc01;
     line-height: 50rpx;
-  }
-  
-  .content-in .images img {
-    width: 105rpx;
-    height: 105rpx;
-    margin-right: 10rpx;
-    margin-bottom: 10rpx;
   }
 
   .content-in .time {
@@ -361,57 +387,60 @@
   }
 
   .interact .interact-in {
-    height: 180rpx;
+    height: 160rpx;
     width: 100rpx;
-    border: 1px solid rgb(219, 219, 219);
-    box-sizing: border-box;
-    margin-left: 15rpx;
-    font-size: 14px;
-    line-height: 60rpx;
-  }
-
-  .interact-in span {
     display: inline-block;
-    height: 100%;
-    width: 45rpx;
-  }
-
-  .interact-in .step {
-    border-bottom: 1px solid rgb(219, 219, 219);
-    box-sizing: border-box;
-    height: 60rpx;
-  }
-
-  .step .step-num {
-    color: rgb(137, 145, 150);
-    text-align: right;
-  }
-
-  .step .step-str {
-    text-align: left;
-    margin-left: 4rpx;
+    margin-left: 20rpx;
+    font-size: 14px;
   }
 
   .interact-in .praise {
-    border-bottom: 1px solid rgb(219, 219, 219);
-    box-sizing: border-box;
     height: 60rpx;
+    display: flex;
+    flex-direction: row;
   }
 
   .praise .praise-num {
     color: rgb(137, 145, 150);
     text-align: right;
+    width: 45rpx;
   }
 
   .praise .praise-str {
     text-align: left;
-    margin-left: 4rpx;
+    margin-left: 6rpx;
+    width: 40rpx;
+    height: 40rpx;
+  }
+
+  .interact-in .step {
+    height: 60rpx;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .step .step-num {
+    color: rgb(137, 145, 150);
+    text-align: right;
+    width: 45rpx;
+  }
+
+  .step .step-str {
+    text-align: left;
+    margin-left: 6rpx;
+    width: 40rpx;
+    height: 40rpx;
   }
 
   .interact-in .say {
-    box-sizing: border-box;
-    height: 60rpx;
     text-align: center;
+    height: 40rpx;
+    margin-left: 36rpx;
+  }
+
+  .say1 {
+    width: 40rpx;
+    height: 40rpx;
   }
 
 </style>

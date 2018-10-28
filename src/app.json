@@ -12,7 +12,8 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#ffe144",
-    "navigationBarTitleText": "小鸡窝",
+    "backgroundColor": "#ffe144",
+    "navigationBarTitleText": "小鸡笼",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
@@ -20,6 +21,7 @@
     "selectedColor": "#f3cc01",
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
+    "font-weight":"bold",
     "list": [{
         "pagePath": "pages/index/main",
         "text": "首页",

@@ -1,15 +1,18 @@
 <template>
   <div class="hot" v-if="item.real_estate_name">
-    <div class="title" @click="toRealEstatePage()">{{item.real_estate_name}}</div>
     <div class="view">
-      <div class="num">
-        <span class="tagNum">{{item.tagList.length}}话题</span>
-        <span class="viewNum">&ensp;&ensp;{{item.views_num}}阅读</span>
-      </div>
-      <div class="sendTopic" @click="toRealEstatePage()">发话题</div>
+      <div class="title" @click="toRealEstatePage()">{{item.real_estate_name}}</div>
+      <img src="/static/images/more.png" class="sendTopic" @click="toRealEstatePage()" />
+      <!-- <div class="sendTopic" @click="toRealEstatePage()">发话题</div> -->
     </div>
+      <div class="num">
+        <span class="tagNum" decode="ensp">话题&ensp;{{item.tagList.length}}</span>
+        <span class="viewNum" decode="ensp">&ensp;&ensp;阅读&ensp;{{item.views_num}}</span>
+    </div>
+    <div class="bottom">
     <itemx :tagList="item.tagList" :real_estate_name="item.real_estate_name"></itemx>
-    <line />
+    </div>
+    <!-- <line /> -->
   </div>
 </template>
 
@@ -22,6 +25,8 @@
       line
     },
     props: ['item'],
+    onLoad (){
+    },
     methods: {
       toRealEstatePage(){
         let that = this
@@ -35,25 +40,36 @@
 </script>
 
 <style scoped>
+.hot{
+  box-shadow:  10rpx 10rpx 10rpx rgb(211, 209, 209);/*边框阴影*/
+  margin:40rpx 0;
+}
+
 .title{
-  font-size: 20px;
-  text-align: center;
-  margin-top: 10rpx;
+  font-size: 21px;
+  font-weight:700;/*字体加粗*/
+  color:rgb(53, 61, 68);
 }
 .view{
-  width: 700rpx;
-  margin: 0 auto;
+  margin-left:16rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
-.view .num{
-  float: left;
+
+ .num{
   font-size: 11px;
-  color: rgb(137, 145, 150);
-  margin-top: 10rpx;
+  color: rgb(141, 148, 141);
+  margin: 10rpx 16rpx;
+  font-weight:700;/*字体加粗*/
 }
-.view .sendTopic{
-  float: right;
-  font-size: 12px;
-  border: 1px solid rgb(229,229,229);
-  padding: 10rpx;
+ .sendTopic{
+   width:40rpx;
+   height:40rpx;
+  margin-right:20rpx;
 }
+.bottom{
+  padding-bottom: 15rpx;
+}
+
 </style>

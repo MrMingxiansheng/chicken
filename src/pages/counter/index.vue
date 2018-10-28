@@ -265,6 +265,14 @@
         }, 100)
       },
       //-发送话题
+      
+      focus() {
+        this.focusState = true
+      },
+
+      leave(){
+        this.focusState = false
+      },
 
       //上传图片
       upLoadImage() {
@@ -403,6 +411,7 @@
   .home {
     display: flex;
     flex-direction: row;
+    background-color: #ffe144;
     align-items: center;
     /*纵向居中*/
     height: 80rpx;
@@ -412,7 +421,7 @@
     position: fixed;
     width: 100%;
     text-align: center;
-    font-size: 22px;
+    font-size: 18px;
   }
 
   .browse-right {
@@ -420,7 +429,7 @@
     width: 100%;
     text-align: right;
     color: #888888;
-    font-size: 15px;
+    font-size: 13px;
     right: 20rpx;
   }
 
@@ -438,6 +447,7 @@
 
   .footer li {
     width: 20rpx;
+    font-weight:700;/*字体加粗*/
     text-align: center;
     margin-top: 20rpx;
     flex: auto;
@@ -451,6 +461,7 @@
   .send_arr {
     display: flex;
     flex-direction: row;
+    border-radius: 7px;
     border: 1px solid #d0d0d0;
     width: 710rpx;
     height: 70rpx;
@@ -460,6 +471,7 @@
 
   .send {
     color: #f3cc01;
+    font-weight:700;/*字体加粗*/
     position: relative;
     top: 14rpx;
     left: 20rpx;

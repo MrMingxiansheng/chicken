@@ -1,9 +1,9 @@
 <template>
-  <div class="page">
-    <span class="p">{{city}}</span>
+  <div class="page" v-if="city">
+    <span class="city"><a href="/pages/qwd/main">{{city}}</a></span>
     <div class="search" @click="suo">
       <div class="search_arr">
-        <icon class="searchcion" size="15" type="search"></icon>
+        <icon class="searchcion" size="17" type="search"></icon>
         <input type="text" placeholder="输入楼盘名称或小话题搜索" disabled="true" 
         placeholder-style="font-size:13px;color:#ccc"
         />
@@ -38,7 +38,6 @@
     width: 100%;
     display: flex;
     flex-direction: row;
-    /*整体*/
     background-color: #ffe144;
     position: fixed;
     left: 0;
@@ -46,7 +45,7 @@
     z-index: 88;
   }
 
-  .p {
+  .city {
     margin-left: 30rpx;
     font-size: 16px;
     position: relative;
@@ -68,7 +67,6 @@
     margin: 15rpx;
     text-align: center;
     /*搜索图标*/
-
   }
 
   .search_arr input {
@@ -76,10 +74,7 @@
     height: 60rpx;
     border-radius: 5px;
     width: 440rpx;
-    font-size: 17px;
     /*input框内*/
   }
   
-  
-
 </style>

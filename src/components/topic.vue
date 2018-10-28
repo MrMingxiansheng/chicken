@@ -1,7 +1,14 @@
 <template>
   <div class="topic" v-if="item.tag_name">
     <div class="box">
-          <div class="title" @click="ClickTag(item)"># {{item.tag_name}}</div>
+          <div class="title" @click="ClickTag(item)" decode="ensp">#&ensp;{{item.tag_name}}</div>
+      <div class="box2" v-if="item.interact.interact_content">
+            <div class="words" @click="ClickTag(item)" v-if="content.length >= 8">{{content}}</div>
+            <div class="article" @click="toArticlePage" v-if="articleSrc">文章链接</div>
+        <div class="images">
+          <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)" class="img">
+        </div>
+      </div>
       <div class="box1">
           <div class="bor" @click="ClickTag(item)">
             <div class="border">
@@ -13,17 +20,12 @@
           <span class="views_num" @click="ClickTag(item)">{{item.comment_num}}讨论</span>
           <div class="step" @click="clickStep">
           <span class="step-num">{{item.interact.cnum}}</span>
-          <span class="step-str">踩</span>
+          <img :src="stepSrc" class="step-str"/>
+          <!-- <span class="step-str">踩</span> -->
         </div>
         </div>
       </div>
-      <div class="box2" v-if="item.interact.interact_content">
-            <div class="words" @click="ClickTag(item)">{{content}}</div>
-            <div class="article" @click="toArticlePage" v-if="articleSrc">文章链接</div>
-        <div class="images">
-          <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)" class="img">
-        </div>
-      </div>
+      
     </div>
     <line />
   </div>
@@ -42,10 +44,13 @@
         images:'',
         articleSrc:'',
         stepLock:true,
+        length:'',
+        stepSrc:'/static/images/cai.png'
       };
     },
     onLoad (){
       let that = this
+      that.praiseStatus()
       let allContent,articleArr
       if(this.item.interact.interact_content.indexOf('images=')===-1){
         //没有图片
@@ -110,6 +115,7 @@
           for(let i=0; i<interactList.length; i++){
             if(interactList[i].to_interact_id === that.item.interact.id && interactList[i].interact_type === '点踩'){
               //已经有点踩,要取消踩
+              that.stepSrc = '/static/images/cai.png'
               todo = '取消踩'
               console.log('interactList[i]',interactList[i])
               stepId = interactList[i].id
@@ -119,13 +125,16 @@
           }
           if(todo !== '取消踩'){
             todo = '点踩'
+            that.stepSrc = '/static/images/cai1.png'
           }
         }else{
           //没交互
           todo = '点踩'
+          that.stepSrc = '/static/images/cai1.png'
         }
         if (todo === '点踩') {
-          that.item.cnum = parseInt(that.item.cnum) + 1
+          that.stepSrc = '/static/images/cai1.png'
+          that.item.interact.cnum = parseInt(that.item.interact.cnum) + 1
           interact.tag_id = that.item.interact.tag_id
           interact.user_id = that.user.id
           interact.interact_type = '点踩'
@@ -144,10 +153,11 @@
             that.stepLock = !that.stepLock
           })
         }else if (todo === '取消踩') {
-          that.item.cnum = parseInt(that.item.cnum) - 1
-          for(let i=0; i<that.interactList.length; i++){
-            if(that.interactList[i].id===stepId){
-              that.interactList.splice(i,1)
+          that.stepSrc = '/static/images/cai.png'
+          that.item.interact.cnum = parseInt(that.item.interact.cnum) - 1
+          for(let i=0; i<that.myDetail.interactList.length; i++){
+            if(that.myDetail.interactList[i].id===stepId){
+              that.myDetail.interactList.splice(i,1)
               break
             }
           }
@@ -176,9 +186,17 @@
         wx.navigateTo({
           url: '/pages/article/main?src='+that.articleSrc
         })
-      }
-      
-
+      },
+     
+       praiseStatus (){
+        let that = this
+        for(let i=0; i<that.myDetail.interactList.length; i++){
+         if(that.myDetail.interactList[i].to_interact_id === that.item.interact.id && that.myDetail.interactList[i].interact_type === '点踩'){
+           console.log('')
+           that.stepSrc = '/static/images/cai1.png'
+         } 
+        }
+       }
     }
   };
 
@@ -193,8 +211,11 @@
   }
 
   .title {
-    text-align: center;
+    margin-left:70rpx;
     font-size: 18px;
+    margin-top:10rpx;
+    margin-bottom:10rpx;
+    font-weight:700;/*字体加粗*/
   }
 
   .avatarUrl {
@@ -202,12 +223,14 @@
     width: 40rpx;
     vertical-align:middle;
     margin-bottom:4rpx;
+    border-radius:50%;
   }
 
   .talk {
     display: flex;
     flex-direction: row;
     font-size: 13px;
+    margin-bottom: 10rpx;
   }
 
   .views_num{
@@ -218,20 +241,26 @@
     color: rgb(137, 145, 150);
   }
 
+  .step-str{
+    width: 40rpx;
+    height: 40rpx;
+    vertical-align: middle; /*图片垂直居中*/
+  }
+
   .step{
     height: 50rpx;
     width: 100rpx;
-    border: 1px solid rgb(219, 219, 219);
-    box-sizing: border-box;
+    /* border: 1px solid rgb(219, 219, 219);
+    box-sizing: border-box; */
     line-height: 50rpx;
     text-align: center;
-    margin-right:10rpx;
+    margin-right: 10rpx;
   }
 
   .views_num{
     line-height: 50rpx;
     text-align: center;
-    margin-right:10rpx;
+    margin-right: 10rpx;
   }
 
   .users {
@@ -250,7 +279,7 @@
   }
 
   .box2 {
-    font-size: 17px;
+    font-size: 15px;
     margin-left: 75rpx;
     margin-bottom: 10rpx;
   }
@@ -261,6 +290,7 @@
     justify-content: space-between;
     align-items: baseline;
     margin-left: 20rpx;
+    margin-bottom:5rpx;
   }
 
   .box {

@@ -1,11 +1,7 @@
 <template>
   <div class="itemx" >
     <div class="tagList">
-<<<<<<< HEAD
       <div class="tag"  v-for="(site,index) in tagList" :key="site.id"  v-if="index<6 || (real_estate_name === '杭州楼市小闲话' && index<9)"  @click="toTopicPage(site)">{{ site.tag_name }}</div>
-=======
-      <div class="tag"  v-for="(site,index) in tagList" :key="site.id"  v-if="index<6"  @click="toTopicPage(site)">{{ site.tag_name }}</div>
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
     </div>
   </div>
 </template>
@@ -38,41 +34,35 @@
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 10rpx;
-<<<<<<< HEAD
     margin-left: 6rpx;
-=======
-    margin-left: 5rpx;
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
   }
 
   .tag {
-    width: 230rpx;
-    font-size: 13px;
-    color:rgb(141, 148, 141);
+    padding: 0 20rpx;
+    font-size: 12px;
+    color:rgba(10, 10, 10, 0.774);
+    background: #f5f5f5;
     font-weight:700;/*字体加粗*/
     line-height: 60rpx;
-    border: 2px solid rgb(141, 148, 141);
-    border-radius:5px;/*弧度*/
+    /* border: 2px solid rgb(141, 148, 141); */
+    /* border-radius:5px;弧度 */
     text-align: center;
     box-sizing: border-box;
     margin: 10rpx 10rpx;
   }
-<<<<<<< HEAD
   
-  .tag:hover {
+  /* .tag:hover {
     width: 230rpx;
     font-size: 13px;
     background: rgb(141, 148, 141);
     color:rgb(255, 255, 255);
-    font-weight:700;/*字体加粗*/
+    font-weight:700;字体加粗
     line-height: 60rpx;
     border: 2px solid rgb(141, 148, 141);
-    border-radius:5px;/*弧度*/
-    text-align: center;
+    border-radius:5px;弧度 */
+    /* text-align: center;
     box-sizing: border-box;
     margin: 10rpx 10rpx;
-  }
-=======
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
+  } */
 
 </style>

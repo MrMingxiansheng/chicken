@@ -1,16 +1,11 @@
 <template>
   <div class="hot" v-if="item.real_estate_name">
-<<<<<<< HEAD
-=======
-    <div class="title" @click="toRealEstatePage()">{{item.real_estate_name}}</div>
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
     <div class="view">
       <div class="title" @click="toRealEstatePage()">{{item.real_estate_name}}</div>
       <img src="/static/images/more.png" class="sendTopic" @click="toRealEstatePage()" />
       <!-- <div class="sendTopic" @click="toRealEstatePage()">发话题</div> -->
     </div>
       <div class="num">
-<<<<<<< HEAD
         <span class="tagNum" decode="ensp">话题&ensp;{{item.tagList.length}}</span>
         <span class="viewNum" decode="ensp">&ensp;&ensp;阅读&ensp;{{item.views_num}}</span>
     </div>
@@ -18,15 +13,6 @@
     <itemx :tagList="item.tagList" :real_estate_name="item.real_estate_name"></itemx>
     </div>
     <!-- <line /> -->
-=======
-        <span class="tagNum">{{item.tagList.length}}话题</span>
-        <span class="viewNum">&ensp;&ensp;{{item.views_num}}阅读</span>
-      </div>
-      <div class="sendTopic" @click="toRealEstatePage()">发话题</div>
-    </div>
-    <itemx :tagList="item.tagList" :real_estate_name="item.real_estate_name"></itemx>
-    <line />
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
   </div>
 </template>
 
@@ -39,11 +25,8 @@
       line
     },
     props: ['item'],
-<<<<<<< HEAD
     onLoad (){
     },
-=======
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
     methods: {
       toRealEstatePage(){
         let that = this

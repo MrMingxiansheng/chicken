@@ -17,15 +17,9 @@
         <img src="/static/images/remove.png" class="min" @click="removeImage(index)">
       </div>
       <div class="send_arr">
-<<<<<<< HEAD
         <input id="enter" v-model.lazy="words" maxlength="200" 
+        :focus="focusState" @focus="focus" @blur="leave()"
         placeholder="在此发话题,前8个字重点显示"
-=======
-        <input id="enter"
-        v-model.lazy="words"
-        maxlength="200" 
-        placeholder="  在此发话题,前8个字重点显示"
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
         placeholder-style="font-size: 14px"
         />
         <div class="send" @click="sendTopic()">发送</div>
@@ -64,7 +58,7 @@
         localImage:'',
         user_status:'匿名',
         myDetail:'',
-        real:''                 //楼盘列表中的一项
+        real:'',                //楼盘列表中的一项
       }
     },
 
@@ -87,20 +81,19 @@
       let that = this
       that.ScrollViewHeight()
       that.real = JSON.parse(option.real)
+      // wx.setNavigationBarTitle({
+      //       title: '#'+that.real.real_estate_name+'# ('+that.real.views_num+'浏览)',
+      // })
       that.$get('api/queryRealEstateDetail',{real_estate_id:that.real.id}).then(function(res){
         that.dataList = res.data.tagList
         wx.hideLoading()
-<<<<<<< HEAD
-=======
       })
       wx.getStorage({
         key:'myDetail',
         success(res){
           that.myDetail = res.data
         }
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       })
-      that.myDetail = wx.getStorageSync('myDetail')
     },
     onUnload() {
       this.real = ''
@@ -115,16 +108,6 @@
     methods: {
       //计算滚动高度
       ScrollViewHeight() {
-<<<<<<< HEAD
-        let windowWidth = wx.getSystemInfoSync().windowWidth
-        let windowHeight = wx.getSystemInfoSync().windowHeight
-        let statusBarHeight = wx.getSystemInfoSync().statusBarHeight
-        let rWindowWidth = 750
-        let px_to_rpx = rWindowWidth / windowWidth
-        let rWindowHeight = windowHeight * px_to_rpx
-        let rStatusBarHeight = statusBarHeight * px_to_rpx
-        this.scrollHight = rWindowHeight - rStatusBarHeight - 230
-=======
         let that = this
         wx.getSystemInfo({
           success(res){
@@ -134,15 +117,16 @@
             that.scrollHight = height - statusBarHeight - 230
           }
         })
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
         //读取机型全屏高度，减去固定高度获得scroll高度
       },
       
       //发送话题
       sendTopic () {
+        this.focusState = false
         let that = this
         let topicTitle = {} //话题标题
         let interact = {}
+        let timer = setTimeout(function(){
         if(!that.myDetail.user.id){
           //没有读取到我的id
           wx.showToast({
@@ -265,8 +249,17 @@
             })
           })
         })
+        },100)
       },
       //-发送话题
+      
+      focus() {
+        this.focusState = true
+      },
+
+      leave(){
+        this.focusState = false
+      },
 
       //上传图片
       upLoadImage() {
@@ -399,6 +392,7 @@
   .home {
     display: flex;
     flex-direction: row;
+    background-color: #ffe144;
     align-items: center;
     /*纵向居中*/
     height: 80rpx;
@@ -408,7 +402,7 @@
     position: fixed;
     width: 100%;
     text-align: center;
-    font-size: 22px;
+    font-size: 18px;
   }
 
   .browse-right {
@@ -416,7 +410,7 @@
     width: 100%;
     text-align: right;
     color: #888888;
-    font-size: 15px;
+    font-size: 13px;
     right: 20rpx;
   }
 
@@ -434,6 +428,7 @@
 
   .footer li {
     width: 20rpx;
+    font-weight:700;/*字体加粗*/
     text-align: center;
     margin-top: 20rpx;
     flex: auto;
@@ -447,6 +442,7 @@
   .send_arr {
     display: flex;
     flex-direction: row;
+    border-radius: 7px;
     border: 1px solid #d0d0d0;
     width: 710rpx;
     height: 70rpx;
@@ -456,6 +452,7 @@
 
   .send {
     color: #f3cc01;
+    font-weight:700;/*字体加粗*/
     position: relative;
     top: 14rpx;
     left: 20rpx;

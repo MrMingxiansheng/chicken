@@ -1,18 +1,12 @@
 <template>
   <div class="topic">
     <div class="header">
-      <!-- <div class="building">{{real_estate_name}}</div> -->
-<<<<<<< HEAD
       <div class="topicTitle" decode="ensp">#&ensp;{{tag.tag_name}}</div>
       <div class="topicViews">{{views_num}}浏览</div>
-=======
-      <div class="topicTitle"># {{tag.tag_name}}</div>
-      <div class="topicViews">{{tag.views_num}}浏览</div>
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
     </div>
     <scroll-view scroll-y="true" :style="{height:scrollHight+'rpx'}">
       <div class="content">
-        <speak v-for="obj in interactList" :key="obj.id" :reply="obj" :owner="tag.user_id" :user_type="user_type"
+        <speak v-for="(obj,index) in interactList" :key="obj.id" :index="index" :reply="obj" :owner="tag.user_id" :user_type="user_type"
           :hideUser="hideUser" :myDetail="myDetail" @toReplyName="toReplyName"></speak>
       </div>
     </scroll-view>
@@ -23,14 +17,8 @@
         <img src="/static/images/chacha.png" class="min" @click="removeImage(index)">
       </div>
       <div class="send_arr">
-<<<<<<< HEAD
-        <input id="enter" v-model.lazy="words" :focus="focusState" @input="keyInput" :cursor="cursor" @focus="focus" 
-          maxlength="200" />
-        <div class="send" @click="clickSend">发送</div>
-=======
         <input id="enter" v-model.lazy="words" :focus="focusState" @focus="focus" @input="keyInput" @blur="leave()" maxlength="200" />
         <div class="send" @click="timeOut()">发送</div>
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       </div>
       <line />
       <ul>
@@ -61,27 +49,6 @@
     },
     data() {
       return {
-<<<<<<< HEAD
-        scrollHight: '',        //滚动高度
-        focusState: false,      //输入框是否聚焦
-        collect_status:'',      //收藏状态,是<收藏>还是<已收藏>
-        collectId:'',           //一条收藏的id,用来取消收藏的时候覆盖
-        words: '',              //输入框的内容
-        images:[],              //图片列表
-        localImages:[],
-        interactList: '',       //交互列表,给reply组件加载评论和回复
-        tag_id: '',             //当前话题的id,用来刷新评论和回复
-        views_num:'',           //当前话题的浏览量
-        myDetail:'',            //我的recordList,msgList,tagList,user
-        user_type:'',           //传给reply,判断是不是匿名
-        hideUser:'',            //传给reply,匿名的头像和昵称
-        real_estate_name: '',   //楼盘名
-        to_interact_id: '',     //用来判断是评论还是回复,回复哪条交互
-        cursor: -1,             //光标位置
-        tag:'',                 //包含tag_name,views_num,user_id(传给reply,用来判断是不是题主),tag_id(单独提出来了)
-        user_status:'匿名',
-        collectLock:true
-=======
         scrollHight: '', //滚动高度
         focusState: false, //输入框是否聚焦
         collect_status: '', //收藏状态,是<收藏>还是<已收藏>
@@ -98,22 +65,13 @@
         real_estate_name: '', //楼盘名
         to_interact_id: '', //用来判断是评论还是回复,回复哪条交互
         tag: '', //包含tag_name,views_num,user_id(传给reply,用来判断是不是题主),tag_id(单独提出来了)
+        views_num:'',
         user_status: '匿名',
         collectLock: true
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       }
     },
 
     onLoad(option) {
-      wx.showLoading({
-<<<<<<< HEAD
-        title:'加载中',
-        mask:true
-=======
-        title: '加载中',
-        mask: true
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
-      })
       this.size()
       this.loadTopicPage(option)
       this.collectStatus()
@@ -138,16 +96,16 @@
       loadTopicPage(option) {
         let that = this
         let tag = JSON.parse(option.tag)
+        // wx.setNavigationBarTitle({
+        //  title: '#'+tag.tag_name+'#',
+        // })
         that.tag = tag
         that.tag_id = tag.id
         that.real_estate_name = tag.real_estate_name
-<<<<<<< HEAD
-=======
         if(option.interactList){
           console.log('有交互列表')
           return;
         }
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
         let uploadTagId = {
           tag_id: tag.id
         }
@@ -158,13 +116,12 @@
           that.views_num = tagDetail.data.tag.views_num
           that.user_type = that.interactList[0].user_type || ''
           that.hideUser = that.interactList[0].user
-<<<<<<< HEAD
-          wx.hideLoading()
-=======
           that.$nextTick(function(){
             wx.hideLoading()
           })
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
+          // wx.setNavigationBarTitle({
+          //   title: '#'+tag.tag_name+'# ('+that.views_num+'浏览)',
+          // })
         })
       },
       reloadTopicPage() {
@@ -183,11 +140,7 @@
       timeOut(){
         this.focusState = false
         let that = this
-<<<<<<< HEAD
-        that.focusState = false
-=======
         let timer = setTimeout(function(){
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
         if (that.words) {
           let interact = {}
           if (that.words.indexOf(':') !== -1) {
@@ -228,24 +181,6 @@
               } else {
                 interact.interact_content = that.words + 'images=' + JSON.stringify(that.images)
               }
-<<<<<<< HEAD
-              wx.showLoading({
-                title:'发送中',
-                mask:true
-              })
-              that.$get('api/update', updateInteract).then(function (obj) {
-                wx.hideLoading()
-                that.words = ''
-                that.images = []
-                that.localImages = []
-                that.user_status = '匿名'
-                that.reloadTopicPage()
-              })
-              that.$nextTick(function(){
-                that.focusState = false
-              })
-=======
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
             }
           } else {
             interact.interact_type = '评论'
@@ -296,26 +231,16 @@
         }
         },100)
       },
-<<<<<<< HEAD
-      clickCollect(){
-        let that = this
-        if(!that.collectLock){
-=======
       
       clickCollect() {
         this.focusState = false
         let that = this
         if (!that.collectLock) {
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
           return;
         }
         that.collectLock = !that.collectLock
         let record = {}
-<<<<<<< HEAD
-        if(that.collect_status === '收藏'){
-=======
         if (that.collect_status === '收藏') {
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
           that.collect_status = '已收藏'
           record.record_type = '收藏记录'
           record.user_id = that.myDetail.user.id
@@ -326,17 +251,11 @@
             'item': JSON.stringify(record),
             'items': JSON.stringify(record)
           }
-<<<<<<< HEAD
-          that.$get('api/update',uploadRecord).then(function(res){
-            res.data.tag = that.tag
-            res.data.realEstate = {real_estate_name:that.real_estate_name}
-=======
           that.$get('api/update', uploadRecord).then(function (res) {
             res.data.tag = that.tag
             res.data.realEstate = {
               real_estate_name: that.real_estate_name
             }
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
             that.collectId = res.data.id
             that.myDetail.recordList.reverse()
             that.myDetail.recordList.push(res.data)
@@ -344,11 +263,7 @@
             that.reSetMyDetail(that.myDetail)
             that.collectLock = !that.collectLock
           })
-<<<<<<< HEAD
-        }else if(that.collect_status === '已收藏'){
-=======
         } else if (that.collect_status === '已收藏') {
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
           that.collect_status = '收藏'
           record.record_type = '取消收藏'
           record.id = that.collectId
@@ -358,15 +273,9 @@
             'item': JSON.stringify(record),
             'items': JSON.stringify(record)
           }
-<<<<<<< HEAD
-          that.$get('api/update',uploadRecord).then(function(res){
-            for(let i=0; i<that.myDetail.recordList.length; i++){
-              if(that.myDetail.recordList[i].tag_id===that.tag_id){
-=======
           that.$get('api/update', uploadRecord).then(function (res) {
             for (let i = 0; i < that.myDetail.recordList.length; i++) {
               if (that.myDetail.recordList[i].tag_id === that.tag_id) {
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
                 that.myDetail.recordList.splice(i, 1)
                 break
               }
@@ -400,16 +309,6 @@
       },
 
       size() {
-<<<<<<< HEAD
-        let windowWidth = wx.getSystemInfoSync().windowWidth
-        let windowHeight = wx.getSystemInfoSync().windowHeight
-        let statusBarHeight = wx.getSystemInfoSync().statusBarHeight
-        let rWindowWidth = 750
-        let px_to_rpx = rWindowWidth / windowWidth
-        let rWindowHeight = windowHeight * px_to_rpx
-        let rStatusBarHeight = statusBarHeight * px_to_rpx
-        this.scrollHight = rWindowHeight - rStatusBarHeight - 230
-=======
         let that = this
         wx.getSystemInfo({
           success(res) {
@@ -419,7 +318,6 @@
             that.scrollHight = height - statusBarHeight - 230
           }
         })
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       },
       collectStatus() {
         let that = this
@@ -447,12 +345,8 @@
       },
 
       //上传图片
-<<<<<<< HEAD
-       upLoadImage() {
-=======
       upLoadImage() {
         this.focusState = false
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
         let that = this
         let num = 6 - that.showImages.length
         if (num > 0) {
@@ -465,14 +359,7 @@
                 title: '正在上传图片',
                 mask: true
               })
-<<<<<<< HEAD
-              that.getCanvasImg(0, 0, res.tempFilePaths) //进行压缩
-              for(let i in res.tempFilePaths){
-                that.localImages.push(res.tempFilePaths[i])
-              }
-=======
               that.getCanvasImg(res.tempFilePaths[0]) //进行压缩
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
             }
           })
         } else {
@@ -485,45 +372,6 @@
           return;
         }
       },
-<<<<<<< HEAD
-      getCanvasImg: function (index,failNum, tempFilePaths){
-        let that = this;
-        if (index < tempFilePaths.length){
-          const ctx = wx.createCanvasContext('attendCanvasId');
-          wx.getImageInfo({
-            src:tempFilePaths[index],
-            success(res){
-              let picH = res.height
-              let picW = res.width
-              let d = picH/picW
-              if(picW>250){
-                picW = 250+parseInt((picW-250)/10)
-                picH = parseInt(picW*d)
-              }
-              ctx.drawImage(tempFilePaths[index], 0, 0, picW, picH);
-              ctx.draw(true, function () {
-                index = index + 1;//上传成功的数量，上传成功则加1
-                wx.canvasToTempFilePath({
-                  width:picW,
-                  height:picH,
-                  fileType:'jpg',
-                  canvasId: 'attendCanvasId',
-                  success: function (res) {
-                    that.uploadCanvasImg(res.tempFilePath);
-                    that.getCanvasImg(index,failNum,tempFilePaths);
-                  }, 
-                  fail: function (e) {
-                    failNum += 1;//失败数量，可以用来提示用户
-                    that.getCanvasImg(inedx,failNum,tempFilePaths);
-                  }
-                });
-              });
-            }
-          })
-        }
-      },
-      uploadCanvasImg: function (canvasImg){
-=======
       getCanvasImg: function (tempFilePath) {
         let that = this;
 
@@ -559,7 +407,6 @@
 
       },
       uploadCanvasImg: function (canvasImg) {
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
         let that = this;
         wx.uploadFile({
           url: 'https://www.xaoji.com/api/uploadImage',
@@ -569,13 +416,6 @@
             'content-type': 'multipart/form-data'
           },
           success: function (res) {
-<<<<<<< HEAD
-            let url = 'https://www.xaoji.com'+JSON.parse(res.data).url
-            that.images.push(url)
-            if(that.images.length === that.localImages.length){
-              wx.hideLoading()
-            }
-=======
             wx.hideLoading({
               success() {
                 that.showImages.push(that.localImage)
@@ -583,7 +423,6 @@
             })
 
             // }
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
           }
         })
       },
@@ -592,16 +431,6 @@
 
       //删除图片
       removeImage(index) {
-<<<<<<< HEAD
-        this.images.splice(index, 1)
-        this.localImages.splice(index, 1)
-      },
-      
-      reSetMyDetail(data){
-        wx.setStorage({
-          key:'myDetail',
-          data:data,
-=======
         this.focusState = false
         this.images.splice(index, 1)
         this.showImages.splice(index, 1)
@@ -618,17 +447,12 @@
         wx.setStorage({
           key: 'myDetail',
           data: data,
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
         })
       },
 
       //改变匿名状态
-<<<<<<< HEAD
-      changeUserStatus(){
-=======
       changeUserStatus() {
         this.focusState = false
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
         let that = this
         if (this.user_status === '匿名') {
           this.user_status = '已匿名'
@@ -637,7 +461,7 @@
         }
       },
       leave(){
-        
+        this.focusState = false
       }
 
 
@@ -652,7 +476,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    /*纵向居中*/
+    background-color: #ffe144;
     height: 80rpx;
     border-bottom: 1px solid #ddd;
   }
@@ -661,7 +485,7 @@
     position: fixed;
     width: 100%;
     text-align: center;
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .building {
@@ -677,7 +501,7 @@
     width: 100%;
     text-align: right;
     color: #888888;
-    font-size: 15px;
+    font-size: 13px;
     right: 20rpx;
   }
 
@@ -695,6 +519,7 @@
 
   .footer li {
     width: 20rpx;
+    font-weight:700;/*字体加粗*/
     text-align: center;
     margin-top: 20rpx;
     flex: auto;
@@ -708,6 +533,7 @@
   .send_arr {
     display: flex;
     flex-direction: row;
+    border-radius: 7px;
     border: 1px solid #d0d0d0;
     width: 710rpx;
     height: 70rpx;
@@ -718,6 +544,7 @@
   .send {
     color: #f3cc01;
     position: relative;
+    font-weight:700;/*字体加粗*/
     top: 14rpx;
     left: 20rpx;
   }

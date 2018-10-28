@@ -2,8 +2,8 @@
   <div>
     <div class="page-search">
       <div class="search_that.arr">
-        <icon class="searchcion" size="20" type="search"></icon>
-        <input type="search" placeholder="输入楼盘名称或小话题搜索" v-model="searchValue" focus="true" />
+        <icon class="searchcion" size="17" type="search"></icon>
+        <input type="text" placeholder="输入楼盘名称或小话题搜索" v-model="searchValue" focus="true" />
       </div>
       <div class="sousuo" @click="suo">搜索</div>
     </div>
@@ -13,10 +13,9 @@
     </div>
     <div class="collect" v-for="(list,index) in dataList" :key="index">
       <div class="item">
-        <div class="border" @click="toTopicPage(list)">{{ list.tag_name }}</div>
+        <div class="collect-tag_name" @click="toTopicPage(list)">{{ list.tag_name }}</div>
         <div class="collect-build">{{list.real_estate_name}}</div>
       </div>
-      <line />
     </div>
   </div>
 </template>
@@ -81,7 +80,8 @@
                       that.content = ''
                     }
                   })
-                } else {
+                } 
+                if (that.sites.length == 0 && that.dataList.length == 0) {
                   wx.hideLoading({
                     success() {
                       that.content = 'Sorry!没有搜到相关信息。。'
@@ -119,58 +119,55 @@
 
 <style scoped>
   .page-search {
+    width: 100%;
     display: flex;
     flex-direction: row;
-    /*整体*/
-    margin-top: 20rpx;
+    background-color: #ffe144;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 88;
   }
 
   .search_that.arr {
     display: flex;
     flex-direction: row;
-    border: 1px solid #d0d0d0;
-    width: 600rpx;
+    width: 700rpx;
     height: 60rpx;
     margin-bottom: 20rpx;
     margin-left: 20rpx;
+    background-color: #fff;
+    border-radius: 7px;
   }
 
   .searchcion {
-    margin: 10rpx 10rpx 10rpx 10rpx;
-    position: absolute;
-    left: 20rpx;
-    z-index: 2;
-    width: 40rpx;
-    height: 40rpx;
+    margin: 15rpx;
     text-align: center;
     /*搜索图标*/
   }
 
   .search_that.arr input {
-    margin-left: 60rpx;
+    margin-left: 20rpx;
     height: 60rpx;
     border-radius: 5px;
     width: 440rpx;
-    font-size: 17px;
+    font-size: 13px;
     /*input框内*/
   }
 
   .content {
     text-align: center;
-    margin-top: 20rpx;
+    margin-top: 100rpx;
     font-size: 16px;
     color: rgb(137, 145, 150);
   }
 
   .sousuo {
     font-size: 17px;
-    margin-left: 15rpx;
+    margin-left: 20rpx;
     width: 100rpx;
     height: 60rpx;
-    line-height: 150%;
-    text-align: center;
-    border: 1px solid #d0d0d0;
-    border-radius: 10rpx;
+    line-height: 60rpx;
   }
 
 
@@ -178,19 +175,22 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    font-size: 13px;
     align-items: baseline;
+    font-weight:700;/*字体加粗*/
+    box-shadow:  10rpx 10rpx 10rpx rgb(211, 209, 209);/*边框阴影*/
   }
 
   .collect-build {
     margin-right: 15rpx;
+    font-size: 13px;
   }
 
-  .border {
-    width: 230rpx;
-    background-color: #f8f8f8;
+  .collect-tag_name {
+    padding: 0 20rpx;
+    font-size: 12px;
+    color:rgba(10, 10, 10, 0.774);
+    background: #f5f5f5;
     line-height: 60rpx;
-    border: 1px solid rgb(229, 229, 229);
     text-align: center;
     box-sizing: border-box;
     margin: 20rpx 15rpx;

@@ -1,16 +1,6 @@
 <template>
-  <div class="message">
+  <div class="message" v-if="user_name">
     <div class="mes">
-<<<<<<< HEAD
-    <div class="box">
-    <img :src="head_url" alt="">
-    <span class="nick">{{user_name}}</span>
-    给你
-    <span class="type">&nbsp;{{interact_type}}</span>
-    </div>
-    <div class="content" v-if="interact_content">&nbsp;{{interact_content}}</div>
-    <div class="time">{{time}}</div>
-=======
       <div class="box">
         <img :src="head_url" alt="" class="headImage">
         <span class="nick">{{user_name}}</span>
@@ -22,7 +12,6 @@
         <img v-for="(url,index) in images" :key="index" :src="url" @click="preview(index)">
       </div>
       <div class="time">{{msg.update_time}}</div>
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
     </div>
     <line />
   </div>
@@ -37,16 +26,6 @@
     props: ['msg', 'userList'],
     data() {
       return {
-<<<<<<< HEAD
-        head_url:'',
-        user_name:'',
-        interact_type:'',
-        interact_content:'',
-        time:''
-      }
-    },
-    onLoad(){
-=======
         head_url: '',
         user_name: '',
         images: [],
@@ -93,7 +72,6 @@
           that.head_url = user.head_url
         })
       }
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
     },
     methods: {
       preview: function (index) {
@@ -112,17 +90,6 @@
   .mes {
     display: flex;
     flex-direction: column;
-<<<<<<< HEAD
-    margin-top:20rpx;
-    margin-left:20rpx;
-  }
-
-  img {
-    border: 1rpx solid #ccc;
-    width: 40rpx;
-    height: 40rpx;
-    vertical-align:middle; /*图居中*/
-=======
     margin-top: 20rpx;
     margin-left: 20rpx;
   }
@@ -133,7 +100,6 @@
     height: 40rpx;
     vertical-align: middle;
     /*图居中*/
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
   }
 
   .box {
@@ -142,24 +108,14 @@
   }
 
   .content {
-<<<<<<< HEAD
-    margin-left:40rpx;
-    width:600rpx;
-=======
     margin-left: 40rpx;
     width: 600rpx;
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
     color: #000;
     font-size: 17px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
   }
-<<<<<<< HEAD
-
-  .time {
-    margin-left:40rpx;
-=======
   .images{
     width: 600rpx;
     margin-left: 40rpx;
@@ -171,7 +127,6 @@
 
   .time {
     margin-left: 40rpx;
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
     color: #ccc;
     font-size: 13px;
   }

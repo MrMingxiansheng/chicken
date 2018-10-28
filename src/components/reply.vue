@@ -1,11 +1,8 @@
 <template>
-  <div class="reply">
+<div :class="{ reply: index==0} " :style="{'background-color': index>0 ? 'white' : '#ffe144'}">
+  <div class="topic">
     <div class="avatar">
-<<<<<<< HEAD
-      <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner" @click="test">
-=======
       <img :src="hideUser.head_url"  v-if="user_type === '匿名' && reply.user_id===owner">
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       <img :src="reply.user.head_url"  v-else>
     </div>
     <div class="content">
@@ -35,28 +32,29 @@
       </div>
     </div>
     <div class="interact">
-      <div class="interact-in">
-        <div class="step" @click="clickStep">
-          <span class="step-num">{{reply.cnum}}</span>
-          <img :src="stepSrc" class="step-str"/>
-          <!-- <span class="step-str">踩</span> -->
-        </div>
-        <div class="praise" @click="clickPraise">
-          <span class="praise-num">{{reply.interact_status}}</span>
-          <img :src="praiseSrc" class="praise-str"/>
+      <div class="interact-in" :style="{'margin-left': index>0 ? '40rpx' : '20rpx'}">
+        <div class="praise">
+          <div class="praise-num">{{reply.interact_status}}</div>
+          <img :src="praiseSrc" class="praise-str" @click.stop="clickPraise"/>
           <!-- <span class="praise-str">赞</span> -->
         </div>
-        <div class="say" @click="clickReply">
-          <img src="/static/images/reply.png" class="say1"/>
+        <div class="step">
+          <div class="step-num">{{reply.cnum}}</div>
+          <img :src="stepSrc" class="step-str" @click.stop="clickStep"/>
+          <!-- <span class="step-str">踩</span> -->
+        </div>
+        <div class="say">
+          <img src="/static/images/reply.png" class="say1" @click.stop="clickReply"/>
         </div>
       </div>
     </div>
-  </div>
+   </div>
+</div>
 </template>
 
 <script>
   export default {
-    props: ["reply","owner","hideUser","user_type","myDetail"],
+    props: ["reply","owner","hideUser","user_type","myDetail","index"],
     data() {
       return {
         content:'',
@@ -142,10 +140,7 @@
             'items': JSON.stringify(interact)
           }
           that.$get('api/update', updateInteract).then(function (res) {
-<<<<<<< HEAD
-=======
             that.$sendMessage(JSON.stringify(res.data))
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
             that.myDetail.interactList.push(res.data)
             that.reSetMyDetail(that.myDetail)
             console.log('点赞返回',res.data)
@@ -263,7 +258,6 @@
 
       praiseStatus (){
         let that = this
-<<<<<<< HEAD
         for(let i=0; i<that.myDetail.interactList.length; i++){
          if(that.myDetail.interactList[i].to_interact_id === that.reply.id && that.myDetail.interactList[i].interact_type === '点赞'){
             that.praiseSrc = '/static/images/zan1.png'
@@ -272,19 +266,6 @@
            that.stepSrc = '/static/images/cai1.png'
          } 
         }
-       
-
-=======
-        wx.showLoading({
-          title:'加载中',
-          mask:true
-        })
-        console.log('外面')
-        that.$get('api/testSpeed').then(function(res){
-          console.log('里面')
-          wx.hideLoading()
-        })
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
       },
      
       preview: function (index) {
@@ -310,7 +291,7 @@
             console.log('myDetail缓存设置成功')
           }
         })
-      }
+      },
 
     }//methods下括号
   }
@@ -319,13 +300,15 @@
 
 <style scoped>
   .reply {
-    display: flex;
-    margin: 20rpx 0;
+    background-color: #ffe144;
+    padding: 20rpx;
   }
 
-  .avatar {
-    width: 125rpx;
-    text-align: center;
+  .topic{
+    display: flex;
+    background-color: white;
+    padding: 20rpx 20rpx 10rpx 20rpx;
+    border-radius: 7px;
   }
 
   .avatar img {
@@ -337,6 +320,7 @@
   .content {
     width: 490rpx;
     line-height: 18px;
+    margin-left: 10rpx;
   }
 
   .content .content-in {
@@ -358,21 +342,6 @@
     margin: 20rpx 0;
     font-size: 17px;
     line-height: 24px
-<<<<<<< HEAD
-=======
-  }
-  
-  .content-in .images img {
-    width: 105rpx;
-    height: 105rpx;
-    margin-right: 10rpx;
-    margin-bottom: 10rpx;
->>>>>>> f283c01e40d1a67c34ceb2b6085693c8f27e0fe6
-  }
-
-  .words .article{
-    color:#f3cc01;
-    line-height: 50rpx;
   }
   
   .content-in .images img {
@@ -380,6 +349,11 @@
     height: 105rpx;
     margin-right: 10rpx;
     margin-bottom: 5rpx;
+  }
+
+  .words .article{
+    color:#f3cc01;
+    line-height: 50rpx;
   }
 
   .content-in .time {
@@ -392,69 +366,60 @@
   }
 
   .interact .interact-in {
-    height: 180rpx;
+    height: 160rpx;
     width: 100rpx;
-    /* border: 1px solid rgb(219, 219, 219);
-    box-sizing: border-box; */
-    margin-left: 15rpx;
-    font-size: 14px;
-    line-height: 60rpx;
-  }
-
-  .interact-in span {
     display: inline-block;
-    height: 100%;
-    width: 45rpx;
-  }
-
-  .interact-in .step {
-    /* border-bottom: 1px solid rgb(219, 219, 219);
-    box-sizing: border-box; */
-    height: 60rpx;
-  }
-
-  .step .step-num {
-    color: rgb(137, 145, 150);
-    text-align: right;
-  }
-
-  .step .step-str {
-    text-align: left;
-    margin-left: 4rpx;
-    width:40rpx;
-    height:40rpx;
-    vertical-align: middle; /*图片垂直居中*/
+    margin-left: 20rpx;
+    font-size: 14px;
   }
 
   .interact-in .praise {
-    /* border-bottom: 1px solid rgb(219, 219, 219);
-    box-sizing: border-box; */
     height: 60rpx;
+    display: flex;
+    flex-direction: row;
   }
 
   .praise .praise-num {
     color: rgb(137, 145, 150);
     text-align: right;
+    width: 45rpx;
   }
 
   .praise .praise-str {
     text-align: left;
-    margin-left: 4rpx;
-    width:40rpx;
-    height:40rpx;
-    vertical-align: middle; /*图片垂直居中*/
+    margin-left: 6rpx;
+    width: 40rpx;
+    height: 40rpx;
+  }
+
+  .interact-in .step {
+    height: 60rpx;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .step .step-num {
+    color: rgb(137, 145, 150);
+    text-align: right;
+    width: 45rpx;
+  }
+
+  .step .step-str {
+    text-align: left;
+    margin-left: 6rpx;
+    width: 40rpx;
+    height: 40rpx;
   }
 
   .interact-in .say {
-    /* box-sizing: border-box; */
     text-align: center;
-    height: 60rpx;
+    height: 40rpx;
+    margin-left: 36rpx;
   }
 
   .say1 {
-    width:40rpx;
-    height:40rpx;
-    vertical-align: middle; /*图片垂直居中*/
+    width: 40rpx;
+    height: 40rpx;
   }
 
 </style>

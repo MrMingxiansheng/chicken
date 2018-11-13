@@ -3,17 +3,15 @@
     "pages/index/main",
     "pages/logs/main",
     "pages/counter/main",
-    "pages/qwa/main",
     "pages/qwb/main",
     "pages/qwc/main",
-    "pages/qwd/main",
     "pages/article/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#ffe144",
-    "backgroundColor": "#ffe144",
-    "navigationBarTitleText": "小鸡笼",
+    "backgroundColor": "#fff",
+    "navigationBarTitleText": "小鸡楼市",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {

@@ -1,7 +1,7 @@
 <template>
   <div class="collect" v-if="record.tag.tag_name">
     <div class="item">
-      <div class="border" @click="toTopicPage()">{{ record.tag.tag_name }}</div>
+      <div class="collect-tag_name" @click="toTopicPage()">{{ record.tag.tag_name }}</div>
       <div class="collect-build">{{record.realEstate.real_estate_name}}</div>
     </div>
     <line />
@@ -10,15 +10,13 @@
 
 <script>
   import line from "@/components/line"
-  import itemx from "@/components/itemx"
   export default {
     components: {
-      line,
-      itemx
+      line
     },
     props:['record'],
     onLoad(){
-      
+      console.log(this.record)
     },
     data() {
       return {
@@ -52,6 +50,7 @@
   .collect-build {
     margin-right: 20rpx;
     font-size: 13px;
+    color:rgb(137, 145, 150);
   }
 
   .collect-tag_name {

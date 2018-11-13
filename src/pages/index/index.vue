@@ -4,103 +4,116 @@
       <page></page>
     </div>
     <topswiper :tops="tops"></topswiper>
+    <div class="Top">
+      <top :item="site" v-for="site in five" :key="site.id"></top>
+    </div>
     <div class="Hot">
       <hot :item="site" v-for="site in sites" :key="site.id"></hot>
     </div>
     <div class="mask" v-if="show">
       <img src="../../../static/images/close.png" @click="closeMask()">
-      <div class="notice">
-        <div class="text1">微信快速登录</div>
-        <div class="text2">
-          <div>点击下方"微信登录"按钮进行登录,登录后您可以:</div>
-          <div>1.</div>
-          <div>2.</div>
-          <div>3.</div>
-        </div>
-      </div>
       <button v-if="true" open-type="getUserInfo" @getuserinfo="handleUserInfo">微信登录</button>
+      <div class="span">
+        <mianze></mianze>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
   //导入组件
-  import line from "@/components/line"
   import hot from "@/components/hot"
   import page from "@/components/page"
   import topswiper from "@/components/topSwiper"
+  import top from "@/components/top"
+  import mianze from "@/components/mianze"
   export default {
     components: {
-      line,
       page,
       hot,
       topswiper,
-    }, //声明在当前组件下使用组件
+      top,
+      mianze
+    },
     data() {
       return {
         sites: [],
-        tops: [{
-            imgSrc: '/static/images/ad1.png'
-          },
-          {
-            imgSrc: '/static/images/ad2.png'
-          },
-          {
-            imgSrc: '/static/images/ad3.png'
-          }
-        ],
-        show:''
+        tops: [],
+        five: [],
+        show: ''
       }
     },
-    created(){
+    created() {
       let that = this
       wx.getStorage({
-        key:'user',
-        success(){
+        key: 'user',
+        success() {
           that.show = false
         },
-        fail(){
+        fail() {
           that.show = true
         }
       })
     },
-    onLoad(){
+    onLoad(option) {
       let that = this
       that.queryRealEstate()
-     
+      if (option.tag) {
+        wx.navigateTo({
+          url: '/pages/qwb/main?tag=' + option.tag
+        })
+      } else if (option.realEstateId) {
+        wx.navigateTo({
+          url: '/pages/counter/main?realEstateId=' + option.realEstateId
+        })
+      }
     },
 
     // 下拉刷新回调接口
-    onPullDownRefresh: function () {
+    onPullDownRefresh() {
       let that = this
-    setTimeout(function()
-      {
-      that.sites = []
-      that.$get('api/queryRealEstateList').then(function(res){
-        that.sites = res.data
-        console.log('sites',res.data)
+      that.$get('api/queryRealEstateList').then(function (res) {
+        that.sites = []
+        res.data.splice(0, 4)
         wx.setStorage({
           key: 'queryRealEstateList',
           data: res.data,
-          success: function (res) {
+          success() {
             wx.stopPullDownRefresh({
-              success(){
+              success() {
                 console.log('刷新成功')
               }
             })
           }
         })
+        res.data.splice(0, 5)
+        for (let i = 0; i < res.data.length; i++) {
+          that.sites.push(res.data[i])
+        }
       })
-      wx.hideNavigationBarLoading() //完成停止加载
-      wx.stopPullDownRefresh() //停止下拉刷新
-    },1500)
     },
     methods: {
-      queryRealEstate(){
+      queryRealEstate() {
         let that = this
         that.$get('api/queryRealEstateList').then(function (res) {
-          console.log('查询楼盘列表',res.data)
-          that.sites = res.data
+          that.tops = []
+          that.sites = []
+          that.five = []
+          res.data.splice(0, 1)
+          let tops = res.data.splice(0, 3)
+          that.tops = [{
+              imgSrc: tops[0].real_estate_area + '?date=' + JSON.stringify(new Date()),
+              adSrc: tops[0].real_estate_name
+            },
+            {
+              imgSrc: tops[1].real_estate_area + '?date=' + JSON.stringify(new Date()),
+              adSrc: tops[1].real_estate_name
+            },
+            {
+              imgSrc: tops[2].real_estate_area + '?date=' + JSON.stringify(new Date()),
+              adSrc: tops[2].real_estate_name
+            },
+          ]
           wx.setStorage({
             key: 'queryRealEstateList',
             data: res.data,
@@ -108,12 +121,14 @@
               console.log('设置楼盘列表缓存成功')
             }
           })
-        }, function (res) {
-          // failure
+          that.five = res.data.splice(0, 5)
+          for (let i = 0; i < res.data.length; i++) {
+            that.sites.push(res.data[i])
+          }
         })
       },
-      
-      closeMask(){
+
+      closeMask() {
         this.show = false
       },
 
@@ -137,53 +152,81 @@
               }
               that.$get('api/update', param).then(function (res) {
                 console.log('登录后的返回', res)
-                that.$setStorage('user',res.data)
+                that.$setStorage('user', res.data)
               })
             }
           })
         }
       },
 
-    }//methods下括号
+    } //methods下括号
   }
 
 </script>
 
 <style scoped>
-  .mask{
+  .toReal {
+    display: flex;
+    flex-direction: row;
+    margin-top: 10rpx;
+  }
+
+  .q {
+    text-align: center;
+    width: 132rpx;
+    height: 132rpx;
+    margin-left: 15rpx;
+  }
+
+  .Top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 720rpx;
+    margin: 20rpx 15rpx 0 15rpx;
+  }
+
+  .mask {
     width: 100%;
     height: 100%;
     position: fixed;
-    z-index: 999;
+    z-index: 5;
     left: 0;
     top: 0;
     background-color: #fff;
   }
-  .mask img{
+
+  .mask img {
     width: 50rpx;
     height: 50rpx;
     position: absolute;
     right: 50rpx;
     top: 50rpx;
-    z-index: 1000;
+    z-index: 10;
   }
-  .mask .notice{
-    margin-top: 400rpx;
+
+  .mask .notice {
+    margin-top: 200rpx;
   }
-  .mask button{
+
+  .mask button {
     background-color: #ffe144;
     width: 500rpx;
     height: 60rpx;
     font-size: 15px;
     line-height: 60rpx;
+    margin-top: 300rpx;
   }
-  .notice .text1{
+
+  .notice .text1 {
     text-align: center;
   }
-  .notice .text2{
+
+  .notice .text2 {
     font-size: 13px;
     color: rgb(137, 145, 150);
     width: 600rpx;
     margin: 50rpx auto;
   }
+
 </style>

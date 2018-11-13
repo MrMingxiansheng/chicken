@@ -10,8 +10,8 @@ export default {
 
 <style>
 /* 这部分相当于原生小程序的 app.wxss */
-.container {
-  background-color: #cccccc;
+#app{
+  overflow: hidden;
 }
 </style>
 

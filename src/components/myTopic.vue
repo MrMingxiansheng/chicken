@@ -3,7 +3,7 @@
     <div class="item">
       <div class="my-tag_name" @click="ClickTag_name">{{ tag.tag_name }}</div>
       <span class="my-topic">{{tag.realEstate.real_estate_name}}</span>
-      <img src="/static/images/chacha.png" class="min" @click="removeImage">
+      <img src="/static/images/chacha.png" class="min" @click="removeMyTag">
     </div>
     <line />
   </div>
@@ -15,9 +15,9 @@
     components: {
       line
     },
-    props:['tag','tagList','recordList'],
+    props:['tag'],
     methods: {
-      removeImage() {
+      removeMyTag() {
         let that = this
         let temp = {}
         temp.id = that.tag.id
@@ -39,22 +39,7 @@
               })
               console.log('用户点击确定')
               that.$get('api/update', updateTemp).then(function (res) {
-                wx.hideLoading()
-                for(let i=0; i<that.tagList.length; i++){
-                  if(that.tagList[i].id === that.tag.id){
-                    that.tagList.splice(i,1)
-                    break
-                  }
-                }
-                for(let i=0; i<that.recordList.length; i++){
-                  if(that.recordList[i].tag_id === that.tag.id){
-                    that.recordList.splice(i,1)
-                    break
-                  }
-                }
-                that.$reSetStorage('recordList',that.recordList)
-                that.$reSetStorage('tagList',that.tagList)
-                console.log('删除话题成功', res)
+                that.$emit('delMyTag',that.tag.id)
               })
             } else if (res.cancel) {
               console.log('用户点击取消')
@@ -91,6 +76,7 @@
   .my-topic {
     margin-right: 120rpx;
     font-size: 13px;
+    color:rgb(137, 145, 150);
   }
 
   .my-tag_name {

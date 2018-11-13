@@ -1,6 +1,6 @@
 <template>
-  <div class="page" v-if="city">
-    <span class="city"><a href="/pages/qwd/main">{{city}}</a></span>
+  <div class="page" v-if="city" @click="test">
+    <span class="city">{{city}}</span>
     <div class="search" @click="suo">
       <div class="search_arr">
         <icon class="searchcion" size="17" type="search"></icon>
@@ -25,9 +25,15 @@
           url: '/pages/qwc/main',
         })
       },
-      // test(){
-      //   this.$get('slsls',{id:'234642'})
-      // }
+      test(){
+        wx.setStorage({
+          key:'userList',
+          data:[],
+          success(){
+            console.log('缓存成功')
+          }
+        })
+      }
     }
   }
 
@@ -42,7 +48,10 @@
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 88;
+    z-index: 2;
+    height: 100rpx;
+    padding: 20rpx 0;
+    box-sizing: border-box;
   }
 
   .city {
@@ -57,7 +66,7 @@
     flex-direction: row;
     width: 600rpx;
     height: 60rpx;
-    margin-bottom: 20rpx;
+    /* margin-bottom: 20rpx; */
     margin-left: 30rpx;
     background-color: #fff;
     border-radius: 7px;

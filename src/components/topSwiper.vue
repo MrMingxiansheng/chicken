@@ -1,9 +1,9 @@
 <template>
-  <swiper indicator-dots="true" indicator-active-color=rgba(255,225,64,.7) autoplay="true" interval="3000" duration="1000"
+  <swiper indicator-dots="true" indicator-active-color=rgba(255,225,64,.7) autoplay="true" interval="4000" duration="1000"
     circular="true">
-    <div :key="imgIndex" v-for="(top,imgIndex) in tops">
+    <div :key="index" v-for="(info,index) in tops" @click="toAd(info.adSrc)">
       <swiper-item>
-        <img :src="top.imgSrc">
+        <img :src="info.imgSrc">
       </swiper-item>
     </div>
   </swiper>
@@ -12,7 +12,14 @@
 
 <script>
   export default {
-    props: ['tops']
+    props: ['tops'],
+    methods:{
+      toAd(src){
+        wx.navigateTo({
+          url: '/pages/article/main?src=' + src
+        })
+      }
+    }
   }
 
 </script>
@@ -20,14 +27,14 @@
 <style scoped>
   swiper {
     width: 750rpx;
-    height: 330rpx;
+    height: 210rpx;
     overflow: hidden;
-    margin-top: 76rpx;
+    margin-top: 100rpx;
   }
 
   swiper img {
     width: 750rpx;
-    height: 330rpx;
+    height: 210rpx;
   }
 
 </style>

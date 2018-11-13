@@ -1,39 +1,39 @@
 <template>
-  <div>
+  <div class="logs">
     <div class="box">
       <div class="head">
-        <img :src="user.head_url" class="avatarUrl" v-if="user.head_url"/>
-        <img src="/static/images/nobody.png" class="avatarUrl" v-else/>
+        <img :src="user.head_url" class="avatarUrl" v-if="user.head_url" />
+        <img src="/static/images/nobody.png" class="avatarUrl" v-else />
       </div>
       <div class="box1" v-if="user.user_name">
-        <div class="p1">{{user.user_name}}</div>
-        <div class="p3" decode="emsp"><span>{{praise}}</span>赞 &emsp; <span>{{step}}</span>踩</div>
+        <div class="user">{{user.user_name}}</div>
+        <div class="Num" decode="emsp"><span>{{praise}}</span>赞 &emsp; <span>{{step}}</span>踩</div>
       </div>
       <button v-else plain="true" open-type="getUserInfo" @getuserinfo="handleUserInfo">点击获取昵称</button>
     </div>
     <div>
       <div class="tab">
-        <div class="hd">
-          <div :class="{cur:lanmu=='col'}" @click="change('col')">收藏</div>
-          <div :class="{cur:lanmu=='mytopic'}" @click="change('mytopic')">话题</div>
-          <div :class="{cur:lanmu=='mes'}" @click="change('mes')" class="topMes">
+         <div class="hd"><div :class="{cur:lanmu=='mes'}" @click="change('mes')" class="topMes">
             <i-badge :dot='red' @click="clickDot">消息</i-badge>
           </div>
+          <div :class="{cur:lanmu=='col'}" @click="change('col')">收藏</div>
+          <div :class="{cur:lanmu=='mytopic'}" @click="change('mytopic')">话题</div>
           <div :class="{cur:lanmu=='sug'}" @click="change('sug')">反馈</div>
         </div>
         <line />
         <div class="bd">
           <div class="mes" v-if="lanmu=='mes'">
             <div class="notice" v-if="revMsgList.length===0">消息为空</div>
-            <message v-for="msg in revMsgList" :key="msg.id" :msg="msg" :userList="userList"></message>
+            <message v-for="msg in revMsgList" :key="msg.id" :msg="msg"
+            @removeMsg="removeMsg"></message>
           </div>
           <div class="col" v-if="lanmu=='col'">
             <div class="notice" v-if="recordList.length===0">收藏为空</div>
             <collect v-for="record in recordList" :key="record.id" :record="record"></collect>
           </div>
           <div class="mytopic" v-if="lanmu=='mytopic'">
-            <div class="notice" v-if="tagList.length===0">话题为空</div>
-            <mytopic v-for="tag in tagList" :key="tag.id" :tag="tag" :tagList="tagList" :recordList="recordList"></mytopic>
+            <div class="notice" v-if="myTagList.length===0">话题为空</div>
+            <mytopic v-for="tag in myTagList" :key="tag.id" :tag="tag" @delMyTag="delMyTag"></mytopic>
           </div>
           <div class="sug" v-if="lanmu=='sug'">
             <suggest></suggest>
@@ -62,53 +62,44 @@
       return {
         //canIUse: wx.canIUse('button.open-type.getUserInfo'), //判断小程序的API，回调，参数，组件等是否在当前版本可用
         identity: "(销售)",
-        praise: "25",
-        step: "3",
-        lanmu: "col",
+        lanmu: "mes",
         red: false,
-        user:'',
-        msgList:'',
-        recordList:'',
-        tagList:'',
-        userList:''
+        user: '',
+        msgList: [],
+        recordList: [],
+        myTagList: [],
+        allMessage:[]
       }
     },
     created() {
       this.init()
     },
 
-    onLoad(){
+    onLoad() {
       console.log('我的页面onload')
-      if(!this.user){
+      if (!this.user) {
         console.log('没有用户信息')
         this.init()
-       }
-        wx.getStorage({
-          key: 'myDetail',
-          success: function (res) {
-            for (let i=0; i<res.data.msgList.length; i++){
-              if (res.data.msgList[i].interact_type === "点赞"){
-                that.num += 1
-              }
-              if (res.data.msgList[i].interact_type === "点踩"){
-                that.cnum += 1
-              }
-            }
-          }
-        })
+      }
     },
     onShow: function () {
       let that = this
       wx.getStorage({
-        key:'recordList',
-        success(res){
-          that.recordList = res.data
+        key: 'recordList',
+        success(res) {
+          that.recordList = []
+          for(let i=0; i<res.data.length; i++){
+            that.recordList.push(res.data[i])
+          }
         }
       })
       wx.getStorage({
-        key:'tagList',
-        success(res){
-          that.tagList = res.data
+        key: 'myTagList',
+        success(res) {
+          that.myTagList = []
+          for(let i=0; i<res.data.length; i++){
+            that.myTagList.push(res.data[i])
+          }
         }
       })
     },
@@ -116,21 +107,44 @@
     computed: {
       revMsgList() {
         let arr;
-        if(this.msgList.length>0){
+        if (this.msgList.length > 0) {
           arr = JSON.parse(JSON.stringify(this.msgList)).reverse()
-        }else{
+        } else {
           arr = []
         }
         return arr;
+      },
+      praise() {
+        let num = 0
+        for (let i = 0; i < this.allMessage.length; i++) {
+          if (this.allMessage[i].interact_type === '点赞') {
+            num++
+          }
+        }
+        return num;
+      },
+      step() {
+        let num = 0
+        for (let i = 0; i < this.allMessage.length; i++) {
+          if (this.allMessage[i].interact_type === '点踩') {
+            num++
+          }
+        }
+        return num;
       }
     },
     methods: {
-      change: function (str) {
+      //切换收藏,话题,消息,反馈
+      change (str) {
         this.lanmu = str;
       },
+
+      //点消息让红点消失
       clickDot() {
         this.red = false
       },
+
+      //用户登录
       handleUserInfo(e) {
         console.log('点击登录')
         let that = this
@@ -151,9 +165,9 @@
               that.$get('api/update', param).then(function (res) {
                 console.log('登录后的返回', res)
                 wx.setStorage({
-                  key:'user',
-                  data:res.data,
-                  success(){
+                  key: 'user',
+                  data: res.data,
+                  success() {
                     that.init()
                   }
                 })
@@ -163,7 +177,7 @@
         }
       },
 
-
+      //初始化websocket连接,我的信息的缓存等
       init() {
         console.log('我的页面init开始')
         let that = this
@@ -171,44 +185,61 @@
           key: 'user',
           success(res) {
             console.log('user缓存获取成功')
-            that.user = res.data
+            that.user = res.data //用来展示头像昵称
             that.$get('api/queryUserDetail', {
               user_id: res.data.id
             }).then(function (obj) {
+              let msgArr = obj.data.msgList.filter(function(ele){
+                return ele.msg_status !== 'DELETE'
+              })
+              console.log('msgArr',msgArr)
               wx.getStorage({
-                key:'msgList',
-                success(res){
-                  if (obj.data.msgList.length > res.data.length) {
-                    that.red = true
+                key: 'msgList',
+                success(res) {
+                  if (msgArr.length > res.data.length) {
+                    that.red = true //有新消息就显示红点
                   }
+                  that.$setStorage('msgList', msgArr)
                 }
               })
-              that.userList = obj.data.userList
-              that.msgList = obj.data.msgList
-              that.recordList = obj.data.recordList
-              that.tagList = obj.data.tagList
-              that.$setStorage('interactList',obj.data.interactList)
-              //that.$setStorage('msgList',obj.data.msgList)
-              that.$setStorage('recordList',obj.data.recordList)
-              that.$setStorage('tagList',obj.data.tagList)
-              that.$setStorage('userList',obj.data.userList)
+              that.msgList = []
+              that.recordList = []
+              that.myTagList = []
+              that.allMessage = []
+              for(let i=0; i<msgArr.length; i++){
+                that.msgList.push(msgArr[i])
+              }
+              for(let i=0; i<obj.data.msgList.length; i++){
+                that.allMessage.push(obj.data.msgList[i])
+              }
+              for(let i=0; i<obj.data.recordList.length; i++){
+                that.recordList.push(obj.data.recordList[i])
+              }
+              for(let i=0; i<obj.data.tagList.length; i++){
+                that.myTagList.push(obj.data.tagList[i])
+              }
+              that.$setStorage('myInteractList', obj.data.interactList)
+              that.$setStorage('recordList', obj.data.recordList)
+              that.$setStorage('myTagList', obj.data.tagList)
+              that.$setStorage('userList', obj.data.userList)
+              console.log('obj.data.userList',obj.data.userList)
               wx.connectSocket({
-                url: 'ws://www.xaoji.com:3001',
+                url: 'wss://www.xaoji.com',
                 data: {
                   user_id: obj.data.user.id
                 },
-                success(){
+                success() {
                   console.log('socket连接')
                 }
               })
               wx.onSocketClose(function () {
                 console.log('socket连接断开')
                 wx.connectSocket({
-                  url: 'ws://www.xaoji.com:3001',
+                  url: 'wss://www.xaoji.com',
                   data: {
                     user_id: obj.data.user.id
                   },
-                  success(){
+                  success() {
                     console.log('socket连接')
                   }
                 })
@@ -226,7 +257,8 @@
                 let chat = JSON.parse(message.data)
                 console.log('chat', chat)
                 that.msgList.push(chat)
-                //要不要存缓存?
+                that.allMessage.push(chat)
+                that.$setStorage('msgList', that.msgList)
               })
             })
           },
@@ -238,7 +270,7 @@
                 let code = res.code;
                 if (code) {
                   wx.request({
-                    url: 'https://www.xaoji.com/api/getUser',
+                    url: 'https://www.xaoji.com:3001/api/getUser',
                     data: {
                       code: code
                     },
@@ -247,16 +279,16 @@
                       if (res.data.msg == 'have data') {
                         console.log('后台有这个用户')
                         wx.setStorage({
-                          key:'user',
-                          data:res.data.data[0],
-                          success(){
+                          key: 'user',
+                          data: res.data.data[0],
+                          success() {
                             console.log('user缓存设置成功')
                             that.init()
                           }
                         })
                       } else {
                         console.log('后台没有这个用户')
-                        that.$setStorage('open_id',JSON.parse(res.data.data).openid)
+                        that.$setStorage('open_id', JSON.parse(res.data.data).openid)
                       }
                     }
                   })
@@ -268,6 +300,42 @@
             })
           }
         })
+      },
+
+      removeMsg(msgId){
+        let that = this
+        console.log('父组件删除函数')
+        console.log('msgId',msgId)
+        for(let i=0; i<that.msgList.length; i++){
+          console.log('if外面',that.msgList[i])
+          if(that.msgList[i].id === msgId){
+            console.log('if里面',that.msgList[i])
+            that.msgList.splice(i,1)
+            that.$setStorage('msgList', that.msgList)
+            break
+          }
+        }
+        wx.hideLoading()
+      },
+
+      delMyTag(id){
+        let that = this
+        for(let i=0; i<that.myTagList.length; i++){
+          if(that.myTagList[i].id === id){
+            that.myTagList.splice(i,1)
+            break
+          }
+        }
+        for(let i=0; i<that.recordList.length; i++){
+          if(that.recordList[i].tag_id === id){
+            that.recordList.splice(i,1)
+            break
+          }
+        }
+        that.$reSetStorage('recordList',that.recordList)
+        that.$reSetStorage('myTagList',that.myTagList)
+        wx.hideLoading()
+        console.log('删除话题成功', res)
       }
 
 
@@ -277,16 +345,13 @@
 </script>
 
 <style scoped>
-  .head {
-    height: 100rpx;
-    width: 100rpx;
-    display: inline-block;
+  .logs{
+    overflow: hidden;
   }
-
   .avatarUrl {
     height: 100rpx;
     width: 100rpx;
-    border-radius:50%;
+    border-radius: 50%;
   }
 
   .box {
@@ -296,14 +361,14 @@
     flex-direction: row;
     color: rgb(141, 148, 141);
   }
-  
+
   .box button {
     width: 400rpx;
     height: 100rpx;
     font-size: 35rpx;
     line-height: 100rpx;
-    border:none;
-    text-align:left;
+    border: none;
+    text-align: left;
   }
 
   .box1 {
@@ -311,7 +376,6 @@
     height: 100rpx;
     width: 600rpx;
   }
-
 
   .user {
     height: 35rpx;
@@ -321,11 +385,12 @@
     margin-bottom: 30rpx;
   }
 
-
   .Num {
     height: 35rpx;
     width: 600rpx;
     font-size: 13px;
+    font-weight: 700;
+    /*字体加粗*/
     line-height: 35rpx;
   }
 
@@ -335,7 +400,8 @@
     justify-content: space-around;
     color: rgb(141, 148, 141);
     margin-top: 40rpx;
-    font-weight: 700;/*字体加粗*/
+    font-weight: 700;
+    /*字体加粗*/
     margin-bottom: 20rpx;
   }
 
@@ -350,7 +416,7 @@
 
   .notice {
     text-align: center;
-    font-size: 30px;
+    font-size: 25px;
     color: rgb(229, 229, 229);
     margin-top: 200rpx;
   }
